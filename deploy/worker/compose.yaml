@@ -1,0 +1,45 @@
+# The download worker, for the home PC. It joins your Tailscale network and
+# connects out to the cloud server, so nothing on the PC is opened to the internet.
+#
+#   cp deploy/worker/.env.example deploy/worker/.env      then fill it in
+#   docker compose -f deploy/worker/compose.yaml up -d --build
+name: pluck-worker
+
+services:
+  # Puts this compose project on your tailnet as the machine "pluck-worker".
+  tailscale:
+    image: tailscale/tailscale:v1.104.4
+    hostname: pluck-worker
+    environment:
+      # Used on the first start only. The login is then kept in the tailscale volume.
+      TS_AUTHKEY: ${TS_AUTHKEY:-}
+      TS_STATE_DIR: /var/lib/tailscale
+      # Kernel networking, so the worker's ordinary connections go over Tailscale.
+      # In the default userspace mode only proxied connections would.
+      TS_USERSPACE: "false"
+    volumes: [tailscale:/var/lib/tailscale]
+    devices: ["/dev/net/tun:/dev/net/tun"]
+    cap_add: [net_admin]
+    restart: unless-stopped
+
+  worker:
+    image: pluck-worker
+    build:
+      context: ../..
+      dockerfile: apps/worker/Dockerfile
+    # Shares the tailscale container's network, so its traffic to the server goes over Tailscale.
+    network_mode: service:tailscale
+    depends_on: [tailscale]
+    environment:
+      API_URL: ${API_URL:?set API_URL in deploy/worker/.env}
+      RABBITMQ_URL: ${RABBITMQ_URL:?set RABBITMQ_URL in deploy/worker/.env}
+      WORKER_TOKEN: ${WORKER_TOKEN:?set WORKER_TOKEN in deploy/worker/.env}
+      WORKER_ID: pluck-worker
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-2}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    # The worker waits up to 25 seconds for running jobs on shutdown. Docker's default is 10.
+    stop_grace_period: 30s
+    restart: unless-stopped
+
+volumes:
+  tailscale:

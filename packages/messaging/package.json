@@ -1,0 +1,21 @@
+{
+  "name": "@pluck/messaging",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts"
+  },
+  "dependencies": {
+    "@pluck/contracts": "workspace:*",
+    "rabbitmq-client": "^5.1.0"
+  },
+  "devDependencies": {
+    "@testcontainers/rabbitmq": "^12.2.1"
+  }
+}

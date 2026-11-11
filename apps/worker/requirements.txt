@@ -1,0 +1,6 @@
+# Python packages the worker runs. Pinned, so a rebuild installs the same versions.
+# yt-dlp changes often to keep up with YouTube. When downloads start failing, update it first.
+# The deno extra installs Deno, which yt-dlp needs to run YouTube's player JavaScript.
+yt-dlp[default,deno]==2026.10.26
+# Used by scripts/tag.py to write tags, lyrics and cover art into the audio files.
+mutagen==1.48.1

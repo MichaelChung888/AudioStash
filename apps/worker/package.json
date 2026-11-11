@@ -1,0 +1,24 @@
+{
+  "name": "@pluck/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=../../.env src/index.ts",
+    "start": "node src/index.ts",
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pluck/catalog": "workspace:*",
+    "@pluck/contracts": "workspace:*",
+    "@pluck/core": "workspace:*",
+    "@pluck/messaging": "workspace:*",
+    "pino": "^10.4.0",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "pino-pretty": "^13.2.0"
+  }
+}

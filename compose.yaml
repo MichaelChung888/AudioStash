@@ -1,0 +1,115 @@
+# Local development.
+#
+#   pnpm docker:up                              Postgres, RabbitMQ and storage. Run the API and
+#                                               worker on your machine with pnpm api:dev and pnpm worker:dev.
+#   docker compose --profile app up -d --build  The same, plus the API and worker in containers.
+#
+# The passwords here are for local use only.
+name: pluck
+
+x-api-image: &api-image
+  image: pluck-api
+  build:
+    context: .
+    dockerfile: apps/api/Dockerfile
+
+services:
+  postgres:
+    image: postgres:18.6-trixie
+    environment:
+      POSTGRES_USER: pluck
+      POSTGRES_PASSWORD: pluck
+      POSTGRES_DB: pluck
+    # 5433 on the host, so it does not clash with a Postgres already installed there.
+    ports: ["5433:5432"]
+    # Postgres 18 images keep their data in a versioned folder under /var/lib/postgresql.
+    volumes: [postgres:/var/lib/postgresql]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pluck -d pluck"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  rabbitmq:
+    image: rabbitmq:4.4.0-management-alpine
+    # RabbitMQ names its data folder after the hostname. A fixed one keeps the
+    # queues when the container is recreated.
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: pluck
+      RABBITMQ_DEFAULT_PASS: pluck
+    # 15672 is the management web UI: http://localhost:15672
+    ports: ["5672:5672", "15672:15672"]
+    volumes: [rabbitmq:/var/lib/rabbitmq]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+
+  # An S3-compatible store that stands in for Cloudflare R2. Console: http://localhost:9001
+  storage:
+    image: rustfs/rustfs:1.0.4
+    environment:
+      RUSTFS_ACCESS_KEY: pluck-dev
+      RUSTFS_SECRET_KEY: pluck-dev-secret
+      RUSTFS_CONSOLE_ENABLE: "true"
+    ports: ["9000:9000", "9001:9001"]
+    volumes: [storage:/data]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  migrate:
+    <<: *api-image
+    profiles: [app]
+    command: ["node", "packages/db/scripts/migrate.ts"]
+    environment:
+      DATABASE_URL: postgres://pluck:pluck@postgres:5432/pluck
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    <<: *api-image
+    profiles: [app]
+    env_file: .env
+    # .env points at localhost for running on the host. Inside Docker the other
+    # services are reached by name.
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://pluck:pluck@postgres:5432/pluck
+      RABBITMQ_URL: amqp://pluck:pluck@rabbitmq:5672
+      S3_ENDPOINT: http://storage:9000
+    ports: ["3000:3000"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      rabbitmq: { condition: service_healthy }
+      storage: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/ready').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  worker:
+    profiles: [app]
+    image: pluck-worker
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      API_URL: http://api:3000
+      RABBITMQ_URL: amqp://pluck:pluck@rabbitmq:5672
+    depends_on:
+      api: { condition: service_healthy }
+    # The worker waits up to 25 seconds for running jobs on shutdown. Docker's default is 10.
+    stop_grace_period: 30s
+
+volumes:
+  postgres:
+  rabbitmq:
+  storage:

@@ -1,0 +1,34 @@
+{
+  "name": "pluck",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.1.3",
+  "engines": {
+    "node": ">=24.11"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "test:integration": "turbo test:integration",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "db:generate": "pnpm --filter @pluck/db generate",
+    "db:migrate": "pnpm --filter @pluck/db migrate",
+    "db:studio": "pnpm --filter @pluck/db studio",
+    "api:dev": "pnpm --filter @pluck/api dev",
+    "worker:dev": "pnpm --filter @pluck/worker dev",
+    "token": "pnpm --silent --filter @pluck/api token",
+    "docker:up": "docker compose up -d --wait && pnpm db:migrate",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.6",
+    "@types/node": "^24.19.2",
+    "turbo": "^2.11.10",
+    "typescript": "~6.0.3",
+    "vitest": "^5.1.0"
+  }
+}

@@ -1,0 +1,37 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# pnpm blocks dependency install scripts by default. Only these may run them.
+allowBuilds:
+  esbuild: true # used by drizzle-kit and vitest
+  sharp: true # native image library used by the worker
+  # Optional native add-ons pulled in by Testcontainers. Not needed: it talks to Docker over a local socket.
+  cpu-features: false
+  protobufjs: false
+  ssh2: false
+  # Pulled in by Clerk's sign-in library. Their scripts only print a thank-you message.
+  browser-tabs-lock: false
+  core-js: false
+
+# Written by pnpm: these versions were newer than pnpm's minimum release age when
+# installed. The age check guards against freshly published malicious versions.
+minimumReleaseAgeExclude:
+  - '@aws-sdk/checksums@3.1002.4'
+  - '@aws-sdk/client-s3@3.1165.0'
+  - '@aws-sdk/core@3.980.2'
+  - '@aws-sdk/credential-provider-env@3.972.83'
+  - '@aws-sdk/credential-provider-http@3.972.85'
+  - '@aws-sdk/credential-provider-ini@3.973.28'
+  - '@aws-sdk/credential-provider-login@3.972.90'
+  - '@aws-sdk/credential-provider-node@3.972.95'
+  - '@aws-sdk/credential-provider-process@3.972.83'
+  - '@aws-sdk/credential-provider-sso@3.973.27'
+  - '@aws-sdk/credential-provider-web-identity@3.972.89'
+  - '@aws-sdk/middleware-sdk-s3@3.972.88'
+  - '@aws-sdk/nested-clients@3.998.2'
+  - '@aws-sdk/s3-request-presigner@3.1165.0'
+  - '@aws-sdk/signature-v4-multi-region@3.996.52'
+  - '@aws-sdk/token-providers@3.1165.0'
+  - '@aws-sdk/types@3.975.1'
+  - '@aws-sdk/xml-builder@3.972.43'

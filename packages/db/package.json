@@ -1,0 +1,23 @@
+{
+  "name": "@pluck/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "drizzle-kit generate",
+    "migrate": "node --env-file-if-exists=../../.env scripts/migrate.ts",
+    "studio": "drizzle-kit studio",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@pluck/contracts": "workspace:*",
+    "drizzle-orm": "^0.45.4",
+    "postgres": "^4.1.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.11"
+  }
+}

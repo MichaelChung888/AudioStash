@@ -1,0 +1,5 @@
+# Keep LF line endings on Windows. Shell scripts and Dockerfiles break with CRLF.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary

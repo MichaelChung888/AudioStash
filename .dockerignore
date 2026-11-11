@@ -1,0 +1,16 @@
+# The build context is the repository root. This keeps it small, and keeps
+# secrets and packages built for the host machine out of the images.
+**/node_modules
+**/.turbo
+.git
+.github
+.env
+.env.*
+**/.env
+docs
+deploy
+infra
+apps/mobile
+**/*.test.ts
+**/testing
+**/vitest*.ts
