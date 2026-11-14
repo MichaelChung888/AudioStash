@@ -105,7 +105,7 @@ describe('jobs', () => {
   it('moves a message with an invalid payload to the dead queue', async () => {
     const sub = consumeJobs(rabbit, 'download.resolve', { concurrency: 1, logger: silent, handler: async () => {} });
     const raw = rabbit.createPublisher({ confirm: true });
-    await raw.send({ exchange: 'pluck.jobs', routingKey: 'download.resolve' }, { downloadId: 'not-a-uuid' });
+    await raw.send({ exchange: 'audiostash.jobs', routingKey: 'download.resolve' }, { downloadId: 'not-a-uuid' });
     await waitFor(async () => (await messageCount(deadQueueName('download.resolve'))) === 1);
 
     await sub.close();

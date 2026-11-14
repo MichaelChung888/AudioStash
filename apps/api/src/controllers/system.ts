@@ -1,4 +1,4 @@
-import type { ClientEvent } from '@pluck/contracts';
+import type { ClientEvent } from '@audiostash/contracts';
 import type { Context } from 'hono';
 import { streamSSE } from 'hono/streaming';
 import type { AppEnv } from '../lib/types.ts';

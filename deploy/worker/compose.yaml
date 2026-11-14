@@ -3,13 +3,13 @@
 #
 #   cp deploy/worker/.env.example deploy/worker/.env      then fill it in
 #   docker compose -f deploy/worker/compose.yaml up -d --build
-name: pluck-worker
+name: audiostash-worker
 
 services:
-  # Puts this compose project on your tailnet as the machine "pluck-worker".
+  # Puts this compose project on your tailnet as the machine "audiostash-worker".
   tailscale:
     image: tailscale/tailscale:v1.104.4
-    hostname: pluck-worker
+    hostname: audiostash-worker
     environment:
       # Used on the first start only. The login is then kept in the tailscale volume.
       TS_AUTHKEY: ${TS_AUTHKEY:-}
@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
 
   worker:
-    image: pluck-worker
+    image: audiostash-worker
     build:
       context: ../..
       dockerfile: apps/worker/Dockerfile
@@ -34,7 +34,7 @@ services:
       API_URL: ${API_URL:?set API_URL in deploy/worker/.env}
       RABBITMQ_URL: ${RABBITMQ_URL:?set RABBITMQ_URL in deploy/worker/.env}
       WORKER_TOKEN: ${WORKER_TOKEN:?set WORKER_TOKEN in deploy/worker/.env}
-      WORKER_ID: pluck-worker
+      WORKER_ID: audiostash-worker
       WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-2}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     # The worker waits up to 25 seconds for running jobs on shutdown. Docker's default is 10.

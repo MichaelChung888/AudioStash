@@ -1,4 +1,4 @@
-import type { ClientEvent } from '@pluck/contracts';
+import type { ClientEvent } from '@audiostash/contracts';
 import { describe, expect, it, vi } from 'vitest';
 import { SseHub } from './sse-hub.ts';
 

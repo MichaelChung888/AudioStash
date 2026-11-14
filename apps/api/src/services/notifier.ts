@@ -1,5 +1,5 @@
-import type { BusEvent, Download, DownloadItem } from '@pluck/contracts';
-import type { EventPublisher } from '@pluck/messaging';
+import type { BusEvent, Download, DownloadItem } from '@audiostash/contracts';
+import type { EventPublisher } from '@audiostash/messaging';
 import type { Logger } from '../lib/logger.ts';
 
 // Publishes change notifications after a transaction commits. Fire and forget:

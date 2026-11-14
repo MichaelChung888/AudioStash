@@ -15,7 +15,7 @@ const envSchema = z.object({
   // Songs processed at once. Each one runs yt-dlp and ffmpeg, so more than a few
   // mostly adds load on YouTube and makes rate limiting more likely.
   WORKER_CONCURRENCY: z.coerce.number().int().min(1).max(8).default(2),
-  WORK_DIR: z.string().default(join(tmpdir(), 'pluck-worker')),
+  WORK_DIR: z.string().default(join(tmpdir(), 'audiostash-worker')),
 
   YTDLP_PATH: z.string().default('yt-dlp'),
   FFMPEG_PATH: z.string().default('ffmpeg'),

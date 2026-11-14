@@ -1,21 +1,21 @@
-import { PermanentJobError } from '@pluck/messaging';
+import { PermanentJobError } from '@audiostash/messaging';
 import { describe, expect, it } from 'vitest';
 import { ProcessError } from '../lib/process.ts';
 import { classifyError, parseCollection, parseProgress, parseSearch } from './ytdlp.ts';
 
 describe('parseProgress', () => {
   it('uses the total size, or the estimate when the total is unknown', () => {
-    expect(parseProgress('pluck-progress 500 1000 NA')).toBe(0.5);
-    expect(parseProgress('pluck-progress 250 NA 1000')).toBe(0.25);
+    expect(parseProgress('audiostash-progress 500 1000 NA')).toBe(0.5);
+    expect(parseProgress('audiostash-progress 250 NA 1000')).toBe(0.25);
   });
 
   it('returns null when no size is known', () => {
-    expect(parseProgress('pluck-progress 500 NA NA')).toBeNull();
-    expect(parseProgress('pluck-progress NA NA NA')).toBeNull();
+    expect(parseProgress('audiostash-progress 500 NA NA')).toBeNull();
+    expect(parseProgress('audiostash-progress NA NA NA')).toBeNull();
   });
 
   it('never goes above 1', () => {
-    expect(parseProgress('pluck-progress 1200 NA 1000')).toBe(1);
+    expect(parseProgress('audiostash-progress 1200 NA 1000')).toBe(1);
   });
 });
 

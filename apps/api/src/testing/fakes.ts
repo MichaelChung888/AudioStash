@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { type Database, songs } from '@pluck/db';
+import { type Database, songs } from '@audiostash/db';
 import { vi } from 'vitest';
 import type { NewSong, SongRow } from '../db/songs.ts';
 import type { Clerk, ClerkSession } from '../services/clerk.ts';

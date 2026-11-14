@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url';
-import type { AudioCodec } from '@pluck/contracts';
+import type { AudioCodec } from '@audiostash/contracts';
 import { run } from '../lib/process.ts';
 
 const SCRIPT = fileURLToPath(new URL('../../scripts/tag.py', import.meta.url));

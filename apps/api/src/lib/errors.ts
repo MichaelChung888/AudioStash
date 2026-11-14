@@ -1,4 +1,4 @@
-import type { ErrorCode } from '@pluck/contracts';
+import type { ErrorCode } from '@audiostash/contracts';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 
 // Services and data access throw these. The error handler in app.ts is the only

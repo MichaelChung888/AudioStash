@@ -1,5 +1,5 @@
-import type { Playlist, PlaylistEntry } from '@pluck/contracts';
-import { formatDuration, positionBetween } from '@pluck/core';
+import type { Playlist, PlaylistEntry } from '@audiostash/contracts';
+import { formatDuration, positionBetween } from '@audiostash/core';
 import { router, useLocalSearchParams } from 'expo-router';
 import { type ReactNode, useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';

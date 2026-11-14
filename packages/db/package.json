@@ -1,5 +1,5 @@
 {
-  "name": "@pluck/db",
+  "name": "@audiostash/db",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -13,7 +13,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@pluck/contracts": "workspace:*",
+    "@audiostash/contracts": "workspace:*",
     "drizzle-orm": "^0.45.4",
     "postgres": "^4.1.0"
   },

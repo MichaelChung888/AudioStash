@@ -15,9 +15,9 @@ import {
   type ResolveFail,
   type UploadUrlsRequest,
   type UploadUrlsResponse,
-} from '@pluck/contracts';
-import { type ParsedSourceUrl, parseSourceUrl } from '@pluck/core';
-import type { Database, Transaction } from '@pluck/db';
+} from '@audiostash/contracts';
+import { type ParsedSourceUrl, parseSourceUrl } from '@audiostash/core';
+import type { Database, Transaction } from '@audiostash/db';
 import { type ChangeInput, recordChanges } from '../db/changes.ts';
 import type { DownloadRow } from '../db/downloads.ts';
 import * as downloadsDb from '../db/downloads.ts';

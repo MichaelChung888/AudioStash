@@ -1,5 +1,5 @@
-import type { JobPayload } from '@pluck/contracts';
-import type { FailureInfo, JobContext } from '@pluck/messaging';
+import type { JobPayload } from '@audiostash/contracts';
+import type { FailureInfo, JobContext } from '@audiostash/messaging';
 import { type ApiClient, ApiError } from '../api/client.ts';
 import type { Logger } from '../lib/logger.ts';
 import type { YtDlp } from '../tools/ytdlp.ts';

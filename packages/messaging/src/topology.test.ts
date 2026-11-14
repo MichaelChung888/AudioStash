@@ -5,13 +5,13 @@ describe('jobTopology', () => {
   const topology = jobTopology('download.item');
 
   it('declares a main queue that dead-letters to the dead exchange', () => {
-    const main = topology.queues.find((q) => q.queue === 'pluck.download.item');
+    const main = topology.queues.find((q) => q.queue === 'audiostash.download.item');
     expect(main?.arguments).toMatchObject({ 'x-queue-type': 'quorum', 'x-dead-letter-exchange': EXCHANGES.dead });
   });
 
   it('declares one retry queue per delay that expires back onto the main queue', () => {
     for (const { label, ms } of RETRY_DELAYS) {
-      const retry = topology.queues.find((q) => q.queue === `pluck.download.item.retry.${label}`);
+      const retry = topology.queues.find((q) => q.queue === `audiostash.download.item.retry.${label}`);
       expect(retry?.arguments).toMatchObject({
         'x-message-ttl': ms,
         'x-dead-letter-exchange': EXCHANGES.jobs,

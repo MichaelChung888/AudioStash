@@ -1,7 +1,7 @@
 import { mkdtemp, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { ClaimedItem, DownloadOptions } from '@pluck/contracts';
+import type { ClaimedItem, DownloadOptions } from '@audiostash/contracts';
 import sharp from 'sharp';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type ApiClient, ApiError } from '../api/client.ts';
@@ -57,7 +57,7 @@ const probe = (codec: string): AudioProbe => ({ codec, durationMs: 185_000, bitr
 
 let workDir: string;
 beforeEach(async () => {
-  workDir = await mkdtemp(join(tmpdir(), 'pluck-item-'));
+  workDir = await mkdtemp(join(tmpdir(), 'audiostash-item-'));
 });
 afterEach(async () => {
   await rm(workDir, { recursive: true, force: true });

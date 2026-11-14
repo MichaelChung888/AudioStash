@@ -1,4 +1,4 @@
-import type { Change, Mutation } from '@pluck/contracts';
+import type { Change, Mutation } from '@audiostash/contracts';
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { api } from '../api/endpoints.ts';
 import { db, notifyLibraryChanged } from '../db/database.ts';

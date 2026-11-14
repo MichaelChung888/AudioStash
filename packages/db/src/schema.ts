@@ -7,7 +7,7 @@ import {
   type ItemInput,
   type JobName,
   SONG_SOURCES,
-} from '@pluck/contracts';
+} from '@audiostash/contracts';
 import { sql } from 'drizzle-orm';
 import {
   type AnyPgColumn,

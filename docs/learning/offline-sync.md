@@ -1,14 +1,14 @@
 # The offline library and sync
 
-Pluck's app works with no connection: you can browse the library, play songs, and edit playlists. This note explains how the phone keeps its own copy of the library, how edits made offline reach the server, and how the phone hears about changes made elsewhere.
+AudioStash's app works with no connection: you can browse the library, play songs, and edit playlists. This note explains how the phone keeps its own copy of the library, how edits made offline reach the server, and how the phone hears about changes made elsewhere.
 
 The decisions behind it are in [ADR 0004](../adr/0004-sync-through-a-change-log.md) and [ADR 0005](../adr/0005-local-database-on-the-phone.md). This note explains how it works.
 
 ## The parts
 
-**Source of truth.** The copy that wins when two copies disagree. For Pluck that is the server's Postgres database. The phone's copy is always rebuilt from it.
+**Source of truth.** The copy that wins when two copies disagree. For AudioStash that is the server's Postgres database. The phone's copy is always rebuilt from it.
 
-**SQLite.** A database stored in one file, with no server process. Android ships it, and `expo-sqlite` lets the app use it. The phone's file is `pluck.db`.
+**SQLite.** A database stored in one file, with no server process. Android ships it, and `expo-sqlite` lets the app use it. The phone's file is `audiostash.db`.
 
 **Transaction.** A group of writes that all happen or none do. If the app is closed halfway through, the database is left as it was before the transaction started.
 
@@ -84,7 +84,7 @@ data: {"type":"download.item.progress","downloadId":"…","itemId":"…","stage"
 
 A blank line ends each message.
 
-Why SSE and not a WebSocket: the server only talks and the phone only listens. SSE is an ordinary HTTP request, so the API's normal sign-in check runs on it unchanged. A WebSocket is two-way, which Pluck does not need, and starts as HTTP before switching to its own protocol, so the sign-in check and the server code need separate handling for it.
+Why SSE and not a WebSocket: the server only talks and the phone only listens. SSE is an ordinary HTTP request, so the API's normal sign-in check runs on it unchanged. A WebSocket is two-way, which AudioStash does not need, and starts as HTTP before switching to its own protocol, so the sign-in check and the server code need separate handling for it.
 
 The app handles three problems with the stream:
 

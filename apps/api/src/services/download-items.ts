@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import type { ItemInput } from '@pluck/contracts';
-import { comparePositions, positionsAfter } from '@pluck/core';
-import type { Transaction } from '@pluck/db';
+import type { ItemInput } from '@audiostash/contracts';
+import { comparePositions, positionsAfter } from '@audiostash/core';
+import type { Transaction } from '@audiostash/db';
 import type { ChangeInput } from '../db/changes.ts';
 import type { DownloadRow } from '../db/downloads.ts';
 import * as entriesDb from '../db/entries.ts';

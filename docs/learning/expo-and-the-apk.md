@@ -10,7 +10,7 @@ The app in `apps/mobile` is written in TypeScript and React. This note explains 
 
 **Native module.** Code written for Android (Kotlin or Java) that JavaScript can call, for things JavaScript cannot do alone: play audio, open a SQLite database, show the folder picker.
 
-**Expo.** A set of native modules (`expo-audio`, `expo-sqlite`, `expo-file-system` and others) plus the tools that build the app. Each Expo SDK version is tested with one React Native version and one version of each module, so upgrading means moving everything together. Pluck uses SDK 58 with React Native 0.88.
+**Expo.** A set of native modules (`expo-audio`, `expo-sqlite`, `expo-file-system` and others) plus the tools that build the app. Each Expo SDK version is tested with one React Native version and one version of each module, so upgrading means moving everything together. AudioStash uses SDK 58 with React Native 0.88.
 
 **Metro.** The bundler. It follows the imports from the entry file and writes one JavaScript bundle holding the whole app.
 
@@ -60,7 +60,7 @@ Since Android 9, apps refuse plain `http://` connections unless they opt in. Deb
 
 ## APK and AAB
 
-An **APK** (Android package) installs directly on a phone. An **AAB** (Android App Bundle) is what Google Play takes; Play turns it into APKs for each phone. Pluck is never published to a store, so it builds an APK. To install one you allow your browser or file manager to "install unknown apps" when Android asks.
+An **APK** (Android package) installs directly on a phone. An **AAB** (Android App Bundle) is what Google Play takes; Play turns it into APKs for each phone. AudioStash is never published to a store, so it builds an APK. To install one you allow your browser or file manager to "install unknown apps" when Android asks.
 
 ## Signing
 
@@ -81,12 +81,12 @@ EAS (Expo Application Services) Build runs the steps above on Expo's servers. Th
 
 These checks need no Android tools, so they run on any computer:
 
-| Check                                | What it proves                                                             | What it cannot prove                   |
-| ------------------------------------ | -------------------------------------------------------------------------- | -------------------------------------- |
-| `pnpm typecheck`                     | Types line up across the app and the shared packages                       | Behaviour                              |
-| `pnpm test`                          | Logic with no React Native imports: sync planning, queue order, formatting | Anything that needs a phone            |
-| `pnpm --filter @pluck/mobile bundle` | Metro finds every import and Hermes compiles the whole app                 | That native modules behave as expected |
-| `npx expo-doctor` (in `apps/mobile`) | Package versions match the Expo SDK                                        |                                        |
+| Check                                     | What it proves                                                             | What it cannot prove                   |
+| ----------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------- |
+| `pnpm typecheck`                          | Types line up across the app and the shared packages                       | Behaviour                              |
+| `pnpm test`                               | Logic with no React Native imports: sync planning, queue order, formatting | Anything that needs a phone            |
+| `pnpm --filter @audiostash/mobile bundle` | Metro finds every import and Hermes compiles the whole app                 | That native modules behave as expected |
+| `npx expo-doctor` (in `apps/mobile`)      | Package versions match the Expo SDK                                        |                                        |
 
 Native behaviour (audio, the folder picker, background playback) is checked only by running the app: a debug build on an emulator or a USB phone (see the README), or the APK.
 

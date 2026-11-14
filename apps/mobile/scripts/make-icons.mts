@@ -1,6 +1,6 @@
 // Draws the app icons from the same shapes as Logo in src/ui/Icon.tsx. Run it after changing the logo:
 //
-//   pnpm --filter @pluck/mobile icons
+//   pnpm --filter @audiostash/mobile icons
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 

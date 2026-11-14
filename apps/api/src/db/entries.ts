@@ -1,4 +1,4 @@
-import { type Executor, playlistEntries, type Transaction } from '@pluck/db';
+import { type Executor, playlistEntries, type Transaction } from '@audiostash/db';
 import { eq, inArray, max } from 'drizzle-orm';
 
 export type EntryRow = typeof playlistEntries.$inferSelect;

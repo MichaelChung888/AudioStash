@@ -1,4 +1,4 @@
-import type { JobName } from '@pluck/contracts';
+import type { JobName } from '@audiostash/contracts';
 import type { PublisherProps } from 'rabbitmq-client';
 
 // Every service declares the topology it uses on connect, and RabbitMQ rejects a
@@ -7,13 +7,13 @@ import type { PublisherProps } from 'rabbitmq-client';
 
 export const EXCHANGES = {
   // Direct: routing key = job name, e.g. "download.item".
-  jobs: 'pluck.jobs',
+  jobs: 'audiostash.jobs',
   // Direct: routing key = "<job>.<delay>", e.g. "download.item.2m".
-  retry: 'pluck.retry',
+  retry: 'audiostash.retry',
   // Direct: routing key = job name. Messages that failed every attempt end up here.
-  dead: 'pluck.dead',
+  dead: 'audiostash.dead',
   // Topic: routing key = event type, e.g. "download.updated".
-  events: 'pluck.events',
+  events: 'audiostash.events',
 } as const;
 
 // Wait before attempt 2, 3 and 4. Attempt 1 runs immediately.
@@ -28,9 +28,9 @@ export const MAX_ATTEMPTS = RETRY_DELAYS.length + 1;
 // times is moved to the dead queue instead of looping forever.
 const DELIVERY_LIMIT = 10;
 
-export const queueName = (job: JobName) => `pluck.${job}`;
-export const deadQueueName = (job: JobName) => `pluck.${job}.dead`;
-export const retryQueueName = (job: JobName, label: string) => `pluck.${job}.retry.${label}`;
+export const queueName = (job: JobName) => `audiostash.${job}`;
+export const deadQueueName = (job: JobName) => `audiostash.${job}.dead`;
+export const retryQueueName = (job: JobName, label: string) => `audiostash.${job}.retry.${label}`;
 export const retryRoutingKey = (job: JobName, label: string) => `${job}.${label}`;
 
 type Topology = Required<Pick<PublisherProps, 'exchanges' | 'queues' | 'queueBindings'>>;

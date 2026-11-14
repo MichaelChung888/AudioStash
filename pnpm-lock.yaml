@@ -41,19 +41,19 @@ importers:
       '@hono/zod-validator':
         specifier: ^0.9.1
         version: 0.9.1(hono@4.13.17)(zod@4.6.7)
-      '@pluck/catalog':
+      '@audiostash/catalog':
         specifier: workspace:*
         version: link:../../packages/catalog
-      '@pluck/contracts':
+      '@audiostash/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@pluck/core':
+      '@audiostash/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@pluck/db':
+      '@audiostash/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@pluck/messaging':
+      '@audiostash/messaging':
         specifier: workspace:*
         version: link:../../packages/messaging
       drizzle-orm:
@@ -90,10 +90,10 @@ importers:
       '@expo/vector-icons':
         specifier: ^15.1.1
         version: 15.1.1(expo-font@58.0.11(expo@58.0.23)(react-native@0.88.1(@babel/core@7.29.13)(@react-native/metro-config@0.88.1(@babel/core@7.29.13))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native@0.88.1(@babel/core@7.29.13)(@react-native/metro-config@0.88.1(@babel/core@7.29.13))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0)
-      '@pluck/contracts':
+      '@audiostash/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@pluck/core':
+      '@audiostash/core':
         specifier: workspace:*
         version: link:../../packages/core
       '@tanstack/react-query':
@@ -181,16 +181,16 @@ importers:
 
   apps/worker:
     dependencies:
-      '@pluck/catalog':
+      '@audiostash/catalog':
         specifier: workspace:*
         version: link:../../packages/catalog
-      '@pluck/contracts':
+      '@audiostash/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@pluck/core':
+      '@audiostash/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@pluck/messaging':
+      '@audiostash/messaging':
         specifier: workspace:*
         version: link:../../packages/messaging
       pino:
@@ -221,7 +221,7 @@ importers:
 
   packages/core:
     dependencies:
-      '@pluck/contracts':
+      '@audiostash/contracts':
         specifier: workspace:*
         version: link:../contracts
       fractional-indexing:
@@ -230,7 +230,7 @@ importers:
 
   packages/db:
     dependencies:
-      '@pluck/contracts':
+      '@audiostash/contracts':
         specifier: workspace:*
         version: link:../contracts
       drizzle-orm:
@@ -246,7 +246,7 @@ importers:
 
   packages/messaging:
     dependencies:
-      '@pluck/contracts':
+      '@audiostash/contracts':
         specifier: workspace:*
         version: link:../contracts
       rabbitmq-client:

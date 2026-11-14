@@ -1,4 +1,4 @@
-import type { Download } from '@pluck/contracts';
+import type { Download } from '@audiostash/contracts';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -165,7 +165,7 @@ function phoneLine(mirror: MirrorState, folder: LibraryFolder | null): PhoneLine
       };
     case 'idle':
       return mirror.failed > 0
-        ? { detail: `${plural(mirror.failed, 'song')} could not be saved. Pluck tries again on the next sync`, right: null, progress: null, problem: true }
+        ? { detail: `${plural(mirror.failed, 'song')} could not be saved. AudioStash tries again on the next sync`, right: null, progress: null, problem: true }
         : { detail: `Everything is saved to ${where}`, right: null, progress: null, problem: false };
   }
 }

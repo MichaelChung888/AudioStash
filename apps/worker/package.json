@@ -1,5 +1,5 @@
 {
-  "name": "@pluck/worker",
+  "name": "@audiostash/worker",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,10 +10,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@pluck/catalog": "workspace:*",
-    "@pluck/contracts": "workspace:*",
-    "@pluck/core": "workspace:*",
-    "@pluck/messaging": "workspace:*",
+    "@audiostash/catalog": "workspace:*",
+    "@audiostash/contracts": "workspace:*",
+    "@audiostash/core": "workspace:*",
+    "@audiostash/messaging": "workspace:*",
     "pino": "^10.4.0",
     "sharp": "^0.35.5",
     "zod": "^4.6.7"

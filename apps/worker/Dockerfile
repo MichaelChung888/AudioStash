@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Build from the repository root, so the workspace packages are in the build context:
-#   docker build -f apps/worker/Dockerfile -t pluck-worker .
+#   docker build -f apps/worker/Dockerfile -t audiostash-worker .
 
 FROM node:24.22.2-trixie-slim AS node
 # Corepack installs the pnpm version named in package.json's packageManager field.
@@ -13,7 +13,7 @@ FROM node AS build
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm fetch --prod
 COPY . .
-RUN pnpm install --offline --frozen-lockfile --prod --filter '@pluck/worker...'
+RUN pnpm install --offline --frozen-lockfile --prod --filter '@audiostash/worker...'
 
 # The tools are installed before the code is copied, so a code change does not
 # reinstall them. ffmpeg converts and measures the audio. Python runs yt-dlp and

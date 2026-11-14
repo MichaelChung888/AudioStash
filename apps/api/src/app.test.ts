@@ -1,4 +1,4 @@
-import type { ErrorBody } from '@pluck/contracts';
+import type { ErrorBody } from '@audiostash/contracts';
 import { describe, expect, it, vi } from 'vitest';
 import { createApp } from './app.ts';
 import type { AppContext, Services } from './context.ts';

@@ -1,4 +1,4 @@
-import { type Connection, subscribeEvents } from '@pluck/messaging';
+import { type Connection, subscribeEvents } from '@audiostash/messaging';
 import type { Logger } from '../lib/logger.ts';
 import type { SseHub } from './sse-hub.ts';
 import type { WorkerStatus } from './worker-status.ts';

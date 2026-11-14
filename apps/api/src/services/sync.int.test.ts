@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { Mutation } from '@pluck/contracts';
+import type { Mutation } from '@audiostash/contracts';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { startTestDatabase, type TestDatabase } from '../testing/database.ts';
 import { fakeNotifier, insertSong, MemoryStorage } from '../testing/fakes.ts';

@@ -1,6 +1,6 @@
-import type { CreateDownload, Download, DownloadDetail, DownloadSource, ListDownloadsQuery } from '@pluck/contracts';
-import { parseSourceUrl } from '@pluck/core';
-import type { Database, Transaction } from '@pluck/db';
+import type { CreateDownload, Download, DownloadDetail, DownloadSource, ListDownloadsQuery } from '@audiostash/contracts';
+import { parseSourceUrl } from '@audiostash/core';
+import type { Database, Transaction } from '@audiostash/db';
 import { type ChangeInput, recordChanges } from '../db/changes.ts';
 import type { DownloadRow } from '../db/downloads.ts';
 import * as downloadsDb from '../db/downloads.ts';

@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Build from the repository root, so the workspace packages are in the build context:
-#   docker build -f apps/api/Dockerfile -t pluck-api .
+#   docker build -f apps/api/Dockerfile -t audiostash-api .
 
 FROM node:24.22.2-trixie-slim AS node
 # Corepack installs the pnpm version named in package.json's packageManager field.
@@ -13,7 +13,7 @@ FROM node AS build
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm fetch --prod
 COPY . .
-RUN pnpm install --offline --frozen-lockfile --prod --filter '@pluck/api...'
+RUN pnpm install --offline --frozen-lockfile --prod --filter '@audiostash/api...'
 
 # Node runs the TypeScript directly, so there is no compile step. Copying /app
 # leaves pnpm's download store behind in the build stage.

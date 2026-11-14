@@ -1,4 +1,4 @@
-import { createDb, type Database, runMigrations } from '@pluck/db';
+import { createDb, type Database, runMigrations } from '@audiostash/db';
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { sql } from 'drizzle-orm';
 

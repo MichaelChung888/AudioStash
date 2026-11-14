@@ -1,4 +1,4 @@
-import type { AudioFormat, DownloadOptions } from '@pluck/contracts';
+import type { AudioFormat, DownloadOptions } from '@audiostash/contracts';
 import { StyleSheet, Text, View } from 'react-native';
 import { Toggle, Touchable } from './components.tsx';
 import { colors, fonts, text } from './theme.ts';

@@ -1,4 +1,4 @@
-import { type BusEvent, busEventSchema } from '@pluck/contracts';
+import { type BusEvent, busEventSchema } from '@audiostash/contracts';
 import type { Connection } from 'rabbitmq-client';
 import type { Logger } from './logger.ts';
 import { EXCHANGES, eventsExchange } from './topology.ts';

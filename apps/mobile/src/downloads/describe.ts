@@ -1,5 +1,5 @@
-import type { Download, DownloadItem, ItemStage } from '@pluck/contracts';
-import { parseSourceUrl } from '@pluck/core';
+import type { Download, DownloadItem, ItemStage } from '@audiostash/contracts';
+import { parseSourceUrl } from '@audiostash/core';
 
 const SOURCE_NAMES = { youtube: 'YouTube', soundcloud: 'SoundCloud', bandcamp: 'Bandcamp', upload: 'Upload', other: 'Link' } as const;
 

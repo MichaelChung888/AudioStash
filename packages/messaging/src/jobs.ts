@@ -1,9 +1,9 @@
-import { JOB_NAMES, JOB_SCHEMAS, type JobName, type JobPayload } from '@pluck/contracts';
+import { JOB_NAMES, JOB_SCHEMAS, type JobName, type JobPayload } from '@audiostash/contracts';
 import { type AsyncMessage, type Connection, ConsumerStatus } from 'rabbitmq-client';
 import type { Logger } from './logger.ts';
 import { EXCHANGES, jobTopology, MAX_ATTEMPTS, mergeTopologies, queueName, RETRY_DELAYS, retryRoutingKey } from './topology.ts';
 
-const ATTEMPT_HEADER = 'x-pluck-attempt';
+const ATTEMPT_HEADER = 'x-audiostash-attempt';
 
 // Throw this from a job handler when retrying cannot help, e.g. the video was deleted.
 export class PermanentJobError extends Error {

@@ -1,4 +1,4 @@
-import type { CatalogTrack, Genre } from '@pluck/contracts';
+import type { CatalogTrack, Genre } from '@audiostash/contracts';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { type ReactNode, useState } from 'react';
@@ -54,7 +54,7 @@ function HomeHeader() {
     <View style={styles.header}>
       <View style={styles.brand}>
         <Logo size={28} />
-        <Text style={styles.brandName}>Pluck</Text>
+        <Text style={styles.brandName}>AudioStash</Text>
       </View>
       <Touchable
         accessibilityRole="button"

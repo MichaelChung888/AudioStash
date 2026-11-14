@@ -1,5 +1,5 @@
-import type { DeezerAlbum, DeezerClient, DeezerTrack, DeezerTrackDetail } from '@pluck/catalog';
-import { type MatchCandidate, pickBestMatch, stripFeaturing } from '@pluck/core';
+import type { DeezerAlbum, DeezerClient, DeezerTrack, DeezerTrackDetail } from '@audiostash/catalog';
+import { type MatchCandidate, pickBestMatch, stripFeaturing } from '@audiostash/core';
 import type { Logger } from '../lib/logger.ts';
 
 export interface TrackMetadata {

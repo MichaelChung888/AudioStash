@@ -1,5 +1,5 @@
 {
-  "name": "@pluck/core",
+  "name": "@audiostash/core",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@pluck/contracts": "workspace:*",
+    "@audiostash/contracts": "workspace:*",
     "fractional-indexing": "^4.0.0"
   }
 }

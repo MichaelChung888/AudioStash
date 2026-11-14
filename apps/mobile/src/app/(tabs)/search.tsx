@@ -1,4 +1,4 @@
-import { parseSourceUrl } from '@pluck/core';
+import { parseSourceUrl } from '@audiostash/core';
 import * as Clipboard from 'expo-clipboard';
 import * as DocumentPicker from 'expo-document-picker';
 import { useEffect, useState } from 'react';

@@ -1,9 +1,9 @@
 import { createWriteStream } from 'node:fs';
 import { basename, extname, join } from 'node:path';
 import { pipeline } from 'node:stream/promises';
-import type { ClaimedItem, TrackHint } from '@pluck/contracts';
-import { parseVideoTitle, pickBestMatch, youtubeVideoUrl } from '@pluck/core';
-import { PermanentJobError } from '@pluck/messaging';
+import type { ClaimedItem, TrackHint } from '@audiostash/contracts';
+import { parseVideoTitle, pickBestMatch, youtubeVideoUrl } from '@audiostash/core';
+import { PermanentJobError } from '@audiostash/messaging';
 import { describeFile } from '../lib/files.ts';
 import type { Ffmpeg } from '../tools/ffmpeg.ts';
 import type { VideoInfo, YtDlp } from '../tools/ytdlp.ts';

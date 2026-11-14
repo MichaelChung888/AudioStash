@@ -1,5 +1,5 @@
-import type { Mutation, MutationType } from '@pluck/contracts';
-import { positionsAfter } from '@pluck/core';
+import type { Mutation, MutationType } from '@audiostash/contracts';
+import { positionsAfter } from '@audiostash/core';
 import { randomUUID } from 'expo-crypto';
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { requestSync } from '../sync/engine.ts';

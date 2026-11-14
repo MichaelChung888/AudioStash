@@ -3,11 +3,11 @@ import { folderLabel } from './folder-label.ts';
 
 describe('folderLabel', () => {
   it('shows a folder inside a picked tree', () => {
-    expect(folderLabel('content://com.android.externalstorage.documents/tree/primary%3AMusic/document/primary%3AMusic%2FPluck')).toBe('Music/Pluck');
+    expect(folderLabel('content://com.android.externalstorage.documents/tree/primary%3AMusic/document/primary%3AMusic%2FAudioStash')).toBe('Music/AudioStash');
   });
 
   it('shows a picked tree', () => {
-    expect(folderLabel('content://com.android.externalstorage.documents/tree/primary%3AMusic%2FPluck')).toBe('Music/Pluck');
+    expect(folderLabel('content://com.android.externalstorage.documents/tree/primary%3AMusic%2FAudioStash')).toBe('Music/AudioStash');
   });
 
   it('marks folders on an SD card', () => {

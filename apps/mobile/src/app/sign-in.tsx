@@ -5,7 +5,7 @@ import { Button, Field, Screen } from '../ui/components.tsx';
 import { Logo } from '../ui/Icon.tsx';
 import { colors, fonts, text } from '../ui/theme.ts';
 
-// Email code sign-in. Pluck has one owner: sign-ups are turned off in Clerk, so only
+// Email code sign-in. AudioStash has one owner: sign-ups are turned off in Clerk, so only
 // the owner's email address gets a code.
 export default function SignInScreen() {
   const { signIn, fetchStatus } = useSignIn();
@@ -28,7 +28,7 @@ export default function SignInScreen() {
     setError(null);
     const verified = await signIn.emailCode.verifyCode({ code: code.trim() });
     if (verified.error) return setError(verified.error.message);
-    if (signIn.status !== 'complete') return setError('This account needs another sign-in step that Pluck does not support.');
+    if (signIn.status !== 'complete') return setError('This account needs another sign-in step that AudioStash does not support.');
     const finalized = await signIn.finalize();
     if (finalized.error) setError(finalized.error.message);
   }
@@ -38,7 +38,7 @@ export default function SignInScreen() {
       <KeyboardAvoidingView behavior="padding" style={styles.body}>
         <View style={styles.brand}>
           <Logo size={56} />
-          <Text style={styles.name}>Pluck</Text>
+          <Text style={styles.name}>AudioStash</Text>
         </View>
 
         {step === 'email' ? (

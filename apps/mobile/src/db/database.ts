@@ -66,7 +66,7 @@ let database: SQLiteDatabase | null = null;
 
 export async function openDatabase(): Promise<SQLiteDatabase> {
   if (database) return database;
-  const db = await openDatabaseAsync('pluck.db');
+  const db = await openDatabaseAsync('audiostash.db');
   // WAL lets the screens read while a sync is writing.
   await db.execAsync('PRAGMA journal_mode = WAL;');
   await migrate(db);

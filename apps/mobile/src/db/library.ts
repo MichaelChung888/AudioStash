@@ -1,4 +1,4 @@
-import type { Playlist, PlaylistEntry, Song } from '@pluck/contracts';
+import type { Playlist, PlaylistEntry, Song } from '@audiostash/contracts';
 import { db } from './database.ts';
 import { readPlaylist } from './rows.ts';
 

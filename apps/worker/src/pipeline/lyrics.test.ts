@@ -1,4 +1,4 @@
-import type { LrclibClient, LrclibLyrics } from '@pluck/catalog';
+import type { LrclibClient, LrclibLyrics } from '@audiostash/catalog';
 import { describe, expect, it } from 'vitest';
 import { silentLogger } from '../testing/logger.ts';
 import { createLyricsLookup } from './lyrics.ts';

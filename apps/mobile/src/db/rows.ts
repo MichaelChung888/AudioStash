@@ -1,4 +1,4 @@
-import type { Playlist, PlaylistEntry, Song } from '@pluck/contracts';
+import type { Playlist, PlaylistEntry, Song } from '@audiostash/contracts';
 import type { SQLiteDatabase } from 'expo-sqlite';
 
 // Row writes shared by changes pulled from the server and edits made on this phone.

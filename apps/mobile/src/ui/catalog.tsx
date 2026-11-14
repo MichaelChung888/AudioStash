@@ -1,5 +1,5 @@
-import type { CatalogTrack, YoutubeVideo } from '@pluck/contracts';
-import { formatDuration } from '@pluck/core';
+import type { CatalogTrack, YoutubeVideo } from '@audiostash/contracts';
+import { formatDuration } from '@audiostash/core';
 import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
 import { openAddSheet } from '../downloads/add-request.ts';

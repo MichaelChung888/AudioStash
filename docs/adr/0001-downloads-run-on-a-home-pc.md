@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-Pluck downloads songs from YouTube, SoundCloud and Bandcamp links with yt-dlp, converts them with ffmpeg, tags them, and uploads them to Cloudflare R2. R2 is Cloudflare's file storage. It accepts the same requests as Amazon S3.
+AudioStash downloads songs from YouTube, SoundCloud and Bandcamp links with yt-dlp, converts them with ffmpeg, tags them, and uploads them to Cloudflare R2. R2 is Cloudflare's file storage. It accepts the same requests as Amazon S3.
 
 The constraints at the time:
 

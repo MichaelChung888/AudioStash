@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-Pluck plays songs from files on the phone. Playback must:
+AudioStash plays songs from files on the phone. Playback must:
 
 - carry on while the owner moves between screens, and with the screen off;
 - show lock screen and notification controls, and answer headphone buttons;

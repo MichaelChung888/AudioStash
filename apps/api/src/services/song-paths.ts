@@ -1,6 +1,6 @@
-import { AUDIO_EXTENSIONS, type AudioCodec } from '@pluck/contracts';
-import { buildSongPath, stripFeaturing, withPathSuffix } from '@pluck/core';
-import type { Transaction } from '@pluck/db';
+import { AUDIO_EXTENSIONS, type AudioCodec } from '@audiostash/contracts';
+import { buildSongPath, stripFeaturing, withPathSuffix } from '@audiostash/core';
+import type { Transaction } from '@audiostash/db';
 import * as songsDb from '../db/songs.ts';
 
 const VARIOUS_ARTISTS = /^various artists$/i;

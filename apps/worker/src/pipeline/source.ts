@@ -1,5 +1,5 @@
-import type { SongSource } from '@pluck/contracts';
-import { parseVideoTitle, youtubeVideoUrl } from '@pluck/core';
+import type { SongSource } from '@audiostash/contracts';
+import { parseVideoTitle, youtubeVideoUrl } from '@audiostash/core';
 import type { VideoInfo } from '../tools/ytdlp.ts';
 
 // Identifies where a song came from. The API keeps one song per (source, sourceId),

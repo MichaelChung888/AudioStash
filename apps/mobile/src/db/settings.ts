@@ -1,4 +1,4 @@
-import { type DownloadOptions, downloadOptionsSchema } from '@pluck/contracts';
+import { type DownloadOptions, downloadOptionsSchema } from '@audiostash/contracts';
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { db } from './database.ts';
 

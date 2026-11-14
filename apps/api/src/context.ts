@@ -1,8 +1,8 @@
 import { hostname } from 'node:os';
-import { createAppleChartsClient, createDeezerClient, createYoutubeClient } from '@pluck/catalog';
-import type { StatusResponse } from '@pluck/contracts';
-import { createDb } from '@pluck/db';
-import { createEventPublisher, createJobPublisher, createRabbit } from '@pluck/messaging';
+import { createAppleChartsClient, createDeezerClient, createYoutubeClient } from '@audiostash/catalog';
+import type { StatusResponse } from '@audiostash/contracts';
+import { createDb } from '@audiostash/db';
+import { createEventPublisher, createJobPublisher, createRabbit } from '@audiostash/messaging';
 import { sql } from 'drizzle-orm';
 import pkg from '../package.json' with { type: 'json' };
 import type { Env } from './env.ts';
@@ -47,7 +47,7 @@ export function createContext(env: Env, logger: Logger): AppContext {
   const child = (component: string) => logger.child({ component });
 
   const { db, close: closeDb } = createDb(env.DATABASE_URL);
-  const rabbit = createRabbit(env.RABBITMQ_URL, { name: `pluck-api@${hostname()}`, logger: child('rabbitmq') });
+  const rabbit = createRabbit(env.RABBITMQ_URL, { name: `audiostash-api@${hostname()}`, logger: child('rabbitmq') });
   const jobPublisher = createJobPublisher(rabbit);
   const eventPublisher = createEventPublisher(rabbit);
 
@@ -58,7 +58,7 @@ export function createContext(env: Env, logger: Logger): AppContext {
   const sse = new SseHub();
   const workerStatus = createWorkerStatus({ onChange: ({ online, lastSeenAt }) => sse.broadcast({ type: 'worker.status', online, lastSeenAt }) });
 
-  const http = { userAgent: `Pluck/${pkg.version} (personal music library)` };
+  const http = { userAgent: `AudioStash/${pkg.version} (personal music library)` };
   const services: Services = {
     auth: createAuthService({
       clerk: createClerk({ secretKey: env.CLERK_SECRET_KEY, jwtKey: env.CLERK_JWT_KEY }),

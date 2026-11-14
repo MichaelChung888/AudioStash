@@ -1,4 +1,4 @@
-import type { ErrorBody, ErrorCode } from '@pluck/contracts';
+import type { ErrorBody, ErrorCode } from '@audiostash/contracts';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { requestId } from 'hono/request-id';

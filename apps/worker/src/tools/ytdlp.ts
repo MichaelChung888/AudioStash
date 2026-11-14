@@ -1,7 +1,7 @@
 import { isAbsolute, join } from 'node:path';
-import type { ResolvedEntry } from '@pluck/contracts';
-import { parseVideoTitle, youtubeVideoUrl } from '@pluck/core';
-import { PermanentJobError } from '@pluck/messaging';
+import type { ResolvedEntry } from '@audiostash/contracts';
+import { parseVideoTitle, youtubeVideoUrl } from '@audiostash/core';
+import { PermanentJobError } from '@audiostash/messaging';
 import { z } from 'zod';
 import { ProcessError, run } from '../lib/process.ts';
 
@@ -58,8 +58,8 @@ export interface DownloadOptions {
   signal?: AbortSignal;
 }
 
-const PROGRESS_PREFIX = 'pluck-progress ';
-const FILE_PREFIX = 'pluck-file ';
+const PROGRESS_PREFIX = 'audiostash-progress ';
+const FILE_PREFIX = 'audiostash-file ';
 const UNAVAILABLE_TITLES = new Set(['[Private video]', '[Deleted video]', '[Unavailable video]']);
 
 // Errors that retrying cannot fix. "Sign in to confirm you're not a bot" is not

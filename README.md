@@ -1,4 +1,4 @@
-# Pluck
+# AudioStash
 
 A personal music library for Android. Paste a YouTube, SoundCloud or Bandcamp link, pick songs from the charts, or upload your own files. A worker on your home PC downloads each song at the best quality available and adds the title, artist, album, cover art and lyrics. Your phone keeps a copy of the whole library, so everything plays offline.
 
@@ -64,7 +64,7 @@ This runs the whole backend on your PC in Docker. You only need Git and Docker; 
 
 ### 2. Set up Clerk (sign-in)
 
-1. Create a free account at [clerk.com](https://clerk.com) and an application called Pluck. Turn on sign-in with an email verification code. The app signs in only this way.
+1. Create a free account at [clerk.com](https://clerk.com) and an application called AudioStash. Turn on sign-in with an email verification code. The app signs in only this way.
 2. In **Configure > Restrictions**, set the sign-up mode to **Restricted**, so nobody else can make an account.
 3. In **Users**, create a user with your email. Open it and copy its id (`user_…`).
 4. In **API keys**, copy the secret key (`sk_test_…`).
@@ -77,8 +77,8 @@ In PowerShell:
 git config --global core.longpaths true
 mkdir C:\dev
 cd C:\dev
-git clone https://github.com/MichaelChung888/pluck.git
-cd pluck
+git clone https://github.com/MichaelChung888/AudioStash.git
+cd AudioStash
 Copy-Item .env.example .env
 notepad .env
 ```
@@ -104,11 +104,11 @@ docker compose --profile app up -d --build
 
 The first build takes several minutes. When it finishes, `docker compose ps` shows every service as running or healthy. If Windows asks whether Docker may use private networks, allow it: the phone needs to reach your PC.
 
-| Address                      | What is there                                                      |
-| ---------------------------- | ------------------------------------------------------------------ |
-| http://localhost:3000/health | The API                                                            |
-| http://localhost:15672       | RabbitMQ's web UI, user `pluck`, password `pluck`                  |
-| http://localhost:9001        | The storage console, user `pluck-dev`, password `pluck-dev-secret` |
+| Address                      | What is there                                                                |
+| ---------------------------- | ---------------------------------------------------------------------------- |
+| http://localhost:3000/health | The API                                                                      |
+| http://localhost:15672       | RabbitMQ's web UI, user `audiostash`, password `audiostash`                  |
+| http://localhost:9001        | The storage console, user `audiostash-dev`, password `audiostash-dev-secret` |
 
 ### 5. Try it
 
@@ -124,7 +124,7 @@ $download = Invoke-RestMethod http://localhost:3000/v1/downloads -Method Post -H
 Invoke-RestMethod "http://localhost:3000/v1/downloads/$($download.id)" -Headers $auth
 ```
 
-Run the last line again after a minute and the status changes to `completed`. The song is in the storage console under the `pluck` bucket. `docker compose logs -f worker` shows each step as it happens.
+Run the last line again after a minute and the status changes to `completed`. The song is in the storage console under the `audiostash` bucket. `docker compose logs -f worker` shows each step as it happens.
 
 ### Stop, update, reset
 
@@ -172,7 +172,7 @@ In Android Studio, open **More Actions > Virtual Device Manager** (or **View > T
 ### 3. Point the app at your PC
 
 ```powershell
-cd C:\dev\pluck
+cd C:\dev\AudioStash
 pnpm install
 Copy-Item apps/mobile/.env.example apps/mobile/.env
 notepad apps/mobile/.env
@@ -190,7 +190,7 @@ The emulator reaches your PC on its network address, like a real phone would. If
 With the virtual phone running:
 
 ```powershell
-pnpm --filter @pluck/mobile android
+pnpm --filter @audiostash/mobile android
 ```
 
 The first build takes 10 minutes or more. Later builds are much faster. When it finishes, the app opens on the virtual phone. Then follow [First run](#4-first-run) below.
@@ -204,7 +204,7 @@ The same steps work with your own phone in place of the virtual one:
 1. On the phone, open **Settings > About phone** and tap **Build number** seven times. This turns on **Developer options**.
 2. In **Developer options**, turn on **USB debugging**.
 3. Plug the phone into the PC and allow debugging when the phone asks.
-4. Run `pnpm --filter @pluck/mobile android`. The phone must be on the same Wi-Fi as the PC, and `.env` must use the PC's IP, not `10.0.2.2`.
+4. Run `pnpm --filter @audiostash/mobile android`. The phone must be on the same Wi-Fi as the PC, and `.env` must use the PC's IP, not `10.0.2.2`.
 
 A build made this way is signed with a different key from the APK built by EAS. To switch from one to the other, uninstall the app first. See [Signing](docs/learning/expo-and-the-apk.md#signing).
 
@@ -250,7 +250,7 @@ Later builds install over the old one and keep your library. They must all come 
 ### 4. First run
 
 1. Sign in with your email. Clerk sends a code.
-2. Choose where songs go. **A folder in Music** puts them in `Music/Pluck`, where other players can see them.
+2. Choose where songs go. **A folder in Music** puts them in `Music/AudioStash`, where other players can see them.
 3. Paste a link in Search, or tap a download button on Home.
 
 Songs are saved to the phone only on Wi-Fi unless you turn on mobile data in Settings.
@@ -266,18 +266,18 @@ npm install -g pnpm   # pnpm then switches itself to the version named in packag
 pnpm install
 ```
 
-| Command                              | What it does                                                                                                                     |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm docker:up`                     | Starts Postgres, RabbitMQ and storage only, and runs the migrations                                                              |
-| `pnpm api:dev`                       | Runs the API on your machine, restarting on changes                                                                              |
-| `pnpm worker:dev`                    | Runs the worker on your machine. Needs yt-dlp, ffmpeg and Python with mutagen installed; the Docker worker is easier on Windows. |
-| `pnpm test`                          | Unit tests                                                                                                                       |
-| `pnpm test:integration`              | Tests against real Postgres and RabbitMQ, started in Docker                                                                      |
-| `pnpm typecheck` / `pnpm lint`       | TypeScript and Biome checks                                                                                                      |
-| `pnpm token`                         | Prints a sign-in token for calling the API                                                                                       |
-| `pnpm db:generate`                   | Writes a migration after a change to `packages/db/src/schema.ts`                                                                 |
-| `pnpm --filter @pluck/mobile bundle` | Builds the app's JavaScript bundle for Android, which checks every import resolves and the code compiles                         |
-| `pnpm --filter @pluck/mobile icons`  | Redraws the app icons after a change to the logo                                                                                 |
+| Command                                   | What it does                                                                                                                     |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm docker:up`                          | Starts Postgres, RabbitMQ and storage only, and runs the migrations                                                              |
+| `pnpm api:dev`                            | Runs the API on your machine, restarting on changes                                                                              |
+| `pnpm worker:dev`                         | Runs the worker on your machine. Needs yt-dlp, ffmpeg and Python with mutagen installed; the Docker worker is easier on Windows. |
+| `pnpm test`                               | Unit tests                                                                                                                       |
+| `pnpm test:integration`                   | Tests against real Postgres and RabbitMQ, started in Docker                                                                      |
+| `pnpm typecheck` / `pnpm lint`            | TypeScript and Biome checks                                                                                                      |
+| `pnpm token`                              | Prints a sign-in token for calling the API                                                                                       |
+| `pnpm db:generate`                        | Writes a migration after a change to `packages/db/src/schema.ts`                                                                 |
+| `pnpm --filter @audiostash/mobile bundle` | Builds the app's JavaScript bundle for Android, which checks every import resolves and the code compiles                         |
+| `pnpm --filter @audiostash/mobile icons`  | Redraws the app icons after a change to the logo                                                                                 |
 
 Node runs the TypeScript files directly (Node 24 removes the types as it loads each file), so there is no build step.
 

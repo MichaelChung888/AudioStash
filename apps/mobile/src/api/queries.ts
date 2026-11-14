@@ -1,4 +1,4 @@
-import { type ClientEvent, type Download, type DownloadDetail, FINISHED_DOWNLOAD_STATUSES, type StatusResponse } from '@pluck/contracts';
+import { type ClientEvent, type Download, type DownloadDetail, FINISHED_DOWNLOAD_STATUSES, type StatusResponse } from '@audiostash/contracts';
 import { type QueryClient, useQuery } from '@tanstack/react-query';
 import { config } from '../config.ts';
 import { getLibraryTotals, getPlaylist, getPlaylistItems, listPlaylists, listSongs } from '../db/library.ts';

@@ -1,4 +1,4 @@
-import { buildM3u8, buildPlaylistPath, type M3uEntry, withPathSuffix } from '@pluck/core';
+import { buildM3u8, buildPlaylistPath, type M3uEntry, withPathSuffix } from '@audiostash/core';
 
 export interface WantedSong {
   id: string;

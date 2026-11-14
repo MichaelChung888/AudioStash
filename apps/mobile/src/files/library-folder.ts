@@ -8,7 +8,7 @@ import { folderLabel } from './folder-label.ts';
 // The setting holds the picked folder's URI, or APP_STORAGE. Unset means not chosen
 // yet, and nothing is saved until it is.
 
-const FOLDER_NAME = 'Pluck';
+const FOLDER_NAME = 'AudioStash';
 const APP_STORAGE = 'app';
 // Opens the picker in the phone's Music folder.
 const MUSIC_FOLDER_URI = 'content://com.android.externalstorage.documents/document/primary%3AMusic';
@@ -31,7 +31,7 @@ export async function getLibraryRoot(): Promise<Directory | null> {
 }
 
 // Returns false when the person closes the picker. Picking Music (or any folder
-// not called Pluck) saves into a Pluck folder inside it.
+// not called AudioStash) saves into an AudioStash folder inside it.
 export async function chooseSharedFolder(): Promise<boolean> {
   let picked: Directory;
   try {

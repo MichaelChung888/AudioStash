@@ -1,5 +1,5 @@
-import type { Change, Mutation, PullQuery, PullResponse, PushResponse } from '@pluck/contracts';
-import type { Database, Transaction } from '@pluck/db';
+import type { Change, Mutation, PullQuery, PullResponse, PushResponse } from '@audiostash/contracts';
+import type { Database, Transaction } from '@audiostash/db';
 import * as changesDb from '../db/changes.ts';
 import { type ChangeInput, recordChanges } from '../db/changes.ts';
 import * as entriesDb from '../db/entries.ts';

@@ -8,7 +8,7 @@ import { fromUrl, makeCover, writeSquareJpeg } from './cover.ts';
 
 let dir: string;
 beforeEach(async () => {
-  dir = await mkdtemp(join(tmpdir(), 'pluck-cover-'));
+  dir = await mkdtemp(join(tmpdir(), 'audiostash-cover-'));
 });
 afterEach(async () => {
   await rm(dir, { recursive: true, force: true });

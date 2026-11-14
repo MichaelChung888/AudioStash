@@ -1,11 +1,11 @@
-import type { Download, DownloadItem, Playlist, PlaylistEntry, Song } from '@pluck/contracts';
+import type { Download, DownloadItem, Playlist, PlaylistEntry, Song } from '@audiostash/contracts';
 import type { DownloadRow } from './downloads.ts';
 import type { EntryRow } from './entries.ts';
 import type { ItemCounts, ItemRow } from './items.ts';
 import type { PlaylistRow } from './playlists.ts';
 import type { SongRow } from './songs.ts';
 
-// Database rows -> API shapes from @pluck/contracts. Storage keys, token hashes and
+// Database rows -> API shapes from @audiostash/contracts. Storage keys, token hashes and
 // worker bookkeeping stay on the server.
 
 const iso = (date: Date) => date.toISOString();

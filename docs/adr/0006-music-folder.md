@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-Every song in the library is copied to the phone so it plays offline. The owner wants the files in `Music/Pluck`, where other music players and a computer connected by USB can see them, and wants them to stay there if Pluck is uninstalled.
+Every song in the library is copied to the phone so it plays offline. The owner wants the files in `Music/AudioStash`, where other music players and a computer connected by USB can see them, and wants them to stay there if AudioStash is uninstalled.
 
 Android limits where an app may write. Since Android 10, an app cannot write to an arbitrary path in shared storage (the part of the phone a USB computer sees) just by asking for the old storage permission. The ways left are:
 
@@ -21,8 +21,8 @@ Android limits where an app may write. Since Android 10, an app cannot write to 
 
 On first run the app asks where songs should go:
 
-1. **A folder in Music** (recommended). The SAF picker opens in `Music`. Picking `Music` or any folder not called Pluck creates `Pluck` inside it.
-2. **Inside Pluck only**. App storage, for owners who do not want files elsewhere.
+1. **A folder in Music** (recommended). The SAF picker opens in `Music`. Picking `Music` or any folder not called AudioStash creates `AudioStash` inside it.
+2. **Inside AudioStash only**. App storage, for owners who do not want files elsewhere.
 
 The library is mirrored into that folder. Mirroring means making the folder match the library: save songs that are missing or changed, delete files of songs that left the library, and write one `.m3u8` playlist file per playlist. The planning step compares what the library wants with a `saved_songs` table by path and SHA-256 hash. It is a pure function, tested without a phone.
 
@@ -32,7 +32,7 @@ Rules the mirror follows:
 - Each file is downloaded to the app's cache, its SHA-256 hash checked against the server's, then copied into the folder. A half-downloaded file never appears in the music folder, and a wrong file is never saved.
 - Over mobile data it waits for Wi-Fi, unless the owner allows mobile data in settings.
 - Playlist files list only songs already saved, so they never point at a missing file.
-- Covers are kept in app storage for Pluck's own screens. The audio file has the cover inside it for other players.
+- Covers are kept in app storage for AudioStash's own screens. The audio file has the cover inside it for other players.
 
 ## Options considered
 
@@ -40,7 +40,7 @@ Rules the mirror follows:
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | App storage only | Other players and a computer cannot see the files, and uninstalling deletes them. Kept as the second choice.                                                                              |
 | MediaStore       | After a reinstall the app no longer owns the files it added, and Android asks the owner to approve each change to them. Renaming or deleting songs would show a system prompt every time. |
-| All files access | Gives Pluck every file on the phone when it needs one folder. The owner must find the setting by hand, and Google Play refuses most apps that ask for it.                                 |
+| All files access | Gives AudioStash every file on the phone when it needs one folder. The owner must find the setting by hand, and Google Play refuses most apps that ask for it.                            |
 
 ## Consequences
 
@@ -48,7 +48,7 @@ Rules the mirror follows:
 - Signing out keeps the record of saved files, so signing in again downloads nothing that is already saved.
 - SAF has no paths. Finding `Songs/Dua Lipa/Houdini.opus` means listing each folder in turn, so the mirror lists each folder once per run and keeps the results. Shared storage ignores letter case, so lookups do too.
 - Copying a file into a SAF folder can be slow on some phones. Three downloads run at once to keep the connection busy.
-- If the owner deletes the folder or removes Pluck's access in Android settings, the mirror stops. The Downloads tab says "The music folder cannot be reached. Choose it again", and tapping it opens the folder choice.
+- If the owner deletes the folder or removes AudioStash's access in Android settings, the mirror stops. The Downloads tab says "The music folder cannot be reached. Choose it again", and tapping it opens the folder choice.
 - Changing the folder leaves the old files where they are and saves every song again in the new folder.
 - Folders left empty after their last song is deleted are not removed.
 

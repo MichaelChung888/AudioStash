@@ -1,4 +1,4 @@
-import { findActiveLine, formatDuration, type LyricLine, parseLrc } from '@pluck/core';
+import { findActiveLine, formatDuration, type LyricLine, parseLrc } from '@audiostash/core';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { type LayoutChangeEvent, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';

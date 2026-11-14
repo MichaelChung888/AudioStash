@@ -1,4 +1,4 @@
-import type { ClientEvent } from '@pluck/contracts';
+import type { ClientEvent } from '@audiostash/contracts';
 
 interface Subscriber {
   // The Clerk session that opened the stream.

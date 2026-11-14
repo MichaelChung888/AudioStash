@@ -1,5 +1,5 @@
 {
-  "name": "@pluck/messaging",
+  "name": "@audiostash/messaging",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -12,7 +12,7 @@
     "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "dependencies": {
-    "@pluck/contracts": "workspace:*",
+    "@audiostash/contracts": "workspace:*",
     "rabbitmq-client": "^5.1.0"
   },
   "devDependencies": {

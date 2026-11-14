@@ -1,5 +1,5 @@
-import type { LrclibClient, LyricsQuery } from '@pluck/catalog';
-import { lrcToPlain } from '@pluck/core';
+import type { LrclibClient, LyricsQuery } from '@audiostash/catalog';
+import { lrcToPlain } from '@audiostash/core';
 import type { Logger } from '../lib/logger.ts';
 
 export interface Lyrics {

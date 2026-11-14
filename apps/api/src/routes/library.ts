@@ -1,4 +1,4 @@
-import { createUploadsSchema, fileUrlsRequestSchema, pullQuerySchema, pushRequestSchema } from '@pluck/contracts';
+import { createUploadsSchema, fileUrlsRequestSchema, pullQuerySchema, pushRequestSchema } from '@audiostash/contracts';
 import { Hono } from 'hono';
 import * as ctrl from '../controllers/library.ts';
 import type { AppEnv } from '../lib/types.ts';

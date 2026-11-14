@@ -12,7 +12,7 @@ import {
   resolveClaimResponseSchema,
   type UploadUrlsRequest,
   uploadUrlsResponseSchema,
-} from '@pluck/contracts';
+} from '@audiostash/contracts';
 import { z } from 'zod';
 import { backoff } from '../lib/backoff.ts';
 

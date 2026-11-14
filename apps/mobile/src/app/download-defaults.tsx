@@ -1,4 +1,4 @@
-import type { DownloadOptions } from '@pluck/contracts';
+import type { DownloadOptions } from '@audiostash/contracts';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';

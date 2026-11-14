@@ -1,4 +1,4 @@
-import type { Session } from '@pluck/contracts';
+import type { Session } from '@audiostash/contracts';
 import { ForbiddenError, NotFoundError, UnauthorizedError } from '../lib/errors.ts';
 import { tokensMatch } from '../lib/tokens.ts';
 import type { Clerk, ClerkSession, SignedInUser } from './clerk.ts';

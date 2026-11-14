@@ -1,4 +1,4 @@
-import { type ClientEvent, clientEventSchema } from '@pluck/contracts';
+import { type ClientEvent, clientEventSchema } from '@audiostash/contracts';
 import { fetch } from 'expo/fetch';
 import { config } from '../config.ts';
 import { getSessionToken } from './client.ts';

@@ -1,4 +1,4 @@
-import { appliedMutations, type Executor, type Transaction } from '@pluck/db';
+import { appliedMutations, type Executor, type Transaction } from '@audiostash/db';
 import { eq } from 'drizzle-orm';
 
 export type AppliedMutationRow = typeof appliedMutations.$inferSelect;

@@ -3,9 +3,9 @@ import type { ExpoConfig } from 'expo/config';
 const BACKGROUND = '#0B0C0E';
 
 const config: ExpoConfig = {
-  name: 'Pluck',
-  slug: 'pluck',
-  scheme: 'pluck',
+  name: 'AudioStash',
+  slug: 'audiostash',
+  scheme: 'audiostash',
   version: '0.1.0',
   platforms: ['android'],
   orientation: 'portrait',
@@ -14,7 +14,7 @@ const config: ExpoConfig = {
   icon: './assets/icon.png',
   android: {
     // Only matters if the app is ever published to a store, where it must be unique.
-    package: 'dev.pluck.app',
+    package: 'dev.audiostash.app',
     adaptiveIcon: {
       foregroundImage: './assets/android-icon-foreground.png',
       monochromeImage: './assets/android-icon-monochrome.png',
@@ -24,7 +24,7 @@ const config: ExpoConfig = {
   },
   plugins: [
     'expo-router',
-    // Background playback adds the media playback service. Pluck never records.
+    // Background playback adds the media playback service. AudioStash never records.
     ['expo-audio', { enableBackgroundPlayback: true, recordAudioAndroid: false }],
     'expo-sqlite',
     'expo-secure-store',

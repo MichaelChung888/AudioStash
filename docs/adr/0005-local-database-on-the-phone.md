@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-Pluck's songs live on the phone so they play with no connection. The library around them must work offline too: the list of songs, the playlists, their order, and edits such as renaming a playlist on a train.
+AudioStash's songs live on the phone so they play with no connection. The library around them must work offline too: the list of songs, the playlists, their order, and edits such as renaming a playlist on a train.
 
 The server is the source of truth. It keeps a change log, and phones catch up by reading it from a cursor (see [0004](0004-sync-through-a-change-log.md)). The phone needs somewhere to keep what it has read, and a way to make edits before the server has seen them.
 
@@ -31,13 +31,13 @@ The phone keeps a SQLite database, opened with `expo-sqlite`. SQLite is a databa
 
 ## Options considered
 
-| Option                                   | Why it lost                                                                                                                                                                                     |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Fetch from the API on every screen       | Nothing works offline, which is the main reason the app exists.                                                                                                                                 |
-| Persist React Query's cache to storage   | The cache holds whole responses, not rows. Joining songs to playlists, sorting thousands of songs, and keeping edits in order would all be done by hand in memory.                              |
-| One column per server field              | Every new server field would need a migration on the phone, and old app versions would drop fields they do not know.                                                                            |
-| A sync library (WatermelonDB, PowerSync) | WatermelonDB needs its own native module and its own backend protocol. PowerSync's server is a paid service or another container to run. Pluck's needs are one table of changes and one outbox. |
-| Last-writer-wins merging on the phone    | Merging needs timestamps per field and rules per edit. With one owner, conflicts are rare enough that "the server's copy wins" is simpler and always correct.                                   |
+| Option                                   | Why it lost                                                                                                                                                                                          |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fetch from the API on every screen       | Nothing works offline, which is the main reason the app exists.                                                                                                                                      |
+| Persist React Query's cache to storage   | The cache holds whole responses, not rows. Joining songs to playlists, sorting thousands of songs, and keeping edits in order would all be done by hand in memory.                                   |
+| One column per server field              | Every new server field would need a migration on the phone, and old app versions would drop fields they do not know.                                                                                 |
+| A sync library (WatermelonDB, PowerSync) | WatermelonDB needs its own native module and its own backend protocol. PowerSync's server is a paid service or another container to run. AudioStash's needs are one table of changes and one outbox. |
+| Last-writer-wins merging on the phone    | Merging needs timestamps per field and rules per edit. With one owner, conflicts are rare enough that "the server's copy wins" is simpler and always correct.                                        |
 
 ## Consequences
 

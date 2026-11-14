@@ -1,5 +1,5 @@
 // Handlers for /v1/worker, called only by the home worker.
-import type { ClaimRequest, ItemComplete, ItemFail, ItemSource, ItemStage, ResolveComplete, ResolveFail, UploadUrlsRequest } from '@pluck/contracts';
+import type { ClaimRequest, ItemComplete, ItemFail, ItemSource, ItemStage, ResolveComplete, ResolveFail, UploadUrlsRequest } from '@audiostash/contracts';
 import type { Context } from 'hono';
 import type { AppEnv } from '../lib/types.ts';
 

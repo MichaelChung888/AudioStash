@@ -1,6 +1,6 @@
 # Authentication with Clerk
 
-The API must know that a request comes from you and not from someone who found its address. This note explains how Pluck checks that, and why each part is built the way it is.
+The API must know that a request comes from you and not from someone who found its address. This note explains how AudioStash checks that, and why each part is built the way it is.
 
 Two words first:
 
@@ -9,7 +9,7 @@ Two words first:
 
 ## The parts
 
-**Clerk** is a hosted sign-in service. It stores accounts and sessions, and emails one-time sign-in codes. The free plan covers far more users than Pluck needs. Pluck stores no passwords.
+**Clerk** is a hosted sign-in service. It stores accounts and sessions, and emails one-time sign-in codes. The free plan covers far more users than AudioStash needs. AudioStash stores no passwords.
 
 **Session.** Each time you sign in on a device, Clerk creates a session for it. A session lasts days or weeks (set in the Clerk dashboard) and ends when you sign out or it is revoked. Clerk stores it, and gives it an id like `sess_2Ro7e2…`.
 
@@ -40,9 +40,9 @@ Base64url is an encoding, not encryption. Anyone holding a token can read its cl
 
 ```mermaid
 sequenceDiagram
-    participant Phone as Pluck app
+    participant Phone as AudioStash app
     participant Clerk
-    participant API as Pluck API
+    participant API as AudioStash API
 
     Phone->>Clerk: 1. Sign in with an email code
     Clerk-->>Phone: 2. Session created. Long-lived client token stored in the phone's secure storage
@@ -62,7 +62,7 @@ The API checks a token using only the token and a public key. It does not ask Cl
 
 The cost: the API cannot tell when a session has been revoked. A token signed a few seconds before you revoked its session still has a valid signature. Clerk limits the damage by making tokens expire after about 60 seconds. The phone's Clerk SDK fetches a new token before the old one expires, and Clerk refuses to issue one for a revoked session. So a revoked device is locked out within a minute.
 
-Pluck closes that last minute too. When you sign a device out through the API, the API remembers the session id for 5 minutes and refuses its tokens. Five minutes is longer than any token for that session can live. This memory is per API process, which is fine because Pluck runs one.
+AudioStash closes that last minute too. When you sign a device out through the API, the API remembers the session id for 5 minutes and refuses its tokens. Five minutes is longer than any token for that session can live. This memory is per API process, which is fine because AudioStash runs one.
 
 ## Why there is an allow-list
 
@@ -70,7 +70,7 @@ Clerk's sign-up mode is set to **Restricted**, so nobody can create an account. 
 
 ## Signed-in devices
 
-A device in Pluck's settings screen is a Clerk session. There is no devices table in Pluck's database; Clerk already stores sessions with the time and place they were last used.
+A device in AudioStash's settings screen is a Clerk session. There is no devices table in AudioStash's database; Clerk already stores sessions with the time and place they were last used.
 
 | Request                   | What happens                                                                             |
 | ------------------------- | ---------------------------------------------------------------------------------------- |
@@ -112,16 +112,16 @@ Worker routes refuse session tokens, and app routes refuse `WORKER_TOKEN`. A lea
 
 ## Things people get wrong
 
-| Belief                                           | What is true                                                                                                              |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| A JWT is encrypted                               | It is only encoded. Anyone can read it. The signature stops changes, not reading.                                         |
-| Signing out on the phone stops its token at once | The token works until `exp`. Pluck's API refuses it sooner only when the sign-out went through `DELETE /v1/sessions/:id`. |
-| 401 and 403 are interchangeable                  | 401: we do not know who you are. 403: we know, and the answer is no.                                                      |
-| The public key must be kept secret               | It can only check signatures, not make them. The secret key (`CLERK_SECRET_KEY`) is the one to protect.                   |
+| Belief                                           | What is true                                                                                                                   |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| A JWT is encrypted                               | It is only encoded. Anyone can read it. The signature stops changes, not reading.                                              |
+| Signing out on the phone stops its token at once | The token works until `exp`. AudioStash's API refuses it sooner only when the sign-out went through `DELETE /v1/sessions/:id`. |
+| 401 and 403 are interchangeable                  | 401: we do not know who you are. 403: we know, and the answer is no.                                                           |
+| The public key must be kept secret               | It can only check signatures, not make them. The secret key (`CLERK_SECRET_KEY`) is the one to protect.                        |
 
 ## Adding more users later
 
-Pluck is built for one owner. To let others have their own libraries:
+AudioStash is built for one owner. To let others have their own libraries:
 
 1. Store users. Clerk calls a webhook on your API when a user signs up (`user.created`), and the API inserts a row into a `users` table. Spritegen does this.
 2. Add a `user_id` column to songs, playlists and downloads, and filter every query by it.

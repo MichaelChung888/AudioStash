@@ -1,4 +1,4 @@
-import { type ChangeEntity, type ChangeOp, type Executor, libraryChanges, type Transaction } from '@pluck/db';
+import { type ChangeEntity, type ChangeOp, type Executor, libraryChanges, type Transaction } from '@audiostash/db';
 import { asc, gt, max, sql } from 'drizzle-orm';
 
 export type ChangeRow = typeof libraryChanges.$inferSelect;

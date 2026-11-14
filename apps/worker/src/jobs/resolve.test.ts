@@ -1,4 +1,4 @@
-import type { ResolveComplete, ResolvedEntry } from '@pluck/contracts';
+import type { ResolveComplete, ResolvedEntry } from '@audiostash/contracts';
 import { describe, expect, it, vi } from 'vitest';
 import { type ApiClient, ApiError } from '../api/client.ts';
 import { silentLogger } from '../testing/logger.ts';

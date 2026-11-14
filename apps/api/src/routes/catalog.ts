@@ -1,4 +1,4 @@
-import { chartsQuerySchema, searchQuerySchema, trendingQuerySchema } from '@pluck/contracts';
+import { chartsQuerySchema, searchQuerySchema, trendingQuerySchema } from '@audiostash/contracts';
 import { Hono } from 'hono';
 import * as ctrl from '../controllers/catalog.ts';
 import type { AppEnv } from '../lib/types.ts';

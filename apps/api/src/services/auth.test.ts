@@ -48,7 +48,7 @@ describe('sessions', () => {
   const owner = { userId: OWNER, sessionId: 'sess_phone' };
 
   it('lists the owner’s sessions and marks the one making the request', async () => {
-    clerk.addSession(OWNER, 'sess_phone', { id: 'act_1', isMobile: true, deviceType: 'Android', browserName: 'Pluck', city: 'London', country: 'GB' });
+    clerk.addSession(OWNER, 'sess_phone', { id: 'act_1', isMobile: true, deviceType: 'Android', browserName: 'AudioStash', city: 'London', country: 'GB' });
     clerk.addSession(OWNER, 'sess_laptop');
     clerk.addSession('user_stranger', 'sess_x');
 
@@ -57,7 +57,7 @@ describe('sessions', () => {
     expect(sessions).toEqual([
       {
         id: 'sess_phone',
-        device: 'Android · Pluck',
+        device: 'Android · AudioStash',
         location: 'London · GB',
         createdAt: '1970-01-01T00:00:00.000Z',
         lastActiveAt: '1970-01-01T00:01:00.000Z',

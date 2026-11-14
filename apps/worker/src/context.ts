@@ -1,7 +1,7 @@
 import { mkdir, readdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import { createDeezerClient, createLrclibClient } from '@pluck/catalog';
-import { consumeJobs, createEventPublisher, createRabbit } from '@pluck/messaging';
+import { createDeezerClient, createLrclibClient } from '@audiostash/catalog';
+import { consumeJobs, createEventPublisher, createRabbit } from '@audiostash/messaging';
 import pkg from '../package.json' with { type: 'json' };
 import { createApiClient } from './api/client.ts';
 import type { Env } from './env.ts';
@@ -27,11 +27,11 @@ export interface WorkerContext {
 export function createContext(env: Env, logger: Logger): WorkerContext {
   const child = (component: string) => logger.child({ component });
 
-  const rabbit = createRabbit(env.RABBITMQ_URL, { name: `pluck-worker@${env.WORKER_ID}`, logger: child('rabbitmq') });
+  const rabbit = createRabbit(env.RABBITMQ_URL, { name: `audiostash-worker@${env.WORKER_ID}`, logger: child('rabbitmq') });
   const events = createEventPublisher(rabbit);
-  const api = createApiClient({ baseUrl: env.API_URL, token: env.WORKER_TOKEN, userAgent: `pluck-worker/${pkg.version}` });
+  const api = createApiClient({ baseUrl: env.API_URL, token: env.WORKER_TOKEN, userAgent: `audiostash-worker/${pkg.version}` });
 
-  const http = { userAgent: `Pluck/${pkg.version} (personal music library)` };
+  const http = { userAgent: `AudioStash/${pkg.version} (personal music library)` };
   const ytdlp = createYtDlp({ path: env.YTDLP_PATH, ffmpegPath: env.FFMPEG_PATH, cookiesFile: env.YTDLP_COOKIES_FILE });
   const ffmpeg = createFfmpeg({ ffmpegPath: env.FFMPEG_PATH, ffprobePath: env.FFPROBE_PATH });
   const tagger = createTagger({ pythonPath: env.PYTHON_PATH });

@@ -39,7 +39,7 @@ export default function MusicFolderScreen() {
           {firstRun ? 'Where should songs go?' : 'Music folder'}
         </Text>
         <Text style={text.secondary}>
-          Pluck saves every song in your library on this phone, so it plays with no connection. Playlists are saved next to them as .m3u8 files.
+          AudioStash saves every song in your library on this phone, so it plays with no connection. Playlists are saved next to them as .m3u8 files.
         </Text>
         {current ? <Text style={text.secondary}>Now: {current}</Text> : null}
 
@@ -47,12 +47,12 @@ export default function MusicFolderScreen() {
           icon="folder"
           title="A folder in Music"
           tag="Recommended"
-          detail="Pick Music and Pluck makes a Pluck folder inside it. Other music apps and your computer can see the songs, and they stay if Pluck is removed."
+          detail="Pick Music and AudioStash makes an AudioStash folder inside it. Other music apps and your computer can see the songs, and they stay if AudioStash is removed."
         >
           <Button label="Choose folder" busy={busy} onPress={() => void choose(chooseSharedFolder)} />
         </Choice>
 
-        <Choice icon="phone" title="Inside Pluck only" detail="Only Pluck can play them, and they are deleted if Pluck is removed.">
+        <Choice icon="phone" title="Inside AudioStash only" detail="Only AudioStash can play them, and they are deleted if AudioStash is removed.">
           <Button
             label="Use app storage"
             variant="quiet"

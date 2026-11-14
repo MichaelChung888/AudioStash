@@ -1,5 +1,5 @@
-import { type DownloadStatus, FINISHED_DOWNLOAD_STATUSES } from '@pluck/contracts';
-import type { Transaction } from '@pluck/db';
+import { type DownloadStatus, FINISHED_DOWNLOAD_STATUSES } from '@audiostash/contracts';
+import type { Transaction } from '@audiostash/db';
 import type { DownloadRow } from '../db/downloads.ts';
 import * as downloadsDb from '../db/downloads.ts';
 import type { ItemCounts } from '../db/items.ts';

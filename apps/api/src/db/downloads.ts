@@ -1,5 +1,5 @@
-import { type DownloadStatus, FINISHED_DOWNLOAD_STATUSES } from '@pluck/contracts';
-import { downloads, type Executor, type Transaction } from '@pluck/db';
+import { type DownloadStatus, FINISHED_DOWNLOAD_STATUSES } from '@audiostash/contracts';
+import { downloads, type Executor, type Transaction } from '@audiostash/db';
 import { and, desc, eq, inArray, lt, notInArray, type SQL } from 'drizzle-orm';
 
 export type DownloadRow = typeof downloads.$inferSelect;

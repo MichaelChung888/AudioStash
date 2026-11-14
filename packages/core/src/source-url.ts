@@ -1,4 +1,4 @@
-import type { SongSource } from '@pluck/contracts';
+import type { SongSource } from '@audiostash/contracts';
 
 export interface ParsedSourceUrl {
   source: SongSource;

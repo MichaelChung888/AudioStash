@@ -1,4 +1,4 @@
-import { createDownloadSchema, idParamSchema, listDownloadsQuerySchema } from '@pluck/contracts';
+import { createDownloadSchema, idParamSchema, listDownloadsQuerySchema } from '@audiostash/contracts';
 import { Hono } from 'hono';
 import * as ctrl from '../controllers/downloads.ts';
 import type { AppEnv } from '../lib/types.ts';

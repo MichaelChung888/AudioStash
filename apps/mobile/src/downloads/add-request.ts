@@ -1,5 +1,5 @@
-import type { CatalogTrack, YoutubeVideo } from '@pluck/contracts';
-import type { ParsedSourceUrl } from '@pluck/core';
+import type { CatalogTrack, YoutubeVideo } from '@audiostash/contracts';
+import type { ParsedSourceUrl } from '@audiostash/core';
 import type { DocumentPickerAsset } from 'expo-document-picker';
 import { router } from 'expo-router';
 

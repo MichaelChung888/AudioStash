@@ -1,6 +1,6 @@
-import type { JobName, JobPayload } from '@pluck/contracts';
-import type { Database } from '@pluck/db';
-import type { JobPublisher } from '@pluck/messaging';
+import type { JobName, JobPayload } from '@audiostash/contracts';
+import type { Database } from '@audiostash/db';
+import type { JobPublisher } from '@audiostash/messaging';
 import * as outboxDb from '../db/outbox.ts';
 import { withTimeout } from '../lib/concurrency.ts';
 import type { Logger } from '../lib/logger.ts';

@@ -1,6 +1,6 @@
 # Known limitations
 
-Things Pluck does not do yet, or does in a simple way on purpose. Each entry says what happens and why it was left.
+Things AudioStash does not do yet, or does in a simple way on purpose. Each entry says what happens and why it was left.
 
 ## Not tried on a phone yet
 

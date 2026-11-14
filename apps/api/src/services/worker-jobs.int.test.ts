@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { type CreateDownloadRequest, createDownloadSchema, type ItemComplete } from '@pluck/contracts';
-import { libraryChanges, outbox, playlistEntries, playlists, songs } from '@pluck/db';
+import { type CreateDownloadRequest, createDownloadSchema, type ItemComplete } from '@audiostash/contracts';
+import { libraryChanges, outbox, playlistEntries, playlists, songs } from '@audiostash/db';
 import { asc, eq } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { BadRequestError, ConflictError } from '../lib/errors.ts';

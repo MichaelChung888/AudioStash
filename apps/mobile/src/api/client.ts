@@ -1,5 +1,5 @@
+import { errorBodySchema } from '@audiostash/contracts';
 import { getClerkInstance } from '@clerk/expo';
-import { errorBodySchema } from '@pluck/contracts';
 import type { z } from 'zod';
 import { config } from '../config.ts';
 

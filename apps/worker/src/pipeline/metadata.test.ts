@@ -1,4 +1,4 @@
-import type { DeezerClient, DeezerTrack, DeezerTrackDetail } from '@pluck/catalog';
+import type { DeezerClient, DeezerTrack, DeezerTrackDetail } from '@audiostash/catalog';
 import { describe, expect, it, vi } from 'vitest';
 import { silentLogger } from '../testing/logger.ts';
 import { createMetadataLookup } from './metadata.ts';

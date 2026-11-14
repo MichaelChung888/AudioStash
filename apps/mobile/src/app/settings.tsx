@@ -1,5 +1,5 @@
+import type { Session } from '@audiostash/contracts';
 import { useAuth, useUser } from '@clerk/expo';
-import type { Session } from '@pluck/contracts';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';

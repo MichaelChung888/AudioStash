@@ -1,6 +1,6 @@
 // HTTP-aware handlers for /v1/downloads. Validation happens in routes/downloads.ts;
 // business rules live in services/downloads.ts. Errors propagate to app.onError.
-import type { CreateDownload, ListDownloadsQuery } from '@pluck/contracts';
+import type { CreateDownload, ListDownloadsQuery } from '@audiostash/contracts';
 import type { Context } from 'hono';
 import type { AppEnv } from '../lib/types.ts';
 

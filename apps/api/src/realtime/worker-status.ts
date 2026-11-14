@@ -1,4 +1,4 @@
-import type { BusEvent } from '@pluck/contracts';
+import type { BusEvent } from '@audiostash/contracts';
 
 type Heartbeat = Extract<BusEvent, { type: 'worker.heartbeat' }>;
 

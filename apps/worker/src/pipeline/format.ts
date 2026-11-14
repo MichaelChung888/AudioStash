@@ -1,4 +1,4 @@
-import { AUDIO_EXTENSIONS, type AudioCodec, type AudioFormat } from '@pluck/contracts';
+import { AUDIO_EXTENSIONS, type AudioCodec, type AudioFormat } from '@audiostash/contracts';
 
 export interface EncodePlan {
   codec: AudioCodec;

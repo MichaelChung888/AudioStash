@@ -1,4 +1,4 @@
-import type { CreateUploadsRequest, FileUrlsRequest, Mutation, PullQuery } from '@pluck/contracts';
+import type { CreateUploadsRequest, FileUrlsRequest, Mutation, PullQuery } from '@audiostash/contracts';
 import type { Context } from 'hono';
 import type { AppEnv } from '../lib/types.ts';
 

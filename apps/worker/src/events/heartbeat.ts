@@ -1,4 +1,4 @@
-import type { EventPublisher } from '@pluck/messaging';
+import type { EventPublisher } from '@audiostash/messaging';
 import type { Logger } from '../lib/logger.ts';
 
 // The API marks the worker offline after 90 seconds without a heartbeat, so a

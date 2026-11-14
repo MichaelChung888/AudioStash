@@ -1,4 +1,4 @@
-import type { Download, DownloadItem } from '@pluck/contracts';
+import type { Download, DownloadItem } from '@audiostash/contracts';
 import { describe, expect, it } from 'vitest';
 import { downloadProgress, finishedSummary, openSummary, queueSummary, sourceName, stageLabel } from './describe.ts';
 

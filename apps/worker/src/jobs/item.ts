@@ -1,8 +1,8 @@
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { ClaimedItem, ItemComplete, JobPayload } from '@pluck/contracts';
-import { gainToTarget } from '@pluck/core';
-import type { EventPublisher, FailureInfo, JobContext } from '@pluck/messaging';
+import type { ClaimedItem, ItemComplete, JobPayload } from '@audiostash/contracts';
+import { gainToTarget } from '@audiostash/core';
+import type { EventPublisher, FailureInfo, JobContext } from '@audiostash/messaging';
 import { type ApiClient, ApiError } from '../api/client.ts';
 import { createProgressReporter } from '../events/progress.ts';
 import { describeFile } from '../lib/files.ts';

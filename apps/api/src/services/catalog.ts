@@ -1,7 +1,7 @@
-import { type AppleChartSong, type AppleChartsClient, appleArtwork, type DeezerClient, type DeezerTrack, type YoutubeClient } from '@pluck/catalog';
-import type { CatalogTrack, ForYouResponse, Genre, YoutubeVideo } from '@pluck/contracts';
-import { normalizeForMatch, parseIsoDuration, pickBestMatch, stripFeaturing, youtubeVideoUrl } from '@pluck/core';
-import type { Database } from '@pluck/db';
+import { type AppleChartSong, type AppleChartsClient, appleArtwork, type DeezerClient, type DeezerTrack, type YoutubeClient } from '@audiostash/catalog';
+import type { CatalogTrack, ForYouResponse, Genre, YoutubeVideo } from '@audiostash/contracts';
+import { normalizeForMatch, parseIsoDuration, pickBestMatch, stripFeaturing, youtubeVideoUrl } from '@audiostash/core';
+import type { Database } from '@audiostash/db';
 import * as songsDb from '../db/songs.ts';
 import { mapWithConcurrency } from '../lib/concurrency.ts';
 import { AppError, UnavailableError } from '../lib/errors.ts';

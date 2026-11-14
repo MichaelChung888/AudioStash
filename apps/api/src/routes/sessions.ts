@@ -1,4 +1,4 @@
-import { sessionIdParamSchema } from '@pluck/contracts';
+import { sessionIdParamSchema } from '@audiostash/contracts';
 import { Hono } from 'hono';
 import * as ctrl from '../controllers/sessions.ts';
 import type { AppEnv } from '../lib/types.ts';

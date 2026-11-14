@@ -1,5 +1,5 @@
-import type { SongSource } from '@pluck/contracts';
-import { type Executor, songs, type Transaction } from '@pluck/db';
+import type { SongSource } from '@audiostash/contracts';
+import { type Executor, songs, type Transaction } from '@audiostash/db';
 import { and, desc, eq, inArray, isNotNull, sql } from 'drizzle-orm';
 
 export type SongRow = typeof songs.$inferSelect;

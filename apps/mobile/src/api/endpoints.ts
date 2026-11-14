@@ -14,7 +14,7 @@ import {
   statusResponseSchema,
   tracksResponseSchema,
   youtubeVideoSchema,
-} from '@pluck/contracts';
+} from '@audiostash/contracts';
 import { z } from 'zod';
 import { query, request } from './client.ts';
 

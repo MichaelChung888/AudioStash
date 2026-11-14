@@ -5,10 +5,10 @@
 #   docker compose --profile app up -d --build  The same, plus the API and worker in containers.
 #
 # The passwords here are for local use only.
-name: pluck
+name: audiostash
 
 x-api-image: &api-image
-  image: pluck-api
+  image: audiostash-api
   build:
     context: .
     dockerfile: apps/api/Dockerfile
@@ -17,15 +17,15 @@ services:
   postgres:
     image: postgres:18.6-trixie
     environment:
-      POSTGRES_USER: pluck
-      POSTGRES_PASSWORD: pluck
-      POSTGRES_DB: pluck
+      POSTGRES_USER: audiostash
+      POSTGRES_PASSWORD: audiostash
+      POSTGRES_DB: audiostash
     # 5433 on the host, so it does not clash with a Postgres already installed there.
     ports: ["5433:5432"]
     # Postgres 18 images keep their data in a versioned folder under /var/lib/postgresql.
     volumes: [postgres:/var/lib/postgresql]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pluck -d pluck"]
+      test: ["CMD-SHELL", "pg_isready -U audiostash -d audiostash"]
       interval: 2s
       timeout: 5s
       retries: 30
@@ -36,8 +36,8 @@ services:
     # queues when the container is recreated.
     hostname: rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: pluck
-      RABBITMQ_DEFAULT_PASS: pluck
+      RABBITMQ_DEFAULT_USER: audiostash
+      RABBITMQ_DEFAULT_PASS: audiostash
     # 15672 is the management web UI: http://localhost:15672
     ports: ["5672:5672", "15672:15672"]
     volumes: [rabbitmq:/var/lib/rabbitmq]
@@ -51,8 +51,8 @@ services:
   storage:
     image: rustfs/rustfs:1.0.4
     environment:
-      RUSTFS_ACCESS_KEY: pluck-dev
-      RUSTFS_SECRET_KEY: pluck-dev-secret
+      RUSTFS_ACCESS_KEY: audiostash-dev
+      RUSTFS_SECRET_KEY: audiostash-dev-secret
       RUSTFS_CONSOLE_ENABLE: "true"
     ports: ["9000:9000", "9001:9001"]
     volumes: [storage:/data]
@@ -67,7 +67,7 @@ services:
     profiles: [app]
     command: ["node", "packages/db/scripts/migrate.ts"]
     environment:
-      DATABASE_URL: postgres://pluck:pluck@postgres:5432/pluck
+      DATABASE_URL: postgres://audiostash:audiostash@postgres:5432/audiostash
     depends_on:
       postgres: { condition: service_healthy }
 
@@ -79,8 +79,8 @@ services:
     # services are reached by name.
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgres://pluck:pluck@postgres:5432/pluck
-      RABBITMQ_URL: amqp://pluck:pluck@rabbitmq:5672
+      DATABASE_URL: postgres://audiostash:audiostash@postgres:5432/audiostash
+      RABBITMQ_URL: amqp://audiostash:audiostash@rabbitmq:5672
       S3_ENDPOINT: http://storage:9000
     ports: ["3000:3000"]
     depends_on:
@@ -95,7 +95,7 @@ services:
 
   worker:
     profiles: [app]
-    image: pluck-worker
+    image: audiostash-worker
     build:
       context: .
       dockerfile: apps/worker/Dockerfile
@@ -103,7 +103,7 @@ services:
     environment:
       NODE_ENV: production
       API_URL: http://api:3000
-      RABBITMQ_URL: amqp://pluck:pluck@rabbitmq:5672
+      RABBITMQ_URL: amqp://audiostash:audiostash@rabbitmq:5672
     depends_on:
       api: { condition: service_healthy }
     # The worker waits up to 25 seconds for running jobs on shutdown. Docker's default is 10.

@@ -1,5 +1,5 @@
-import type { DownloadOptions, DownloadSource, DownloadTarget, UploadedFile } from '@pluck/contracts';
-import { formatDuration } from '@pluck/core';
+import type { DownloadOptions, DownloadSource, DownloadTarget, UploadedFile } from '@audiostash/contracts';
+import { formatDuration } from '@audiostash/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { randomUUID } from 'expo-crypto';
 import type { DocumentPickerAsset } from 'expo-document-picker';

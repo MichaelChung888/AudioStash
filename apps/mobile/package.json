@@ -1,5 +1,5 @@
 {
-  "name": "@pluck/mobile",
+  "name": "@audiostash/mobile",
   "version": "0.1.0",
   "private": true,
   "main": "expo-router/entry",
@@ -16,8 +16,8 @@
     "@expo-google-fonts/inter": "^0.4.2",
     "@expo-google-fonts/space-grotesk": "^0.4.1",
     "@expo/vector-icons": "^15.1.1",
-    "@pluck/contracts": "workspace:*",
-    "@pluck/core": "workspace:*",
+    "@audiostash/contracts": "workspace:*",
+    "@audiostash/core": "workspace:*",
     "@tanstack/react-query": "^5.107.1",
     "expo": "~58.0.23",
     "expo-asset": "~58.0.20",

@@ -6,7 +6,7 @@ import { createUploader, UploadError } from './upload.ts';
 
 let file: string;
 beforeEach(async () => {
-  file = join(await mkdtemp(join(tmpdir(), 'pluck-upload-')), 'audio.opus');
+  file = join(await mkdtemp(join(tmpdir(), 'audiostash-upload-')), 'audio.opus');
   await writeFile(file, Buffer.from('audio bytes'));
 });
 afterEach(async () => {

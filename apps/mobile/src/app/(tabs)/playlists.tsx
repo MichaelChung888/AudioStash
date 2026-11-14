@@ -1,5 +1,5 @@
-import type { Download, Playlist } from '@pluck/contracts';
-import { formatTotalDuration } from '@pluck/core';
+import type { Download, Playlist } from '@audiostash/contracts';
+import { formatTotalDuration } from '@audiostash/core';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';

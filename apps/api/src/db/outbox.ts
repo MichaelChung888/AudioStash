@@ -1,5 +1,5 @@
-import type { JobName, JobPayload } from '@pluck/contracts';
-import { type Executor, outbox, type Transaction } from '@pluck/db';
+import type { JobName, JobPayload } from '@audiostash/contracts';
+import { type Executor, outbox, type Transaction } from '@audiostash/db';
 import { and, asc, inArray, isNotNull, isNull, lt, sql } from 'drizzle-orm';
 
 export type OutboxRow = typeof outbox.$inferSelect;

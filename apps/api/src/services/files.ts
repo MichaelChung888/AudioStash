@@ -1,5 +1,5 @@
-import type { CreateUploadsRequest, CreateUploadsResponse, FileUrlsResponse } from '@pluck/contracts';
-import type { Database } from '@pluck/db';
+import type { CreateUploadsRequest, CreateUploadsResponse, FileUrlsResponse } from '@audiostash/contracts';
+import type { Database } from '@audiostash/db';
 import * as songsDb from '../db/songs.ts';
 import { type Storage, storageKeys } from './storage.ts';
 

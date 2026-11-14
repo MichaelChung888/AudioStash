@@ -1,4 +1,4 @@
-import type { BusEvent } from '@pluck/contracts';
+import type { BusEvent } from '@audiostash/contracts';
 import { describe, expect, it, vi } from 'vitest';
 import { silentLogger } from '../testing/logger.ts';
 import { createProgressReporter } from './progress.ts';

@@ -1,4 +1,4 @@
-import { gainToVolume } from '@pluck/core';
+import { gainToVolume } from '@audiostash/core';
 import { type AudioPlaylist, type AudioPlaylistStatus, createAudioPlaylist, setAudioModeAsync } from 'expo-audio';
 import type { LibrarySong } from '../db/library.ts';
 import { recordPlay } from '../db/mutations.ts';
