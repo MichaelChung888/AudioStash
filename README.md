@@ -74,11 +74,16 @@ This runs the whole backend on your PC in Docker. You only need Git and Docker; 
 In PowerShell:
 
 ```powershell
-git clone https://github.com/<your-username>/pluck.git
+git config --global core.longpaths true
+mkdir C:\dev
+cd C:\dev
+git clone https://github.com/MichaelChung888/pluck.git
 cd pluck
 Copy-Item .env.example .env
 notepad .env
 ```
+
+Keep the folder path short. `pnpm install` creates deeply nested folders, and Windows refuses paths over 260 characters unless long paths are on.
 
 Fill in:
 
@@ -129,11 +134,85 @@ Run the last line again after a minute and the status changes to `completed`. Th
 | Update after `git pull` | `docker compose --profile app up -d --build` |
 | Delete all local data   | `docker compose --profile app down -v`       |
 
+## Try the app on an emulator
+
+An emulator is a virtual Android phone that runs in a window on your PC. This builds a debug version of the app on your PC and installs it there. A debug build allows plain `http://`, so it works with the backend from the quick start, before any cloud deploy.
+
+The backend must be running (quick start step 4), and you need Node 24 and pnpm (see [Developing](#developing)).
+
+### 1. Install the Android tools
+
+1. Install [Android Studio](https://developer.android.com/studio). Open it once and finish the setup wizard with the standard options. It downloads the Android SDK, which is the set of tools that builds Android apps.
+2. Install Java 17, which the Android build needs:
+
+   ```powershell
+   winget install Microsoft.OpenJDK.17
+   ```
+
+3. Tell the build where both are. In PowerShell:
+
+   ```powershell
+   $jdk = (Get-ChildItem 'C:\Program Files\Microsoft\jdk-17*')[0].FullName
+   [Environment]::SetEnvironmentVariable('JAVA_HOME', $jdk, 'User')
+   [Environment]::SetEnvironmentVariable('ANDROID_HOME', "$env:LOCALAPPDATA\Android\Sdk", 'User')
+   $path = [Environment]::GetEnvironmentVariable('Path', 'User')
+   [Environment]::SetEnvironmentVariable('Path', "$path;$env:LOCALAPPDATA\Android\Sdk\platform-tools", 'User')
+   ```
+
+   Close the terminal and open a new one, so it sees the new settings.
+
+### 2. Create a virtual phone
+
+In Android Studio, open **More Actions > Virtual Device Manager** (or **View > Tool Windows > Device Manager** if a project is open).
+
+1. Click **+**, pick **Pixel 9**, then **Next**.
+2. Pick the newest system image marked **Google Play** for `x86_64`. Download it if asked.
+3. Finish, then press the play button next to the new device. The phone starts in a window.
+
+### 3. Point the app at your PC
+
+```powershell
+cd C:\dev\pluck
+pnpm install
+Copy-Item apps/mobile/.env.example apps/mobile/.env
+notepad apps/mobile/.env
+```
+
+| Setting                             | Value                                                                                |
+| ----------------------------------- | ------------------------------------------------------------------------------------ |
+| `EXPO_PUBLIC_API_URL`               | `http://<your PC's IP>:3000`, the same IP as `S3_PUBLIC_ENDPOINT` in the root `.env` |
+| `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` | The publishable key (`pk_test_…`) from **API keys** in the Clerk dashboard           |
+
+The emulator reaches your PC on its network address, like a real phone would. If it cannot connect, use `10.0.2.2` instead of the IP in both settings: inside the emulator, that address means the PC it runs on. Restart the backend after changing the root `.env`.
+
+### 4. Build and run
+
+With the virtual phone running:
+
+```powershell
+pnpm --filter @pluck/mobile android
+```
+
+The first build takes 10 minutes or more. Later builds are much faster. When it finishes, the app opens on the virtual phone. Then follow [First run](#4-first-run) below.
+
+The command keeps running: it is Metro, the server that sends the app's JavaScript to the phone. Saving a change to the code reloads the app within a second. Press `Ctrl+C` to stop it. Run the same command again next time.
+
+### A real phone over USB
+
+The same steps work with your own phone in place of the virtual one:
+
+1. On the phone, open **Settings > About phone** and tap **Build number** seven times. This turns on **Developer options**.
+2. In **Developer options**, turn on **USB debugging**.
+3. Plug the phone into the PC and allow debugging when the phone asks.
+4. Run `pnpm --filter @pluck/mobile android`. The phone must be on the same Wi-Fi as the PC, and `.env` must use the PC's IP, not `10.0.2.2`.
+
+A build made this way is signed with a different key from the APK built by EAS. To switch from one to the other, uninstall the app first. See [Signing](docs/learning/expo-and-the-apk.md#signing).
+
 ## The Android app
 
 The app is installed as an APK, built on Expo's servers (EAS Build) so you do not need Android tools on your computer. [Expo, and how the app becomes an APK](docs/learning/expo-and-the-apk.md) explains each step.
 
-The APK only connects to `https://` addresses, so it needs the API deployed to the cloud first. Until then, the API on your PC works from PowerShell (step 5 above) but not from the app.
+The APK only connects to `https://` addresses, so it needs the API deployed to the cloud first. Until then, [try the app on an emulator](#try-the-app-on-an-emulator).
 
 ### 1. Set up EAS
 

@@ -4,11 +4,11 @@ Things Pluck does not do yet, or does in a simple way on purpose. Each entry say
 
 ## Not tried on a phone yet
 
-The app passes type checks, unit tests, lint, and builds its Android bundle. It has not run on a phone, because no Android tools are installed where it was written. Audio, the folder picker, background playback and lock screen controls are checked only by installing the APK.
+The app passes type checks, unit tests, lint, and builds its Android bundle. It has not run on a phone or an emulator yet. Audio, the folder picker, background playback and lock screen controls are checked only by running it ([Try the app on an emulator](../README.md#try-the-app-on-an-emulator)).
 
 ## The APK needs the API on https
 
-A release build refuses plain `http://` (see [Expo, and how the app becomes an APK](learning/expo-and-the-apk.md)). The API running in Docker on the PC is `http://`, so the APK cannot use it. The cloud deploy, which is next, gives the API an `https://` address.
+A release build refuses plain `http://` (see [Expo, and how the app becomes an APK](learning/expo-and-the-apk.md)). The API running in Docker on the PC is `http://`, so the APK cannot use it. A debug build on an emulator or a USB phone can. The cloud deploy, which is next, gives the API an `https://` address.
 
 ## App
 

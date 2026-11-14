@@ -35,7 +35,7 @@ Node 24 runs the `.ts` files directly by removing the types. So:
 
 ## Mobile app
 
-- Android only. No Android SDK here: check changes with `pnpm --filter @pluck/mobile bundle` as well as typecheck, test and lint. Native behaviour is only checked on a phone.
+- Android only. Check changes with `pnpm --filter @pluck/mobile bundle` as well as typecheck, test and lint; these need no Android SDK. Native behaviour is only checked on an emulator or a phone (README, "Try the app on an emulator").
 - Screens read the local SQLite database through queries under `keys.local`. Library edits go through `src/db/mutations.ts`, which applies the edit locally and queues it in the outbox in one transaction. Never send a library edit to the API directly.
 - The mirror (`src/files/mirror.ts`) deletes files of songs missing from the local database, so it runs only after a complete sync (`onSynced`).
 - The sign-out order in `src/session.ts` matters: stop the mirror, stop playback, sign out, wait for sync, clear the library.

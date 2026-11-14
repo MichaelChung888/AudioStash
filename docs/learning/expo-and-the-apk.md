@@ -79,7 +79,7 @@ EAS (Expo Application Services) Build runs the steps above on Expo's servers. Th
 
 ## Checking the app without a phone
 
-This repository is developed on a Mac with no Android tools installed. These checks run anyway:
+These checks need no Android tools, so they run on any computer:
 
 | Check                                | What it proves                                                             | What it cannot prove                   |
 | ------------------------------------ | -------------------------------------------------------------------------- | -------------------------------------- |
@@ -88,7 +88,7 @@ This repository is developed on a Mac with no Android tools installed. These che
 | `pnpm --filter @pluck/mobile bundle` | Metro finds every import and Hermes compiles the whole app                 | That native modules behave as expected |
 | `npx expo-doctor` (in `apps/mobile`) | Package versions match the Expo SDK                                        |                                        |
 
-Native behaviour (audio, the folder picker, background playback) is checked only by running the APK.
+Native behaviour (audio, the folder picker, background playback) is checked only by running the app: a debug build on an emulator or a USB phone (see the README), or the APK.
 
 ## Where the code is
 
