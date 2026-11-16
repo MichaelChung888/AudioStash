@@ -1,0 +1,409 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1820" height="1840" viewBox="0 0 1820 1840" role="img" aria-labelledby="title desc">
+  <title id="title">AudioStash: how everything connects</title>
+  <desc id="desc">The Android app, the API on a cloud server with Postgres and RabbitMQ, the download worker on a home PC, Cloudflare R2 storage, Clerk sign-in and public music APIs, with the nine steps of a song download.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrowEvent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7C3AED"/>
+    </marker>
+    <style>
+      text { font-family: 'Segoe UI', -apple-system, 'Helvetica Neue', Arial, sans-serif; fill: #334155; }
+      .mono { font-family: 'Cascadia Mono', Consolas, 'SFMono-Regular', Menlo, monospace; }
+      .h1 { font-size: 30px; font-weight: 700; fill: #0F172A; }
+      .lead { font-size: 14px; fill: #475569; }
+      .zone { font-size: 19px; font-weight: 700; }
+      .zsub { font-size: 12px; fill: #64748B; }
+      .bt { font-size: 14px; font-weight: 600; fill: #0F172A; }
+      .bf { font-size: 11px; fill: #64748B; }
+      .b { font-size: 12.5px; }
+      .s { font-size: 11.5px; }
+      .chipName { font-size: 10.5px; font-weight: 700; fill: #0F172A; }
+      .lbl { font-size: 11.5px; fill: #475569; }
+      .badgeText { font-size: 12px; font-weight: 700; fill: #FFFFFF; }
+      .panelTitle { font-size: 18px; font-weight: 700; fill: #0F172A; }
+      .step { font-size: 13px; }
+      .term { font-size: 13px; font-weight: 700; fill: #0F172A; }
+      .gloss { font-size: 12.5px; }
+      .box { fill: #FFFFFF; stroke-width: 1.5; }
+      .flow { fill: none; stroke: #334155; stroke-width: 1.8; }
+      .event { fill: none; stroke: #7C3AED; stroke-width: 1.8; stroke-dasharray: 6 4; }
+      .badge { fill: #0F172A; }
+    </style>
+  </defs>
+
+  <rect width="1820" height="1840" fill="#FFFFFF"/>
+
+  <!-- ===================== Title and legend ===================== -->
+  <text x="40" y="52" class="h1">AudioStash: how everything connects</text>
+  <text x="40" y="80" class="lead">The planned production layout. Today all of it runs in Docker on your PC, and RustFS stands in for Cloudflare R2.</text>
+
+  <rect x="1150" y="26" width="630" height="50" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <line x1="1168" y1="51" x2="1208" y2="51" class="flow" marker-end="url(#arrow)"/>
+  <text x="1216" y="55" class="s">HTTPS request</text>
+  <line x1="1328" y1="51" x2="1368" y2="51" class="event" marker-end="url(#arrowEvent)"/>
+  <text x="1376" y="55" class="s">RabbitMQ message or live event</text>
+  <circle cx="1582" cy="51" r="11" class="badge"/>
+  <text x="1582" y="55" text-anchor="middle" class="badgeText">1</text>
+  <text x="1600" y="55" class="s">download step, listed below</text>
+
+  <!-- ===================== Outside services (top row) ===================== -->
+  <rect x="40" y="96" width="360" height="118" rx="12" class="box" stroke="#7C3AED"/>
+  <text x="58" y="120" class="bt">Clerk</text>
+  <text x="58" y="138" class="bf">hosted sign-in service</text>
+  <text x="58" y="160" class="b">Email and password, or Google, Apple, GitHub,</text>
+  <text x="58" y="178" class="b">Facebook. Keeps your account and each device's</text>
+  <text x="58" y="196" class="b">session, and signs the session tokens.</text>
+
+  <rect x="760" y="96" width="780" height="118" rx="12" class="box" stroke="#64748B"/>
+  <text x="778" y="120" class="bt">Public music APIs</text>
+  <text x="778" y="138" class="bf mono">packages/catalog</text>
+  <text x="778" y="160" class="b"><tspan font-weight="600">Apple Music RSS</tspan>  most-played chart</text>
+  <text x="778" y="180" class="b"><tspan font-weight="600">YouTube Data API</tspan>  video search</text>
+  <text x="1080" y="160" class="b"><tspan font-weight="600">Deezer</tspan>  genre charts, search, song tags, album art</text>
+  <text x="1080" y="180" class="b"><tspan font-weight="600">LRCLIB</tspan>  synced lyrics</text>
+  <text x="778" y="202" class="s">The API uses them for charts and search, cached in memory. The worker uses Deezer and LRCLIB for tags and lyrics.</text>
+
+  <rect x="1580" y="96" width="200" height="118" rx="12" class="box" stroke="#64748B"/>
+  <text x="1598" y="120" class="bt">Audio sources</text>
+  <text x="1598" y="142" class="b">YouTube, YouTube Music,</text>
+  <text x="1598" y="160" class="b">SoundCloud, Bandcamp and</text>
+  <text x="1598" y="178" class="b">other sites yt-dlp knows,</text>
+  <text x="1598" y="196" class="b">fetched from your home PC.</text>
+
+  <!-- ===================== Zones ===================== -->
+  <rect x="40" y="250" width="600" height="915" rx="16" fill="#ECFDF5" stroke="#059669" stroke-width="2"/>
+  <text x="60" y="280" class="zone" fill="#065F46" style="fill:#065F46">Android phone</text>
+  <text x="60" y="300" class="zsub mono">apps/mobile</text>
+
+  <rect x="690" y="250" width="560" height="915" rx="16" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+  <text x="710" y="280" class="zone" style="fill:#1E3A8A">Cloud server</text>
+  <text x="710" y="300" class="zsub">Docker · HTTPS for the phone, Tailscale for the PC</text>
+
+  <rect x="1300" y="250" width="480" height="915" rx="16" fill="#FFFBEB" stroke="#D97706" stroke-width="2"/>
+  <text x="1320" y="280" class="zone" style="fill:#78350F">Home PC</text>
+  <text x="1320" y="300" class="zsub">Docker + Tailscale</text>
+
+  <!-- ===================== Phone ===================== -->
+  <rect x="60" y="315" width="200" height="72" rx="10" class="box" stroke="#059669"/>
+  <text x="76" y="337" class="bt">Clerk SDK</text>
+  <text x="76" y="355" class="bf mono">@clerk/expo</text>
+  <text x="76" y="375" class="b">Session kept in SecureStore</text>
+
+  <rect x="280" y="315" width="340" height="72" rx="10" class="box" stroke="#059669"/>
+  <text x="296" y="337" class="bt">Screens</text>
+  <text x="296" y="355" class="bf mono">src/app · Expo Router + React Query</text>
+  <text x="296" y="375" class="b">Read SQLite; ask the API for charts, downloads</text>
+
+  <rect x="60" y="417" width="560" height="104" rx="10" class="box" stroke="#059669"/>
+  <text x="76" y="439" class="bt">Sync engine</text>
+  <text x="76" y="457" class="bf mono">src/sync/engine.ts</text>
+  <text x="76" y="477" class="b"><tspan font-weight="600">Push:</tspan> sends the outbox (your edits) to the API, in order.</text>
+  <text x="76" y="495" class="b"><tspan font-weight="600">Pull:</tspan> fetches the change log after its cursor and applies it to SQLite.</text>
+  <text x="76" y="513" class="b">Runs each time you open the app, on reconnect, on library.changed, after edits.</text>
+
+  <!-- SQLite cylinder -->
+  <path d="M60,563 a280,12 0 0,1 560,0 V729 a280,12 0 0,1 -560,0 Z" fill="#FFFFFF" stroke="#059669" stroke-width="1.5"/>
+  <ellipse cx="340" cy="563" rx="280" ry="12" fill="#D1FAE5" stroke="#059669" stroke-width="1.5"/>
+  <text x="78" y="597" class="bt">Local SQLite database</text>
+  <text x="78" y="615" class="bf"><tspan class="mono">src/db/database.ts</tspan> · the phone's own copy of the library</text>
+  <rect x="78" y="627" width="258" height="44" rx="6" fill="#F0FDF4" stroke="#A7F3D0"/>
+  <text x="88" y="645" class="chipName mono">songs · playlists · entries</text>
+  <text x="88" y="662" class="s">the library, pulled from the server</text>
+  <rect x="344" y="627" width="258" height="44" rx="6" fill="#F0FDF4" stroke="#A7F3D0"/>
+  <text x="354" y="645" class="chipName mono">outbox</text>
+  <text x="354" y="662" class="s">your edits, waiting for the next push</text>
+  <rect x="78" y="679" width="258" height="44" rx="6" fill="#F0FDF4" stroke="#A7F3D0"/>
+  <text x="88" y="697" class="chipName mono">saved_songs · saved_playlists</text>
+  <text x="88" y="714" class="s">files already in the Music folder</text>
+  <rect x="344" y="679" width="258" height="44" rx="6" fill="#F0FDF4" stroke="#A7F3D0"/>
+  <text x="354" y="697" class="chipName mono">settings</text>
+  <text x="354" y="714" class="s">sync cursor, music folder, options</text>
+
+  <rect x="60" y="771" width="270" height="72" rx="10" class="box" stroke="#059669"/>
+  <text x="76" y="793" class="bt">Library edits</text>
+  <text x="76" y="811" class="bf mono">src/db/mutations.ts</text>
+  <text x="76" y="831" class="b">Change SQLite + add to outbox</text>
+
+  <rect x="350" y="771" width="270" height="72" rx="10" class="box" stroke="#059669"/>
+  <text x="366" y="793" class="bt">Live events (SSE)</text>
+  <text x="366" y="811" class="bf mono">src/api/events.ts</text>
+  <text x="366" y="831" class="b">Progress, and library.changed syncs</text>
+
+  <rect x="60" y="873" width="270" height="72" rx="10" class="box" stroke="#059669"/>
+  <text x="76" y="895" class="bt">Music folder</text>
+  <text x="76" y="913" class="bf">a folder you pick, or app storage</text>
+  <text x="76" y="933" class="b">Audio files, .m3u8 playlists</text>
+
+  <rect x="350" y="873" width="270" height="72" rx="10" class="box" stroke="#059669"/>
+  <text x="366" y="895" class="bt">Player</text>
+  <text x="366" y="913" class="bf mono">src/player · expo-audio</text>
+  <text x="366" y="933" class="b">Plays saved files, works offline</text>
+
+  <rect x="60" y="975" width="340" height="128" rx="10" class="box" stroke="#059669"/>
+  <text x="76" y="997" class="bt">Mirror</text>
+  <text x="76" y="1015" class="bf mono">src/files/mirror.ts</text>
+  <text x="76" y="1035" class="b">After each complete sync, makes the Music</text>
+  <text x="76" y="1053" class="b">folder match the library: saves new and</text>
+  <text x="76" y="1071" class="b">changed songs, deletes removed ones, writes</text>
+  <text x="76" y="1089" class="b">playlists. Skips mobile data unless allowed.</text>
+
+  <rect x="420" y="975" width="200" height="128" rx="10" class="box" stroke="#059669"/>
+  <text x="436" y="997" class="bt">Your own files</text>
+  <text x="436" y="1015" class="bf mono">src/app/add.tsx</text>
+  <text x="436" y="1035" class="b">Uploaded straight to R2</text>
+  <text x="436" y="1053" class="b">with links from</text>
+  <text x="436" y="1071" class="s mono">/v1/uploads, then</text>
+  <text x="436" y="1089" class="b">sent as a download.</text>
+
+  <!-- phone: arrows inside -->
+  <line x1="340" y1="523" x2="340" y2="549" class="flow" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <line x1="195" y1="771" x2="195" y2="743" class="flow" marker-end="url(#arrow)"/>
+  <line x1="195" y1="975" x2="195" y2="947" class="flow" marker-end="url(#arrow)"/>
+  <line x1="330" y1="909" x2="348" y2="909" class="flow" marker-end="url(#arrow)"/>
+
+  <!-- ===================== Cloud server ===================== -->
+  <rect x="710" y="315" width="520" height="270" rx="10" class="box" stroke="#2563EB"/>
+  <text x="726" y="337" class="bt">API</text>
+  <text x="726" y="355" class="bf"><tspan class="mono">apps/api</tspan> · Hono on Node 24</text>
+  <text x="726" y="377" class="s mono" style="fill:#1D4ED8">routes → controllers → services → db</text>
+  <text x="726" y="396" class="s">Every /v1 route needs your Clerk session token, except the worker's.</text>
+  <g class="s">
+    <text x="726" y="422" class="mono s" style="fill:#0F172A">/v1/catalog/*</text><text x="890" y="422" class="s">charts, search, recommendations</text>
+    <text x="726" y="440" class="mono s" style="fill:#0F172A">/v1/downloads</text><text x="890" y="440" class="s">start, list, cancel, retry, remove</text>
+    <text x="726" y="458" class="mono s" style="fill:#0F172A">/v1/sync/push, /pull</text><text x="890" y="458" class="s">your edits in, library changes out</text>
+    <text x="726" y="476" class="mono s" style="fill:#0F172A">/v1/songs/file-urls</text><text x="890" y="476" class="s">links to download song files</text>
+    <text x="726" y="494" class="mono s" style="fill:#0F172A">/v1/uploads</text><text x="890" y="494" class="s">links to upload your own audio files</text>
+    <text x="726" y="512" class="mono s" style="fill:#0F172A">/v1/sessions</text><text x="890" y="512" class="s">signed-in devices; sign one out</text>
+    <text x="726" y="530" class="mono s" style="fill:#0F172A">/v1/status, /events</text><text x="890" y="530" class="s">is the worker online, live events (SSE)</text>
+    <text x="726" y="548" class="mono s" style="fill:#B45309">/v1/worker/*</text><text x="890" y="548" class="s" style="fill:#B45309">worker only, with WORKER_TOKEN</text>
+    <text x="726" y="566" class="mono s" style="fill:#0F172A">/health, /ready</text><text x="890" y="566" class="s">no token; for Docker and uptime checks</text>
+  </g>
+
+  <!-- Postgres cylinder -->
+  <path d="M710,627 a260,12 0 0,1 520,0 V828 a260,12 0 0,1 -520,0 Z" fill="#FFFFFF" stroke="#2563EB" stroke-width="1.5"/>
+  <ellipse cx="970" cy="627" rx="260" ry="12" fill="#DBEAFE" stroke="#2563EB" stroke-width="1.5"/>
+  <text x="726" y="661" class="bt">Postgres</text>
+  <text x="726" y="679" class="bf"><tspan class="mono">packages/db</tspan> · the source of truth</text>
+  <rect x="726" y="690" width="252" height="40" rx="6" fill="#EFF6FF" stroke="#BFDBFE"/>
+  <text x="736" y="706" class="chipName mono">songs · playlists · playlist_entries</text>
+  <text x="736" y="722" class="s">the library</text>
+  <rect x="988" y="690" width="226" height="40" rx="6" fill="#EFF6FF" stroke="#BFDBFE"/>
+  <text x="998" y="706" class="chipName mono">library_changes</text>
+  <text x="998" y="722" class="s">the change log, numbered in order</text>
+  <rect x="726" y="736" width="252" height="40" rx="6" fill="#EFF6FF" stroke="#BFDBFE"/>
+  <text x="736" y="752" class="chipName mono">downloads · download_items</text>
+  <text x="736" y="768" class="s">your requests and their progress</text>
+  <rect x="988" y="736" width="226" height="40" rx="6" fill="#EFF6FF" stroke="#BFDBFE"/>
+  <text x="998" y="752" class="chipName mono">outbox</text>
+  <text x="998" y="768" class="s">jobs waiting to go to RabbitMQ</text>
+  <rect x="726" y="782" width="252" height="40" rx="6" fill="#EFF6FF" stroke="#BFDBFE"/>
+  <text x="736" y="798" class="chipName mono">applied_mutations</text>
+  <text x="736" y="814" class="s">phone edits already applied</text>
+
+  <rect x="710" y="870" width="250" height="72" rx="10" class="box" stroke="#2563EB"/>
+  <text x="726" y="892" class="bt">Live events</text>
+  <text x="726" y="910" class="bf mono">src/realtime</text>
+  <text x="726" y="930" class="b">RabbitMQ events → phones</text>
+
+  <rect x="980" y="870" width="250" height="72" rx="10" class="box" stroke="#2563EB"/>
+  <text x="996" y="892" class="bt">Outbox relay</text>
+  <text x="996" y="910" class="bf mono">src/outbox/relay.ts</text>
+  <text x="996" y="930" class="b">Sends outbox rows to RabbitMQ</text>
+
+  <rect x="710" y="972" width="520" height="143" rx="10" class="box" stroke="#2563EB"/>
+  <text x="726" y="994" class="bt">RabbitMQ</text>
+  <text x="726" y="1012" class="bf"><tspan class="mono">packages/messaging</tspan> · the message broker</text>
+  <text x="726" y="1036" class="mono s" style="fill:#0F172A">audiostash.jobs</text><text x="880" y="1036" class="s">a queue each for download.resolve and download.item</text>
+  <text x="726" y="1056" class="mono s" style="fill:#0F172A">audiostash.retry</text><text x="880" y="1056" class="s">waits 30 s, 2 min or 10 min, then retries</text>
+  <text x="726" y="1076" class="mono s" style="fill:#0F172A">audiostash.dead</text><text x="880" y="1076" class="s">jobs whose retries ran out</text>
+  <text x="726" y="1096" class="mono s" style="fill:#0F172A">audiostash.events</text><text x="880" y="1096" class="s">events from the API and the worker</text>
+
+  <!-- cloud: arrows inside -->
+  <polyline points="1230,570 1242,570 1242,956 1200,956 1200,970" class="event" marker-end="url(#arrowEvent)"/>
+  <line x1="1105" y1="841" x2="1105" y2="868" class="flow" marker-end="url(#arrow)"/>
+  <line x1="1105" y1="942" x2="1105" y2="970" class="event" marker-end="url(#arrowEvent)"/>
+  <line x1="835" y1="972" x2="835" y2="944" class="event" marker-end="url(#arrowEvent)"/>
+  <line x1="800" y1="585" x2="800" y2="616" class="flow" marker-end="url(#arrow)"/>
+
+  <!-- ===================== Home PC ===================== -->
+  <rect x="1320" y="315" width="440" height="104" rx="10" class="box" stroke="#D97706"/>
+  <text x="1336" y="337" class="bt">Download worker</text>
+  <text x="1336" y="355" class="bf mono">apps/worker</text>
+  <text x="1336" y="375" class="b">Takes jobs from RabbitMQ: up to 2 songs at once by default.</text>
+  <text x="1336" y="393" class="b">Changes data only through the API's /v1/worker/* routes,</text>
+  <text x="1336" y="411" class="b">and every call is safe to repeat after a crash.</text>
+
+  <rect x="1320" y="445" width="440" height="84" rx="10" class="box" stroke="#D97706"/>
+  <text x="1336" y="467" class="bt">Job: download.resolve</text>
+  <text x="1336" y="485" class="bf mono">src/jobs/resolve.ts</text>
+  <text x="1336" y="505" class="b">A playlist, album or channel link becomes a list of songs.</text>
+  <text x="1336" y="522" class="b">The API then adds a download.item job for each new one.</text>
+
+  <rect x="1320" y="555" width="440" height="280" rx="10" class="box" stroke="#D97706"/>
+  <text x="1336" y="577" class="bt">Job: download.item</text>
+  <text x="1336" y="595" class="bf mono">src/jobs/item.ts · one song, in four stages</text>
+  <rect x="1334" y="609" width="412" height="46" rx="6" fill="#FEF3C7" stroke="#FCD34D"/>
+  <text x="1346" y="636" class="b" style="font-weight:600;fill:#78350F">Matching</text>
+  <text x="1446" y="627" class="s">Probes the link or upload, or searches YouTube for a pick.</text>
+  <text x="1446" y="644" class="s">Tags from Deezer. Stops if it is already in the library.</text>
+  <rect x="1334" y="663" width="412" height="46" rx="6" fill="#FEF3C7" stroke="#FCD34D"/>
+  <text x="1346" y="690" class="b" style="font-weight:600;fill:#78350F">Downloading</text>
+  <text x="1446" y="681" class="s">yt-dlp fetches the best audio stream.</text>
+  <text x="1446" y="698" class="s">Progress goes out as live events.</text>
+  <rect x="1334" y="717" width="412" height="46" rx="6" fill="#FEF3C7" stroke="#FCD34D"/>
+  <text x="1346" y="744" class="b" style="font-weight:600;fill:#78350F">Processing</text>
+  <text x="1446" y="735" class="s">ffmpeg converts only if needed, measures loudness.</text>
+  <text x="1446" y="752" class="s">Adds lyrics, cover art and tags.</text>
+  <rect x="1334" y="771" width="412" height="46" rx="6" fill="#FEF3C7" stroke="#FCD34D"/>
+  <text x="1346" y="798" class="b" style="font-weight:600;fill:#78350F">Uploading</text>
+  <text x="1446" y="789" class="s">Gets upload links from the API, puts the files in R2,</text>
+  <text x="1446" y="806" class="s">then tells the API the song is ready.</text>
+
+  <rect x="1320" y="865" width="340" height="72" rx="10" class="box" stroke="#D97706"/>
+  <text x="1336" y="887" class="bt">Tools in the worker image</text>
+  <rect x="1336" y="900" width="62" height="24" rx="12" fill="#FEF3C7" stroke="#FCD34D"/>
+  <text x="1367" y="916" text-anchor="middle" class="s mono" style="fill:#78350F">yt-dlp</text>
+  <rect x="1406" y="900" width="116" height="24" rx="12" fill="#FEF3C7" stroke="#FCD34D"/>
+  <text x="1464" y="916" text-anchor="middle" class="s mono" style="fill:#78350F">ffmpeg, ffprobe</text>
+  <rect x="1530" y="900" width="68" height="24" rx="12" fill="#FEF3C7" stroke="#FCD34D"/>
+  <text x="1564" y="916" text-anchor="middle" class="s mono" style="fill:#78350F">mutagen</text>
+  <rect x="1606" y="900" width="44" height="24" rx="12" fill="#FEF3C7" stroke="#FCD34D"/>
+  <text x="1628" y="916" text-anchor="middle" class="s mono" style="fill:#78350F">Deno</text>
+
+  <rect x="1320" y="967" width="340" height="84" rx="10" class="box" stroke="#D97706"/>
+  <text x="1336" y="989" class="bt">Progress and heartbeat</text>
+  <text x="1336" y="1009" class="b">Download progress, and a heartbeat every 30 s,</text>
+  <text x="1336" y="1027" class="b">go straight to RabbitMQ as events. After 90 s</text>
+  <text x="1336" y="1045" class="b">with no heartbeat, the app shows the PC offline.</text>
+
+  <!-- ===================== Cloudflare R2 ===================== -->
+  <rect x="40" y="1195" width="1740" height="80" rx="12" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+  <text x="60" y="1223" class="bt">Cloudflare R2</text>
+  <text x="60" y="1241" class="bf">file storage that speaks the Amazon S3 protocol · RustFS stands in for it locally</text>
+  <text x="60" y="1263" class="s mono" style="fill:#9A3412">songs/&lt;id&gt;/audio.&lt;ext&gt;   songs/&lt;id&gt;/cover.jpg   incoming/&lt;uuid&gt;/&lt;file&gt;</text>
+  <text x="1060" y="1229" class="b">Only the API holds the storage keys. The phone and the worker</text>
+  <text x="1060" y="1247" class="b">reach it through presigned links the API signs. Songs keep</text>
+  <text x="1060" y="1265" class="b">downloading to the phone while the PC is off.</text>
+
+  <!-- ===================== Arrows between parts ===================== -->
+  <!-- Clerk -->
+  <line x1="230" y1="315" x2="230" y2="216" class="flow" marker-end="url(#arrow)"/>
+  <text x="238" y="240" class="lbl">sign in, get tokens</text>
+  <polyline points="710,330 665,330 665,185 402,185" class="flow" marker-end="url(#arrow)"/>
+  <text x="414" y="177" class="lbl">list and sign out sessions</text>
+
+  <!-- music APIs and sources -->
+  <line x1="1060" y1="315" x2="1060" y2="216" class="flow" marker-end="url(#arrow)"/>
+  <text x="1068" y="240" class="lbl">charts, search</text>
+  <line x1="1500" y1="315" x2="1500" y2="216" class="flow" marker-end="url(#arrow)"/>
+  <text x="1508" y="240" class="lbl">tags, lyrics, art</text>
+  <line x1="1680" y1="315" x2="1680" y2="216" class="flow" marker-end="url(#arrow)"/>
+  <text x="1688" y="240" class="lbl">audio</text>
+
+  <!-- 1: start a download -->
+  <line x1="620" y1="351" x2="708" y2="351" class="flow" marker-end="url(#arrow)"/>
+  <!-- 8: sync -->
+  <line x1="620" y1="469" x2="708" y2="469" class="flow" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <!-- 7: live events to the phone -->
+  <polyline points="710,906 665,906 665,807 622,807" class="event" marker-end="url(#arrowEvent)"/>
+  <!-- 4: jobs to the worker -->
+  <polyline points="1230,1010 1272,1010 1272,487 1318,487" class="event" marker-end="url(#arrowEvent)"/>
+  <line x1="1272" y1="600" x2="1318" y2="600" class="event" marker-end="url(#arrowEvent)"/>
+  <!-- 5: worker calls the API -->
+  <line x1="1320" y1="360" x2="1232" y2="360" class="flow" marker-end="url(#arrow)"/>
+  <!-- progress and heartbeat events -->
+  <line x1="1320" y1="1030" x2="1232" y2="1030" class="event" marker-end="url(#arrowEvent)"/>
+  <!-- 6: upload to R2 -->
+  <line x1="1710" y1="835" x2="1710" y2="1193" class="flow" marker-end="url(#arrow)"/>
+  <!-- 9: phone downloads from R2 -->
+  <line x1="230" y1="1195" x2="230" y2="1105" class="flow" marker-end="url(#arrow)"/>
+  <line x1="520" y1="1103" x2="520" y2="1193" class="flow" marker-end="url(#arrow)"/>
+  <text x="528" y="1153" class="lbl">upload</text>
+
+  <!-- ===================== Step badges ===================== -->
+  <g>
+    <circle cx="665" cy="351" r="11" class="badge"/><text x="665" y="355" text-anchor="middle" class="badgeText">1</text>
+    <circle cx="826" cy="600" r="11" class="badge"/><text x="826" y="604" text-anchor="middle" class="badgeText">2</text>
+    <circle cx="1130" cy="956" r="11" class="badge"/><text x="1130" y="960" text-anchor="middle" class="badgeText">3</text>
+    <circle cx="1272" cy="760" r="11" class="badge"/><text x="1272" y="764" text-anchor="middle" class="badgeText">4</text>
+    <circle cx="1276" cy="360" r="11" class="badge"/><text x="1276" y="364" text-anchor="middle" class="badgeText">5</text>
+    <circle cx="1710" cy="1000" r="11" class="badge"/><text x="1710" y="1004" text-anchor="middle" class="badgeText">6</text>
+    <circle cx="665" cy="857" r="11" class="badge"/><text x="665" y="861" text-anchor="middle" class="badgeText">7</text>
+    <circle cx="665" cy="469" r="11" class="badge"/><text x="665" y="473" text-anchor="middle" class="badgeText">8</text>
+    <circle cx="230" cy="1150" r="11" class="badge"/><text x="230" y="1154" text-anchor="middle" class="badgeText">9</text>
+  </g>
+
+  <!-- ===================== Step list ===================== -->
+  <rect x="40" y="1315" width="860" height="500" rx="12" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="64" y="1350" class="panelTitle">A download, step by step</text>
+  <g>
+    <circle cx="74" cy="1382" r="11" class="badge"/><text x="74" y="1386" text-anchor="middle" class="badgeText">1</text>
+    <text x="96" y="1380" class="step">You pick a song, paste a link or upload your own files. The app sends <tspan class="mono">POST /v1/downloads</tspan></text>
+    <text x="96" y="1397" class="step">with an id it chose, so sending it twice is harmless.</text>
+    <circle cx="74" cy="1426" r="11" class="badge"/><text x="74" y="1430" text-anchor="middle" class="badgeText">2</text>
+    <text x="96" y="1431" class="step">One Postgres transaction saves the download and outbox rows: a job per new song, or a resolve job for a playlist.</text>
+    <circle cx="74" cy="1470" r="11" class="badge"/><text x="74" y="1474" text-anchor="middle" class="badgeText">3</text>
+    <text x="96" y="1475" class="step">The outbox relay sends each job to RabbitMQ, and marks it sent only once RabbitMQ confirms it has it.</text>
+    <circle cx="74" cy="1514" r="11" class="badge"/><text x="74" y="1518" text-anchor="middle" class="badgeText">4</text>
+    <text x="96" y="1519" class="step">RabbitMQ hands the job to the worker over Tailscale. If the PC is off, the job waits in its queue.</text>
+    <circle cx="74" cy="1558" r="11" class="badge"/><text x="74" y="1562" text-anchor="middle" class="badgeText">5</text>
+    <text x="96" y="1563" class="step">The worker claims the item and reports each stage through <tspan class="mono">/v1/worker/*</tspan>, sent with WORKER_TOKEN.</text>
+    <circle cx="74" cy="1602" r="11" class="badge"/><text x="74" y="1606" text-anchor="middle" class="badgeText">6</text>
+    <text x="96" y="1607" class="step">It uploads the audio and cover to R2, then reports the item complete. The API adds the song to the change log.</text>
+    <circle cx="74" cy="1646" r="11" class="badge"/><text x="74" y="1650" text-anchor="middle" class="badgeText">7</text>
+    <text x="96" y="1651" class="step">Each update goes out as an event through RabbitMQ, and the API forwards it to your phone's open SSE stream.</text>
+    <circle cx="74" cy="1690" r="11" class="badge"/><text x="74" y="1694" text-anchor="middle" class="badgeText">8</text>
+    <text x="96" y="1695" class="step">The library.changed event makes the phone sync. The new song lands in SQLite and shows in your library.</text>
+    <circle cx="74" cy="1734" r="11" class="badge"/><text x="74" y="1738" text-anchor="middle" class="badgeText">9</text>
+    <text x="96" y="1739" class="step">The mirror gets a link from <tspan class="mono">/v1/songs/file-urls</tspan> and saves the file from R2 into the Music folder.</text>
+  </g>
+  <text x="64" y="1778" class="s">A failed job runs again from the start after 30 s, 2 min and 10 min. Then it goes to the dead queue and the song shows as failed.</text>
+  <text x="64" y="1795" class="s">A failure that a retry cannot fix, such as a deleted video, fails the song at once.</text>
+
+  <!-- ===================== Glossary ===================== -->
+  <rect x="920" y="1315" width="860" height="500" rx="12" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="944" y="1350" class="panelTitle">Words used here</text>
+  <g>
+    <text x="944" y="1386" class="term">Outbox table</text>
+    <text x="1110" y="1386" class="gloss">Jobs saved in the same transaction as the change that needs them. The relay sends them to RabbitMQ</text>
+    <text x="1110" y="1403" class="gloss">afterwards, so a crash can never keep the change but lose its job.</text>
+
+    <text x="944" y="1429" class="term">RabbitMQ</text>
+    <text x="1110" y="1429" class="gloss">A message broker: it holds jobs in queues until a worker takes them. Retry queues</text>
+    <text x="1110" y="1446" class="gloss">delay a failed job; the dead queue keeps the jobs whose retries ran out.</text>
+
+    <text x="944" y="1472" class="term">Change log</text>
+    <text x="1110" y="1472" class="gloss">library_changes gives every library change the next number. Each phone remembers the</text>
+    <text x="1110" y="1489" class="gloss">last number it saw (its cursor) and pulls only what came after it.</text>
+
+    <text x="944" y="1515" class="term">Phone outbox</text>
+    <text x="1110" y="1515" class="gloss">Edits you make on the phone apply locally at once and wait here until a push succeeds.</text>
+    <text x="1110" y="1532" class="gloss">The server's applied_mutations table makes sure each one is applied only once.</text>
+
+    <text x="944" y="1558" class="term">Presigned link</text>
+    <text x="1110" y="1558" class="gloss">A URL the API signs that allows uploading or downloading one file, for one hour.</text>
+    <text x="1110" y="1575" class="gloss">It works without the storage keys, which stay on the server.</text>
+
+    <text x="944" y="1601" class="term">SSE</text>
+    <text x="1110" y="1601" class="gloss">Server-Sent Events: one long HTTP response the API keeps writing events into.</text>
+    <text x="1110" y="1618" class="gloss">The app keeps it open while it is on screen.</text>
+
+    <text x="944" y="1644" class="term">Mirror</text>
+    <text x="1110" y="1644" class="gloss">Makes the Music folder match the library after each complete sync. The files are plain</text>
+    <text x="1110" y="1661" class="gloss">audio files, so other music apps can play them too.</text>
+
+    <text x="944" y="1687" class="term">Tailscale</text>
+    <text x="1110" y="1687" class="gloss">A private network between your own machines. The PC connects out to the server,</text>
+    <text x="1110" y="1704" class="gloss">so nothing on the PC is open to the internet.</text>
+
+    <text x="944" y="1730" class="term">Tokens</text>
+    <text x="1110" y="1730" class="gloss">The phone sends a Clerk session token, a signed JWT that expires after about a minute.</text>
+    <text x="1110" y="1747" class="gloss">The worker sends WORKER_TOKEN, a long secret shared with the API.</text>
+
+    <text x="944" y="1773" class="term">packages/</text>
+    <text x="1110" y="1773" class="gloss">Code the apps share: contracts (request shapes), core (matching, file paths), catalog</text>
+    <text x="1110" y="1790" class="gloss">(music API clients), db (schema, migrations), messaging (RabbitMQ setup).</text>
+  </g>
+</svg>

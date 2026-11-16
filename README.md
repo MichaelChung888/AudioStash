@@ -7,29 +7,7 @@ A personal music library for Android. Paste a YouTube, SoundCloud or Bandcamp li
 
 ## How it fits together
 
-```mermaid
-flowchart LR
-    phone["Android app<br/>(Expo)"]
-    clerk["Clerk<br/>(sign-in)"]
-    subgraph cloud["Cloud server"]
-        api["API<br/>(Hono)"]
-        pg[("Postgres")]
-        mq[["RabbitMQ"]]
-    end
-    r2[("Cloudflare R2<br/>audio + covers")]
-    subgraph pc["Home PC"]
-        worker["Download worker<br/>yt-dlp, ffmpeg"]
-    end
-
-    phone -- "sign in" --> clerk
-    phone -- "HTTPS + session token" --> api
-    api --> pg
-    api -- "jobs" --> mq
-    mq -- "jobs, over Tailscale" --> worker
-    worker -- "progress, results" --> api
-    worker -- "upload" --> r2
-    phone -- "download files" --> r2
-```
+![AudioStash architecture: the Android app, the API with Postgres and RabbitMQ on a cloud server, the download worker on a home PC, Cloudflare R2, Clerk, and the nine steps of a download](docs/architecture.svg)
 
 1. The app asks the API to download a link. The API saves the request in Postgres and puts a job on a RabbitMQ queue.
 2. The worker on your PC takes the job, downloads and tags the song, and uploads it to storage.
