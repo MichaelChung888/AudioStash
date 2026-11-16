@@ -16,7 +16,7 @@ The phone needs a sign-in screen, and the owner needs a way to sign out one devi
 
 ## Decision
 
-- Clerk, a hosted sign-in service, handles sign-in on the phone. The app asks for an email address, Clerk emails a one-time code, and the app sends the code back to Clerk ([apps/mobile/src/app/sign-in.tsx](../../apps/mobile/src/app/sign-in.tsx)). Clerk stores the account and the sessions; AudioStash stores no passwords.
+- Clerk, a hosted sign-in service, handles sign-in on the phone. The app signs in with an email and password, or with Google, Apple, GitHub or Facebook through Clerk; a forgotten password is reset with a code Clerk emails ([apps/mobile/src/app/sign-in.tsx](../../apps/mobile/src/app/sign-in.tsx)). Clerk stores the account, the password and the sessions; AudioStash stores no passwords.
 - The phone sends a Clerk session token with each request. A session token is a JWT: a token that carries its own facts (such as the user id) and a signature over them. It expires about a minute after Clerk issues it. The API checks the signature with Clerk's public key, without calling Clerk.
 - Two independent checks keep strangers out. Clerk's sign-up mode is Restricted, so nobody can create an account. The API also answers 403 to any user id not in `CLERK_ALLOWED_USER_IDS`, which holds only the owner's id ([apps/api/src/services/auth.ts](../../apps/api/src/services/auth.ts)).
 - A signed-in device is a Clerk session. Signing a device out through the API revokes its session at Clerk, and the API refuses that session's tokens for five minutes, longer than any of them can live.

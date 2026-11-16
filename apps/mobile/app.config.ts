@@ -36,6 +36,8 @@ const config: ExpoConfig = {
     'expo-sqlite',
     'expo-secure-store',
     'expo-font',
+    // Opens the browser tab for Google, Apple, GitHub and Facebook sign-in.
+    'expo-web-browser',
     ['expo-splash-screen', { image: './assets/splash-icon.png', imageWidth: 96, backgroundColor: BACKGROUND }],
   ],
 };

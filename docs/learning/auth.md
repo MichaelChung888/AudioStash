@@ -9,7 +9,7 @@ Two words first:
 
 ## The parts
 
-**Clerk** is a hosted sign-in service. It stores accounts and sessions, and emails one-time sign-in codes. The free plan covers far more users than AudioStash needs. AudioStash stores no passwords.
+**Clerk** is a hosted sign-in service. It stores accounts, passwords and sessions, and signs you in with Google, Apple, GitHub or Facebook. It also emails one-time codes, to reset a password or to confirm a sign-in from a new device. The free plan covers far more users than AudioStash needs. AudioStash itself stores no passwords: the phone sends the password to Clerk, never to the AudioStash API.
 
 **Session.** Each time you sign in on a device, Clerk creates a session for it. A session lasts days or weeks (set in the Clerk dashboard) and ends when you sign out or it is revoked. Clerk stores it, and gives it an id like `sess_2Ro7e2…`.
 
@@ -44,7 +44,7 @@ sequenceDiagram
     participant Clerk
     participant API as AudioStash API
 
-    Phone->>Clerk: 1. Sign in with an email code
+    Phone->>Clerk: 1. Sign in with email and password, or a social account
     Clerk-->>Phone: 2. Session created. Long-lived client token stored in the phone's secure storage
     Phone->>Clerk: 3. getToken(): new session token, if the cached one is about to expire
     Clerk-->>Phone: 4. JWT, valid for about 60 seconds
