@@ -21,6 +21,13 @@ const config: ExpoConfig = {
       backgroundColor: '#F5B83D',
     },
     predictiveBackGestureEnabled: false,
+    // Only request permissions we actually use; removes "Nearby devices" prompt
+    permissions: [
+      'android.permission.READ_MEDIA_AUDIO',
+      'android.permission.POST_NOTIFICATIONS',
+      'android.permission.FOREGROUND_SERVICE',
+      'android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK',
+    ],
   },
   plugins: [
     'expo-router',

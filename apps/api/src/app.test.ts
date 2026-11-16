@@ -82,6 +82,26 @@ describe('app', () => {
       expect(res.status).toBe(401);
     });
 
+    it('accepts the worker token on worker routes', async () => {
+      const failItem = vi.fn(async () => {});
+      const request = setup({ workerJobs: { failItem } as unknown as Services['workerJobs'] });
+
+      const res = await request(`/v1/worker/items/${ITEM_ID}/fail`, {
+        method: 'POST',
+        token: WORKER_TOKEN,
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ error: 'boom', final: false }),
+      });
+
+      expect(res.status).toBe(204);
+      expect(failItem).toHaveBeenCalledWith(ITEM_ID, { error: 'boom', final: false });
+    });
+
+    it('returns 404, not 401, for unknown routes under /v1', async () => {
+      const res = await setup()('/v1/nope');
+      expect(res.status).toBe(404);
+    });
+
     it('signs another device out, and its token stops working', async () => {
       const request = setup();
       const oldToken = userToken(OWNER, 'sess_old');

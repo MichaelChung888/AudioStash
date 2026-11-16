@@ -64,9 +64,9 @@ This runs the whole backend on your PC in Docker. You only need Git and Docker; 
 
 ### 2. Set up Clerk (sign-in)
 
-1. Create a free account at [clerk.com](https://clerk.com) and an application called AudioStash. Turn on sign-in with an email verification code. The app signs in only this way.
+1. Create a free account at [clerk.com](https://clerk.com) and an application called AudioStash. In **Configure > User & authentication**, turn on **Email** and **Password**. Under **SSO connections**, turn on any of Google, Apple, GitHub and Facebook you want on the sign-in screen. If you later switch to a production Clerk instance (`pk_live_` keys), also add `audiostash://sso-callback` under **Configure > Native applications**. A production instance sends a sign-in back only to the addresses listed there; a development instance accepts any.
 2. In **Configure > Restrictions**, set the sign-up mode to **Restricted**, so nobody else can make an account.
-3. In **Users**, create a user with your email. Open it and copy its id (`user_…`).
+3. In **Users**, create a user with your email and a password. Open it and copy its id (`user_…`). A Google, Apple, GitHub or Facebook account with the same email signs in as this user.
 4. In **API keys**, copy the secret key (`sk_test_…`).
 
 ### 3. Configure
@@ -74,9 +74,6 @@ This runs the whole backend on your PC in Docker. You only need Git and Docker; 
 In PowerShell:
 
 ```powershell
-git config --global core.longpaths true
-mkdir C:\dev
-cd C:\dev
 git clone https://github.com/MichaelChung888/AudioStash.git
 cd AudioStash
 Copy-Item .env.example .env
@@ -149,7 +146,24 @@ The backend must be running (quick start step 4), and you need Node 24 and pnpm 
    winget install Microsoft.OpenJDK.17
    ```
 
-3. Tell the build where both are. In PowerShell:
+3. Install CMake 3.31.6. The Android SDK's default CMake cannot handle this project's long file paths, and the build fails with `build.ninja still dirty after 100 tries`.
+   1. In Android Studio, open **Settings > Languages & Frameworks > Android SDK > SDK Tools**, tick **Show Package Details**, and install **CMake 3.31.6**.
+   2. Tell Gradle to use it. This is a setting for your PC, not the repo, because the APK is built on Linux.
+
+      ```powershell
+      New-Item -ItemType Directory -Force "$env:USERPROFILE\.gradle" | Out-Null
+      Add-Content "$env:USERPROFILE\.gradle\gradle.properties" 'android.cmakeVersion=3.31.6'
+      ```
+
+   3. Turn on long paths in Windows, in PowerShell opened with **Run as administrator**:
+
+      ```powershell
+      Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name LongPathsEnabled -Value 1
+      ```
+
+   If a build already failed, see [Expo: Windows long paths](https://docs.expo.dev/troubleshooting/windows-long-paths/) to clear it.
+
+4. Tell the build where Java and the Android SDK are. In PowerShell:
 
    ```powershell
    $jdk = (Get-ChildItem 'C:\Program Files\Microsoft\jdk-17*')[0].FullName
@@ -159,7 +173,7 @@ The backend must be running (quick start step 4), and you need Node 24 and pnpm 
    [Environment]::SetEnvironmentVariable('Path', "$path;$env:LOCALAPPDATA\Android\Sdk\platform-tools", 'User')
    ```
 
-   Close the terminal and open a new one, so it sees the new settings.
+   Then quit and reopen VS Code so it sees the new settings.
 
 ### 2. Create a virtual phone
 
@@ -183,14 +197,14 @@ notepad apps/mobile/.env
 | `EXPO_PUBLIC_API_URL`               | `http://<your PC's IP>:3000`, the same IP as `S3_PUBLIC_ENDPOINT` in the root `.env` |
 | `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` | The publishable key (`pk_test_…`) from **API keys** in the Clerk dashboard           |
 
-The emulator reaches your PC on its network address, like a real phone would. If it cannot connect, use `10.0.2.2` instead of the IP in both settings: inside the emulator, that address means the PC it runs on. Restart the backend after changing the root `.env`.
+The emulator reaches your PC on its Wi-Fi address, the same way a real phone does. Use that address, not `10.0.2.2`, even though inside the emulator `10.0.2.2` also means the PC. The API puts `S3_PUBLIC_ENDPOINT` into the upload links it gives the worker as well as the download links it gives the phone. The worker runs in Docker, where `10.0.2.2` means nothing, so every upload would fail.
 
 ### 4. Build and run
 
 With the virtual phone running:
 
 ```powershell
-pnpm --filter @audiostash/mobile android
+pnpm run mobile:dev
 ```
 
 The first build takes 10 minutes or more. Later builds are much faster. When it finishes, the app opens on the virtual phone. Then follow [First run](#4-first-run) below.
@@ -204,7 +218,7 @@ The same steps work with your own phone in place of the virtual one:
 1. On the phone, open **Settings > About phone** and tap **Build number** seven times. This turns on **Developer options**.
 2. In **Developer options**, turn on **USB debugging**.
 3. Plug the phone into the PC and allow debugging when the phone asks.
-4. Run `pnpm --filter @audiostash/mobile android`. The phone must be on the same Wi-Fi as the PC, and `.env` must use the PC's IP, not `10.0.2.2`.
+4. Run `pnpm run mobile:dev`. The phone must be on the same Wi-Fi as the PC. In Windows, set that Wi-Fi to Private (**Settings > Network & internet > Wi-Fi >** your network **> Network profile type**). On a Public network, Windows Firewall blocks other devices from connecting to the PC, so the phone cannot reach the backend.
 
 A build made this way is signed with a different key from the APK built by EAS. To switch from one to the other, uninstall the app first. See [Signing](docs/learning/expo-and-the-apk.md#signing).
 

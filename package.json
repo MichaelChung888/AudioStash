@@ -20,6 +20,10 @@
     "api:dev": "pnpm --filter @audiostash/api dev",
     "worker:dev": "pnpm --filter @audiostash/worker dev",
     "token": "pnpm --silent --filter @audiostash/api token",
+    "mobile:dev": "pnpm --filter @audiostash/mobile android",
+    "mobile:ios": "pnpm --filter @audiostash/mobile ios",
+    "mobile:bundle": "pnpm --filter @audiostash/mobile bundle",
+    "mobile:icons": "pnpm --filter @audiostash/mobile icons",
     "docker:up": "docker compose up -d --wait && pnpm db:migrate",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f"

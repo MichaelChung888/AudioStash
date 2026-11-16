@@ -8,7 +8,8 @@ export const healthRouter = new Hono<AppEnv>();
 healthRouter.get('/health', (c) => c.json({ status: 'ok' }));
 healthRouter.get('/ready', ctrl.ready);
 
+// Mounted at /v1, so adding requireUser has to go on each route instead. Otherwise it
+// would also run for every other /v1 route, including the worker's.
 export const statusRouter = new Hono<AppEnv>();
-statusRouter.use('*', requireUser);
-statusRouter.get('/status', ctrl.status);
-statusRouter.get('/events', ctrl.events);
+statusRouter.get('/status', requireUser, ctrl.status);
+statusRouter.get('/events', requireUser, ctrl.events);
