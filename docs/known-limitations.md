@@ -8,7 +8,7 @@ The app passes type checks, unit tests, lint, and builds its Android bundle. It 
 
 ## The APK needs the API on https
 
-A release build refuses plain `http://` (see [Expo, and how the app becomes an APK](learning/expo-and-the-apk.md)). The API running in Docker on the PC is `http://`, so the APK cannot use it. A debug build on an emulator or a USB phone can. The cloud deploy, which is next, gives the API an `https://` address.
+A release build refuses plain `http://` (see [Expo, and how the app becomes an APK](learning/expo-and-the-apk.md)). The API running in Docker on the PC is `http://`, so the APK cannot use it. A debug build on an emulator or a USB phone can. [The cloud deploy](deploy.md) gives the API an `https://` address.
 
 ## App
 

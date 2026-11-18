@@ -3,7 +3,7 @@
 A personal music library for Android. Paste a YouTube, SoundCloud or Bandcamp link, pick songs from the charts, or upload your own files. A worker on your home PC downloads each song at the best quality available and adds the title, artist, album, cover art and lyrics. Your phone keeps a copy of the whole library, so everything plays offline.
 
 **Built so far:** the API, the download worker, the Android app, and the local setup that runs the backend.
-**Next:** deploying the API to a free cloud server with Terraform. The installed app needs it, because a release build only connects over `https://`.
+**To use it for real:** [Deploying AudioStash](docs/deploy.md) puts the backend on a cloud server and the app on your phone, and covers shipping changes afterwards. The installed app needs this, because a release build only connects over `https://`.
 
 ## How it fits together
 
@@ -27,6 +27,7 @@ Downloads run on your PC because YouTube blocks most requests from cloud servers
 | [packages/messaging](packages/messaging) | RabbitMQ queues, retries and events                                         |
 | [packages/catalog](packages/catalog)     | Clients for Deezer, Apple Music charts, LRCLIB lyrics and YouTube search    |
 | [packages/core](packages/core)           | Logic with no I/O: title matching, file paths, loudness, playlist order     |
+| [deploy/server](deploy/server)           | Docker Compose for the API, Postgres and RabbitMQ on the cloud server       |
 | [deploy/worker](deploy/worker)           | Docker Compose for running the worker on your PC                            |
 | [docs/learning](docs/learning)           | Notes explaining each tool and why it is used                               |
 | [docs/adr](docs/adr)                     | Architecture decision records: what was decided, and why                    |
@@ -204,7 +205,7 @@ A build made this way is signed with a different key from the APK built by EAS. 
 
 The app is installed as an APK, built on Expo's servers (EAS Build) so you do not need Android tools on your computer. [Expo, and how the app becomes an APK](docs/learning/expo-and-the-apk.md) explains each step.
 
-The APK only connects to `https://` addresses, so it needs the API deployed to the cloud first. Until then, [try the app on an emulator](#try-the-app-on-an-emulator).
+The APK only connects to `https://` addresses, so it needs the API deployed first ([Deploying AudioStash](docs/deploy.md)). Until then, [try the app on an emulator](#try-the-app-on-an-emulator).
 
 ### 1. Set up EAS
 
@@ -241,7 +242,7 @@ Later builds install over the old one and keep your library. They must all come 
 
 ### 4. First run
 
-1. Sign in with your email. Clerk sends a code.
+1. Sign in with your email and password, or a social account.
 2. Choose where songs go. **A folder in Music** puts them in `Music/AudioStash`, where other players can see them.
 3. Paste a link in Search, or tap a download button on Home.
 
@@ -275,6 +276,7 @@ Node runs the TypeScript files directly (Node 24 removes the types as it loads e
 
 ## Learning notes
 
+- [The tools AudioStash uses, and why](docs/learning/tools.md)
 - [Authentication with Clerk](docs/learning/auth.md)
 - [The offline library and sync](docs/learning/offline-sync.md)
 - [Android storage and the music folder](docs/learning/android-storage.md)
