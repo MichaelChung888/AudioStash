@@ -101,6 +101,18 @@ curl -fsSL https://tailscale.com/install.sh | sh
 sudo tailscale up --ssh --hostname audiostash
 ```
 
+| Command                                             | What it does                                                                                                                                                                                                            |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sudo apt update && sudo apt upgrade -y`            | `apt` is Ubuntu's software installer. `update` refreshes the list of available versions, and `upgrade -y` installs every pending update without asking. If a purple screen asks which services to restart, press Enter. |
+| `curl -fsSL https://get.docker.com \| sudo sh`      | Downloads Docker's official install script and runs it as administrator.                                                                                                                                                |
+| `sudo usermod -aG docker $USER`                     | Adds your user to the `docker` group, so `docker` works without `sudo`. It applies from your next login only.                                                                                                           |
+| `curl -fsSL https://tailscale.com/install.sh \| sh` | Downloads and runs Tailscale's install script.                                                                                                                                                                          |
+| `sudo tailscale up --ssh --hostname audiostash`     | Joins the server to your tailnet, under the name `audiostash`.                                                                                                                                                          |
+
+`sudo` runs a command as administrator. Installing software and changing system settings need it.
+
+**Then type `exit` and SSH in again.** Until you do, every `docker` command fails with "permission denied while trying to connect to the docker API", because the group change has not applied yet. `groups` should now list `docker`.
+
 `tailscale up` prints a link. Open it and sign in to add the server to your tailnet. `--ssh` turns on Tailscale SSH, so you can reach the server by name over the tailnet without the key file.
 
 In the [Tailscale admin console](https://login.tailscale.com/admin/machines), open the `audiostash` machine's menu and choose **Disable key expiry**. Otherwise the server drops off your tailnet after 180 days, and the worker loses it.
@@ -112,8 +124,6 @@ ssh ubuntu@audiostash
 ```
 
 Tailscale may ask you to confirm in the browser the first time. Once this works, you can remove the SSH rule from the cloud firewall, so SSH is reachable only over your tailnet.
-
-Log out and back in once, so the `docker` group change applies.
 
 ### 3. Get the code and fill in the settings
 
@@ -159,16 +169,31 @@ tailscale serve status
 tailscale ip -4
 ```
 
-- The first `funnel` command prints a link to turn on HTTPS and Funnel for your tailnet. Open it and approve.
-- `serve status` shows the public address: `https://audiostash.<your tailnet>.ts.net`. This is the API's address for the app.
-- `tailscale ip -4` prints the server's `100.x.y.z` address, for the worker.
-- `--bg` keeps each one running, also after a reboot.
+| Command                                                     | What it does                                                                                                                                                                                                             |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `sudo tailscale funnel --bg 3000`                           | Opens `https://audiostash.<your tailnet>.ts.net` to the whole internet and passes each request to port 3000 on the server, where the API listens. Tailscale provides the HTTPS certificate. This is the phone's address. |
+| `sudo tailscale serve --bg --tcp=3000 tcp://localhost:3000` | Makes port 3000 reachable at the server's private `100.x` address, from your own machines only. The worker calls the API this way.                                                                                       |
+| `sudo tailscale serve --bg --tcp=5672 tcp://localhost:5672` | The same for RabbitMQ, so the worker can take jobs. It is never public.                                                                                                                                                  |
+| `tailscale serve status`                                    | Lists the three rules above, to check they are set.                                                                                                                                                                      |
+| `tailscale ip -4`                                           | Prints the server's `100.x.y.z` address, for the worker's `.env` on your PC.                                                                                                                                             |
 
-Open `https://audiostash.<your tailnet>.ts.net/health` in your phone's browser, with Wi-Fi turned off. It should answer. The first request can take a few seconds while Tailscale gets the certificate.
+- `sudo` runs a command as administrator, which changing Tailscale's settings needs.
+- `--bg` keeps each rule after you close SSH, and after a reboot.
+- The first `funnel` command prints a link to turn on HTTPS and Funnel for your tailnet. Open it and approve.
+
+These commands only connect addresses to ports. They start nothing, so the API must already be running from step 4.
+
+Open `https://audiostash.<your tailnet>.ts.net/ready` in your phone's browser, with Wi-Fi turned off. It should show `"status":"ok"`. The first request can take a few seconds while Tailscale gets the certificate. The address alone, with no path, answers 404, because the API has no page at `/`.
+
+If the browser shows **502 Bad Gateway**, Tailscale is working but nothing answered on port 3000: the API is not running. Check it with `docker compose -f deploy/server/compose.yaml ps` and read its log with `docker compose -f deploy/server/compose.yaml logs api --tail 30`. An API that keeps restarting usually has a missing or malformed value in `deploy/server/.env`; the log names it. After fixing `.env`, run `docker compose -f deploy/server/compose.yaml up -d`, not `restart`, because a container reads `.env` only when it is created.
 
 ## Part 3: The worker on your PC
 
-1. In the Tailscale admin console, **Settings > Keys > Generate auth key**. The defaults are fine; the key is used once.
+1. In the Tailscale admin console, **Settings > Keys > Generate auth key**. The defaults are fine, but leave **Ephemeral** off: an ephemeral machine is removed from the tailnet soon after it goes offline, which happens every time the PC sleeps.
+
+   The key is used once. On its first start, the `tailscale` container signs in with it and keeps its login in a Docker volume; later starts use that login and ignore the key. Once `audiostash-worker` shows in the admin console, you can blank `TS_AUTHKEY` in `.env`. You need a new key only if that volume is deleted, for example by `docker compose down -v` or by resetting Docker Desktop.
+
+   The container is its own machine on the tailnet, separate from the Tailscale app on your PC. The app lets you reach the server; the container lets the worker reach it.
 2. In the repository on your PC:
 
    ```powershell
