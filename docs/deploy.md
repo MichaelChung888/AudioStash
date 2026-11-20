@@ -298,7 +298,7 @@ pnpm mobile:release
 1. Checks the settings: the API address must start with `https://`, because a release build refuses plain `http`.
 2. Sets the **version code** to the number of commits on the branch. Android refuses to install a lower version code over a higher one, and the commit count only grows.
 3. Runs `expo prebuild --clean`, which deletes the `android` folder and writes it again from `app.config.ts`. Starting clean means a permission or plugin removed from the config does not linger in the app.
-4. Runs Gradle's `assembleRelease`, which bundles the JavaScript, compiles the native code and signs the APK.
+4. Runs Gradle's `assembleRelease`, which bundles the JavaScript, compiles the native code and signs the APK. The native code is built for arm64 only, the processor in every current Android phone, which keeps the APK small and the build shorter.
 
 The first build takes 10 minutes or more; later ones are faster. It ends by printing where the APK is: `apps/mobile/android/app/build/outputs/apk/release/app-release.apk`.
 

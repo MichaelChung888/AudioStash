@@ -51,11 +51,16 @@ const expoCli = createRequire(import.meta.url).resolve('expo/bin/cli');
 env.EXPO_NO_GIT_STATUS = '1';
 run(process.execPath, [expoCli, 'prebuild', '--platform', 'android', '--clean', '--no-install'], mobileDir);
 
+// Builds the native code for arm64 only, the processor in every current Android phone.
+// Otherwise it is built four times, also for 32-bit phones and x86 emulators, which makes the
+// APK about three times larger and the build much slower. Debug builds are unaffected.
+const gradleArgs = ['assembleRelease', '-PreactNativeArchitectures=arm64-v8a'];
+
 // Windows runs .bat files only through cmd.exe. The arguments are fixed, so nothing is interpolated.
 if (process.platform === 'win32') {
-  run('cmd.exe', ['/d', '/c', 'gradlew.bat', 'assembleRelease'], androidDir);
+  run('cmd.exe', ['/d', '/c', 'gradlew.bat', ...gradleArgs], androidDir);
 } else {
-  run('./gradlew', ['assembleRelease'], androidDir);
+  run('./gradlew', gradleArgs, androidDir);
 }
 
 console.warn(`\nBuilt version ${env.AUDIOSTASH_VERSION_CODE}: ${join(androidDir, 'app', 'build', 'outputs', 'apk', 'release', 'app-release.apk')}`);
