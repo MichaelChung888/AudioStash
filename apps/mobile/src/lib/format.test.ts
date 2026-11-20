@@ -5,7 +5,19 @@ describe('formatBytes', () => {
   it('picks the unit by size', () => {
     expect(formatBytes(512)).toBe('1 KB');
     expect(formatBytes(214_000_000)).toBe('214 MB');
+    expect(formatBytes(999_000_000)).toBe('999 MB');
     expect(formatBytes(2_900_000_000)).toBe('2.9 GB');
+    expect(formatBytes(123_400_000_000)).toBe('123.4 GB');
+  });
+
+  it('moves up a unit when rounding reaches 1000', () => {
+    expect(formatBytes(999_600)).toBe('1 MB');
+    expect(formatBytes(999_600_000)).toBe('1 GB');
+  });
+
+  it('drops a trailing .0', () => {
+    expect(formatBytes(2_000_000_000)).toBe('2 GB');
+    expect(formatBytes(2_040_000_000)).toBe('2 GB');
   });
 });
 
@@ -26,9 +38,24 @@ describe('formatAgo', () => {
 });
 
 describe('formatCompactDuration', () => {
-  it('drops the hours when there are none', () => {
-    expect(formatCompactDuration(45 * 60_000)).toBe('45 m');
-    expect(formatCompactDuration(112 * 60_000)).toBe('1 h 52 m');
+  const minutes = (count: number) => formatCompactDuration(count * 60_000);
+
+  it('writes min and hr, plural unless one', () => {
+    expect(minutes(45)).toBe('45 mins');
+    expect(minutes(1)).toBe('1 min');
+    expect(minutes(0)).toBe('0 mins');
+    expect(minutes(112)).toBe('1 hr 52 mins');
+    expect(minutes(121)).toBe('2 hrs 1 min');
+    expect(minutes(599)).toBe('9 hrs 59 mins');
+  });
+
+  it('drops the minutes on a whole number of hours', () => {
+    expect(minutes(120)).toBe('2 hrs');
+  });
+
+  it('drops the minutes from 10 hours, rounding to the nearest hour', () => {
+    expect(minutes(600)).toBe('10 hrs');
+    expect(minutes(277 * 60 + 47)).toBe('278 hrs');
   });
 });
 

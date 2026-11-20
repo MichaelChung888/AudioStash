@@ -329,7 +329,9 @@ const styles = StyleSheet.create({
   kind: { fontFamily: fonts.semibold, fontSize: 12, color: colors.textFaint },
   name: { fontFamily: fonts.heading, fontSize: 26, letterSpacing: -0.52, color: colors.text },
   stats: { flexDirection: 'row', gap: 8 },
-  stat: { flex: 1, gap: 2, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10, backgroundColor: colors.surface },
+  // Each tile starts at the width of its text and shares out the space left.
+  // Otherwise equal tiles cut off a long length such as "1 hr 52 mins".
+  stat: { flexGrow: 1, gap: 2, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 10, backgroundColor: colors.surface },
   statValue: { fontFamily: fonts.headingSemibold, fontSize: 18, color: colors.text },
   controls: { flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: -10 },
   grow: { flex: 1 },

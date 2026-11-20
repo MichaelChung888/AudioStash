@@ -1,10 +1,13 @@
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-// Decimal units, as Android's storage settings show them.
+// Decimal units, as Android's storage settings show them. Each unit is chosen after rounding,
+// so 999.6 MB shows as "1 GB", not "1000 MB". Number() drops a trailing ".0": "2 GB", not "2.0 GB".
 export function formatBytes(bytes: number): string {
-  if (bytes < 1e6) return `${Math.max(0, Math.round(bytes / 1e3))} KB`;
-  if (bytes < 1e9) return `${Math.round(bytes / 1e6)} MB`;
-  return `${(bytes / 1e9).toFixed(1)} GB`;
+  const kb = Math.max(0, Math.round(bytes / 1e3));
+  if (kb < 1000) return `${kb} KB`;
+  const mb = Math.round(bytes / 1e6);
+  if (mb < 1000) return `${mb} MB`;
+  return `${Number((bytes / 1e9).toFixed(1))} GB`;
 }
 
 // "14 Mar 2026", in the phone's time zone.
@@ -26,12 +29,15 @@ export function formatAgo(iso: string, now = Date.now()): string {
   return formatDate(iso);
 }
 
-// "1 h 52 m". Short enough for the narrow stat tiles on a playlist.
+// "45 mins", "1 hr 52 mins", "278 hrs". For a playlist's total length.
+// From 10 hours the minutes are left out: they add little, and the text must fit a narrow stat tile.
 export function formatCompactDuration(ms: number): string {
   const totalMinutes = Math.round(ms / 60_000);
+  if (totalMinutes < 60) return plural(totalMinutes, 'min');
+  if (totalMinutes >= 600) return plural(Math.round(totalMinutes / 60), 'hr');
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  return hours > 0 ? `${hours} h ${minutes} m` : `${minutes} m`;
+  return minutes === 0 ? plural(hours, 'hr') : `${plural(hours, 'hr')} ${plural(minutes, 'min')}`;
 }
 
 export function plural(count: number, one: string, many = `${one}s`): string {
