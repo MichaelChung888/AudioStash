@@ -2,7 +2,7 @@ import { gainToVolume } from '@audiostash/core';
 import { type AudioPlaylist, type AudioPlaylistStatus, createAudioPlaylist, setAudioModeAsync } from 'expo-audio';
 import type { LibrarySong } from '../db/library.ts';
 import { recordPlay } from '../db/mutations.ts';
-import { nextRepeatMode, playCountsAt, playOrder, type RepeatMode } from './queue.ts';
+import { nextRepeatMode, playCountsAt, playOrder, type RepeatMode, startQueue } from './queue.ts';
 
 // One player for the whole app, kept outside React so playback carries on while
 // screens come and go. Android's media session gives it lock screen and headphone controls.
@@ -46,31 +46,35 @@ export function onPlayerChange(listener: () => void): () => void {
 export function getPlaylist(): AudioPlaylist {
   if (playlist) return playlist;
   const created = createAudioPlaylist({ updateInterval: 500, loop: 'none' });
-  created.addListener('trackChanged', ({ currentIndex }) => onTrackChanged(currentIndex));
+  created.addListener('trackChanged', () => onTrackChanged(created.currentIndex));
   created.addListener('playlistStatusUpdate', countPlay);
   void setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true, interruptionMode: 'doNotMix' });
   playlist = created;
   return created;
 }
 
-// Songs without a file on the phone are left out: they cannot play yet.
 export function playSongs(list: readonly LibrarySong[], start: number, source: PlaySource): void {
-  const startId = list[start]?.id;
+  // Songs without a file on the phone are left out: they cannot play yet.
   songs = list.filter((song) => song.fileUri !== null);
   if (songs.length === 0) return;
+
+  // Find the song the user tapped in the list, that plays first
+  const startId = list[start]?.id;
   const first = Math.max(
     0,
     songs.findIndex((song) => song.id === startId),
   );
-  order = playOrder(songs.length, first, snapshot.shuffle);
+
+  const queue = startQueue(songs.length, first, snapshot.shuffle);
+  order = queue.order;
 
   const player = getPlaylist();
   player.clear();
   for (const index of order) player.add(toSource(songs[index] as LibrarySong));
-  player.skipTo(0);
+  player.skipTo(queue.position);
   player.play();
-  update({ source, position: 0 });
-  onTrackChanged(0);
+  update({ source, position: queue.position });
+  onTrackChanged(queue.position);
   const current = snapshot.current;
   if (current) player.setActiveForLockScreen(true, toMetadata(current), { showNextTrack: true, showPreviousTrack: true });
 }
