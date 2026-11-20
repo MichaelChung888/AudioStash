@@ -67,6 +67,11 @@ function SongList({ source, playlist, rows, loading }: SongListProps) {
     playSongs(songs, start, source);
   }
 
+  function openOrPlay(index: number) {
+    if (player.current?.id === rows[index]?.song.id) router.push('/now-playing');
+    else play(index);
+  }
+
   function shuffle() {
     setShuffle(true);
     play(Math.floor(Math.random() * songs.length));
@@ -143,7 +148,7 @@ function SongList({ source, playlist, rows, loading }: SongListProps) {
             reordering={reordering}
             isFirst={index === 0}
             isLast={index === rows.length - 1}
-            onPress={() => play(index)}
+            onPress={() => openOrPlay(index)}
             onMove={(by) => move(index, by)}
           />
         )}
