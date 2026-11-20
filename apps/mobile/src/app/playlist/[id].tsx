@@ -13,6 +13,7 @@ import { type PlaySource, playSongs, setShuffle, togglePlay } from '../../player
 import { Button, Cover, CoverGrid, type CoverTile, IconButton, Message, Screen, Touchable } from '../../ui/components.tsx';
 import { Icon, PlayingBars } from '../../ui/Icon.tsx';
 import { MenuButton } from '../../ui/menu.tsx';
+import { MiniPlayer } from '../../ui/mini-player.tsx';
 import { NamePrompt } from '../../ui/name-prompt.tsx';
 import { colors, fonts, text } from '../../ui/theme.ts';
 
@@ -110,7 +111,7 @@ function SongList({ source, playlist, rows, loading }: SongListProps) {
     : null;
 
   return (
-    <Screen>
+    <Screen bottom>
       <TopBar>
         {reordering ? (
           <Touchable accessibilityRole="button" onPress={() => setReordering(false)} hitSlop={10} style={styles.done}>
@@ -153,6 +154,7 @@ function SongList({ source, playlist, rows, loading }: SongListProps) {
           />
         )}
       />
+      <MiniPlayer />
       {playlist ? (
         <NamePrompt
           visible={renaming}

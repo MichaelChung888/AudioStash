@@ -3,13 +3,11 @@ import { type BottomTabBarProps, Tabs } from 'expo-router/tabs';
 import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useDownloads } from '../../api/queries.ts';
-import type { LibrarySong } from '../../db/library.ts';
 import { getLibraryFolder } from '../../files/library-folder.ts';
-import { usePlaybackStatus, usePlayer } from '../../player/hooks.ts';
-import { next, togglePlay } from '../../player/player.ts';
-import { Cover, IconButton, Touchable } from '../../ui/components.tsx';
+import { Touchable } from '../../ui/components.tsx';
 import { Icon, type IconName } from '../../ui/Icon.tsx';
-import { colors, fonts, text } from '../../ui/theme.ts';
+import { MiniPlayer } from '../../ui/mini-player.tsx';
+import { colors, fonts } from '../../ui/theme.ts';
 
 const TAB_ICONS: Record<string, IconName> = { index: 'home', search: 'search', downloads: 'download', playlists: 'playlists' };
 
@@ -72,41 +70,6 @@ function TabBar({ state, descriptors, emitter, navigateToTab, insets }: BottomTa
   );
 }
 
-function MiniPlayer() {
-  const { current } = usePlayer();
-  // The bar is only mounted while a song is loaded, so the native player is not created before then.
-  return current ? <MiniPlayerBar song={current} /> : null;
-}
-
-function MiniPlayerBar({ song }: { song: LibrarySong }) {
-  const status = usePlaybackStatus();
-  const progress = status.duration > 0 ? status.currentTime / status.duration : 0;
-
-  return (
-    <Touchable
-      accessibilityRole="button"
-      accessibilityLabel={`${song.title} by ${song.artist}. Open the player`}
-      onPress={() => router.push('/now-playing')}
-      style={styles.mini}
-    >
-      <Cover uri={song.coverUri} color={song.coverColor} size={40} radius={5} />
-      <View style={styles.miniText}>
-        <Text numberOfLines={1} style={styles.miniTitle}>
-          {song.title}
-        </Text>
-        <Text numberOfLines={1} style={text.small}>
-          {song.artist}
-        </Text>
-      </View>
-      <IconButton icon={status.playing ? 'pause' : 'play'} label={status.playing ? 'Pause' : 'Play'} onPress={togglePlay} />
-      <IconButton icon="next" label="Next song" onPress={next} />
-      <View style={styles.miniTrack}>
-        <View style={[styles.miniFill, { width: `${Math.min(1, progress) * 100}%` }]} />
-      </View>
-    </Touchable>
-  );
-}
-
 const styles = StyleSheet.create({
   bottom: { backgroundColor: colors.background },
   tabBar: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: colors.raised, backgroundColor: colors.background },
@@ -126,20 +89,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
   },
   badgeText: { fontFamily: fonts.bold, fontSize: 10, color: colors.onAccent },
-  mini: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    height: 56,
-    marginHorizontal: 8,
-    marginBottom: 8,
-    paddingLeft: 8,
-    borderRadius: 10,
-    overflow: 'hidden',
-    backgroundColor: colors.raised,
-  },
-  miniText: { flex: 1, minWidth: 0 },
-  miniTitle: { fontFamily: fonts.semibold, fontSize: 14, color: colors.text },
-  miniTrack: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 2, backgroundColor: colors.border },
-  miniFill: { height: 2, backgroundColor: colors.accent },
 });
