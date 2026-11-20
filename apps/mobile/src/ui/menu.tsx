@@ -59,7 +59,10 @@ export function MenuButton({
         {position ? (
           <View
             accessibilityRole="menu"
-            style={[styles.menu, { top: Math.min(position.top, window.height - menuHeight - 24), right: Math.max(8, position.right) }]}
+            style={[
+              styles.menu,
+              { top: Math.min(position.top, window.height - menuHeight - 24), right: Math.max(8, position.right), maxWidth: window.width - 16 },
+            ]}
           >
             {items.map((item) => (
               <View key={item.label}>
@@ -80,13 +83,13 @@ export function MenuButton({
 const styles = StyleSheet.create({
   menu: {
     position: 'absolute',
-    width: MENU_WIDTH,
+    minWidth: MENU_WIDTH,
     paddingVertical: 8,
     borderRadius: 12,
     backgroundColor: colors.raised,
     elevation: 8,
   },
   item: { flexDirection: 'row', alignItems: 'center', gap: 12, height: ITEM_HEIGHT, paddingHorizontal: 16 },
-  label: { fontFamily: fonts.medium, fontSize: 15, color: colors.text },
+  label: { flexShrink: 1, fontFamily: fonts.medium, fontSize: 15, color: colors.text },
   divider: { height: 1, marginVertical: 4, backgroundColor: colors.border },
 });

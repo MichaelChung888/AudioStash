@@ -73,9 +73,15 @@ function SongList({ source, playlist, rows, loading }: SongListProps) {
     else play(index);
   }
 
+  // Starts on a random song from this list that is saved on the phone.
+  // Opens the song on the now-playing screen.
   function shuffle() {
+    const saved = songs.filter((song) => song.fileUri !== null);
+    const start = saved[Math.floor(Math.random() * saved.length)];
+    if (!start) return;
     setShuffle(true);
-    play(Math.floor(Math.random() * songs.length));
+    play(songs.indexOf(start));
+    router.push('/now-playing');
   }
 
   function confirmDelete() {
