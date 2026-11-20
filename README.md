@@ -215,5 +215,6 @@ Node runs the TypeScript files directly (Node 24 removes the types as it loads e
 - [The offline library and sync](docs/learning/offline-sync.md)
 - [Android storage and the music folder](docs/learning/android-storage.md)
 - [Expo, and how the app becomes an APK](docs/learning/expo-and-the-apk.md)
+- [Screens and navigation with Expo Router](docs/learning/navigation.md)
 
 The decisions behind the design, with the options that lost, are in [docs/adr](docs/adr).
