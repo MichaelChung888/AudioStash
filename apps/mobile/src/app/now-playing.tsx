@@ -66,10 +66,7 @@ function Player({ song, sourceName, sourceId, shuffle, repeat }: PlayerProps) {
                   {
                     label: 'Open the playlist',
                     icon: 'playlists' as const,
-                    onPress: () => {
-                      router.back();
-                      router.push(`/playlist/${sourceId}`);
-                    },
+                    onPress: () => router.dismissTo(`/playlist/${sourceId}`),
                   },
                 ]
               : []),
