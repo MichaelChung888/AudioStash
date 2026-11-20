@@ -23,6 +23,7 @@
     "mobile:dev": "pnpm --filter @audiostash/mobile android",
     "mobile:ios": "pnpm --filter @audiostash/mobile ios",
     "mobile:bundle": "pnpm --filter @audiostash/mobile bundle",
+    "mobile:release": "pnpm --filter @audiostash/mobile release",
     "mobile:icons": "pnpm --filter @audiostash/mobile icons",
     "docker:up": "docker compose up -d --wait && pnpm db:migrate",
     "docker:down": "docker compose down",

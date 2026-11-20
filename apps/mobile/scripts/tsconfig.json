@@ -1,0 +1,9 @@
+{
+  // These scripts run on Node on your computer, not on the phone, so they are checked
+  // with the same settings as the API rather than the app's.
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["."]
+}

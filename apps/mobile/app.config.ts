@@ -1,4 +1,5 @@
 import type { ExpoConfig } from 'expo/config';
+import { withReleaseSigning } from './plugins/release-signing.ts';
 
 const BACKGROUND = '#0B0C0E';
 
@@ -15,6 +16,9 @@ const config: ExpoConfig = {
   android: {
     // Only matters if the app is ever published to a store, where it must be unique.
     package: 'dev.audiostash.app',
+    // Set by scripts/build-release.mts. Android refuses to install a lower number over a
+    // higher one, so every release counts up.
+    versionCode: Number(process.env.AUDIOSTASH_VERSION_CODE ?? 1),
     adaptiveIcon: {
       foregroundImage: './assets/android-icon-foreground.png',
       monochromeImage: './assets/android-icon-monochrome.png',
@@ -42,4 +46,4 @@ const config: ExpoConfig = {
   ],
 };
 
-export default config;
+export default withReleaseSigning(config);

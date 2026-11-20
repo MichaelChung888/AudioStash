@@ -6,10 +6,11 @@
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
-    "typecheck": "tsc",
+    "typecheck": "tsc && tsc -p scripts",
     "test": "vitest run",
     "bundle": "expo export --platform android --output-dir dist --no-minify",
-    "icons": "node scripts/make-icons.mts"
+    "icons": "node scripts/make-icons.mts",
+    "release": "node scripts/build-release.mts"
   },
   "dependencies": {
     "@audiostash/contracts": "workspace:*",

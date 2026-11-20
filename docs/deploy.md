@@ -1,16 +1,16 @@
-# Deploying AudioStash, and shipping changes
+# Deploying AudioStash
 
 This puts AudioStash on the internet so the installed app works anywhere, like a real product. It has three parts, as in the [architecture diagram](architecture.svg):
 
-| Where          | What runs there             | How it gets there                                 |
-| -------------- | --------------------------- | ------------------------------------------------- |
-| A cloud server | The API, Postgres, RabbitMQ | `deploy/server/compose.yaml`, built on the server |
-| Your home PC   | The download worker         | `deploy/worker/compose.yaml`, built on the PC     |
-| Your phone     | The app                     | An APK built by EAS Build, installed from a link  |
+| Where          | What runs there             | How it gets there                                  |
+| -------------- | --------------------------- | -------------------------------------------------- |
+| A cloud server | The API, Postgres, RabbitMQ | `deploy/server/compose.yaml`, built on the server  |
+| Your home PC   | The download worker         | `deploy/worker/compose.yaml`, built on the PC      |
+| Your phone     | The app                     | A release APK built on your PC, installed over USB |
 
 Song files go to Cloudflare R2, and sign-in stays with Clerk.
 
-The first deploy takes an evening. After that, shipping a change is one or two commands ([Shipping changes](#shipping-changes)).
+The first deploy takes an evening. After that, shipping a change is one or two commands ([Shipping changes](shipping-changes.md)).
 
 ## Tools and accounts
 
@@ -20,7 +20,7 @@ The first deploy takes an evening. After that, shipping a change is one or two c
 | [Tailscale](https://tailscale.com)                     | A private network between the server and your PC, and the API's public `https://` address | Free Personal plan                            |
 | [Cloudflare R2](https://developers.cloudflare.com/r2/) | Stores the song files                                                                     | Free up to 10 GB, about 2,000 songs           |
 | [Clerk](https://clerk.com)                             | Sign-in. You already have it                                                              | Free                                          |
-| [Expo](https://expo.dev) (EAS Build)                   | Builds the APK on Expo's servers                                                          | Free, 30 builds a month                       |
+| Android Studio                                         | Builds and signs the APK on your PC. You already have it from the emulator                | Free                                          |
 | GitHub                                                 | The server and the PC pull the code from it                                               | Free                                          |
 | Docker                                                 | Runs everything on the server and the PC                                                  | Free                                          |
 
@@ -93,21 +93,24 @@ Type `yes` when it asks whether to trust the server. The prompt changes to somet
 On the server:
 
 ```bash
+# apt is Ubuntu's software installer. `update` refreshes the list of available versions,
+# and `upgrade -y` installs every pending update without asking.
+# If a purple screen asks which services to restart, press Enter.
 sudo apt update && sudo apt upgrade -y
+
+# Downloads Docker's official install script and runs it as administrator.
 curl -fsSL https://get.docker.com | sudo sh
+
+# Adds your user to the docker group, so `docker` works without sudo.
+# It applies from your next login only.
 sudo usermod -aG docker $USER
 
+# Downloads and runs Tailscale's install script.
 curl -fsSL https://tailscale.com/install.sh | sh
+
+# Joins the server to your tailnet, under the name audiostash.
 sudo tailscale up --ssh --hostname audiostash
 ```
-
-| Command                                             | What it does                                                                                                                                                                                                            |
-| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sudo apt update && sudo apt upgrade -y`            | `apt` is Ubuntu's software installer. `update` refreshes the list of available versions, and `upgrade -y` installs every pending update without asking. If a purple screen asks which services to restart, press Enter. |
-| `curl -fsSL https://get.docker.com \| sudo sh`      | Downloads Docker's official install script and runs it as administrator.                                                                                                                                                |
-| `sudo usermod -aG docker $USER`                     | Adds your user to the `docker` group, so `docker` works without `sudo`. It applies from your next login only.                                                                                                           |
-| `curl -fsSL https://tailscale.com/install.sh \| sh` | Downloads and runs Tailscale's install script.                                                                                                                                                                          |
-| `sudo tailscale up --ssh --hostname audiostash`     | Joins the server to your tailnet, under the name `audiostash`.                                                                                                                                                          |
 
 `sudo` runs a command as administrator. Installing software and changing system settings need it.
 
@@ -162,20 +165,24 @@ curl http://127.0.0.1:3000/ready                     # "status":"ok", with each 
 ### 5. Give it an address
 
 ```bash
+# Opens https://audiostash.<your tailnet>.ts.net to the whole internet and passes each
+# request to port 3000 on the server, where the API listens. Tailscale provides the
+# HTTPS certificate. This is the phone's address.
 sudo tailscale funnel --bg 3000
+
+# Makes port 3000 reachable at the server's private 100.x address, from your own
+# machines only. The worker calls the API this way.
 sudo tailscale serve --bg --tcp=3000 tcp://localhost:3000
+
+# The same for RabbitMQ, so the worker can take jobs. It is never public.
 sudo tailscale serve --bg --tcp=5672 tcp://localhost:5672
+
+# Lists the three rules above, to check they are set.
 tailscale serve status
+
+# Prints the server's 100.x.y.z address, for the worker's .env on your PC.
 tailscale ip -4
 ```
-
-| Command                                                     | What it does                                                                                                                                                                                                             |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `sudo tailscale funnel --bg 3000`                           | Opens `https://audiostash.<your tailnet>.ts.net` to the whole internet and passes each request to port 3000 on the server, where the API listens. Tailscale provides the HTTPS certificate. This is the phone's address. |
-| `sudo tailscale serve --bg --tcp=3000 tcp://localhost:3000` | Makes port 3000 reachable at the server's private `100.x` address, from your own machines only. The worker calls the API this way.                                                                                       |
-| `sudo tailscale serve --bg --tcp=5672 tcp://localhost:5672` | The same for RabbitMQ, so the worker can take jobs. It is never public.                                                                                                                                                  |
-| `tailscale serve status`                                    | Lists the three rules above, to check they are set.                                                                                                                                                                      |
-| `tailscale ip -4`                                           | Prints the server's `100.x.y.z` address, for the worker's `.env` on your PC.                                                                                                                                             |
 
 - `sudo` runs a command as administrator, which changing Tailscale's settings needs.
 - `--bg` keeps each rule after you close SSH, and after a reboot.
@@ -218,69 +225,116 @@ The local development stack (`pnpm docker:up`) can keep running alongside it. It
 
 ## Part 4: The app on your phone
 
-1. If the phone has a build from `pnpm run mobile:dev`, uninstall it first. It is signed with a different key, so Android refuses to install the APK over it.
-2. Follow [The Android app](../README.md#the-android-app) in the README. In step 2, set `EXPO_PUBLIC_API_URL` to `https://audiostash.<your tailnet>.ts.net`, with no `/` at the end.
-3. Sign in, choose where songs go, and download a song. The Downloads screen should show the PC online, and the song should reach your library within a minute or two.
+The app is built on your PC as a **release APK**: the app's JavaScript is packed inside, so it runs on its own, and it is signed with your own key. Building on your PC needs Android Studio, which the emulator already needed, and has no monthly limit. [EAS Build](../README.md#the-android-app) builds on Expo's servers instead, with no Android tools but 30 builds a month. Pick one and stay with it, for the reason in step 1.
+
+### 1. Make the signing key, once
+
+Android installs an update only if it is signed with the same key as the app already installed. The key lives in a **keystore** file. Android Studio includes `keytool`, which makes one:
+
+```powershell
+# A folder for the key in your user folder, outside every project, so git never sees it.
+mkdir $env:USERPROFILE\.android-keys
+
+# keytool comes with Android Studio's copy of Java. `&` tells PowerShell to run the
+# program at this quoted path.
+#   -genkeypair          make a new key pair: a private key that signs, and a public key
+#                        that Android uses to check the signature
+#   -v                   print what it did
+#   -storetype PKCS12    the standard keystore format
+#   -keystore "…"        the file to create
+#   -alias audiostash    the key's name inside the file; Gradle asks for the key by it
+#   -keyalg RSA          the kind of key
+#   -keysize 2048        its strength in bits; 2048 is the standard minimum
+#   -validity 10000      days until the certificate's date runs out, about 27 years
+& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" -genkeypair -v `
+  -storetype PKCS12 -keystore "$env:USERPROFILE\.android-keys\audiostash.jks" `
+  -alias audiostash -keyalg RSA -keysize 2048 -validity 10000
+```
+
+It asks for a few things:
+
+- **A password**, at least 6 characters. Use a long one from a password manager. Avoid backslashes, because step 2 writes the password into a file where a backslash means something else. A PKCS12 keystore uses this one password for both the file and the key.
+- **Your name, organisation, city and so on.** These only label the certificate, and anyone can read them from the APK, so put nothing private. Pressing Enter at each leaves it as "Unknown", which works. At the end, type `yes` to confirm.
+
+Android does not check the expiry date when it installs an update; it only checks that the key matches.
+
+**Back it up now.** Save `audiostash.jks` and its password in a password manager. Without them you can never update the app again: you would uninstall it, which deletes its library, and start over with a new key. Keep the file outside the repository.
+
+### 2. Tell Gradle where the key is, once
+
+**Gradle** is Android's build tool. It reads `gradle.properties` in your user folder for every build. Create or open `%USERPROFILE%\.gradle\gradle.properties` and add:
+
+```properties
+AUDIOSTASH_STORE_FILE=C:/Users/<you>/.android-keys/audiostash.jks
+AUDIOSTASH_STORE_PASSWORD=<the password>
+AUDIOSTASH_KEY_ALIAS=audiostash
+AUDIOSTASH_KEY_PASSWORD=<the same password>
+```
+
+Use forward slashes in the path, because a backslash is an escape character in this file. The file is outside every project, so the password never reaches git.
+
+[apps/mobile/plugins/release-signing.ts](../apps/mobile/plugins/release-signing.ts) makes release builds use these values. Expo generates the `android` folder from `app.config.ts`, so the setup is added there rather than edited by hand. A release build without these values stops with an error instead of making an APK that will not install.
+
+### 3. Give the build its settings, once
+
+Create `apps/mobile/.env.release`:
+
+```bash
+EXPO_PUBLIC_API_URL=https://audiostash.<your tailnet>.ts.net
+EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+EXPO_PUBLIC_CHART_COUNTRY=gb
+```
+
+No `/` at the end of the address. Your `apps/mobile/.env` points at your PC for development; the release build reads `.env.release` instead. Git ignores both. Every value is built into the APK, where anyone with the file can read it, so none may be a secret.
+
+### 4. Build
+
+```powershell
+pnpm mobile:release
+```
+
+[apps/mobile/scripts/build-release.mts](../apps/mobile/scripts/build-release.mts):
+
+1. Checks the settings: the API address must start with `https://`, because a release build refuses plain `http`.
+2. Sets the **version code** to the number of commits on the branch. Android refuses to install a lower version code over a higher one, and the commit count only grows.
+3. Runs `expo prebuild --clean`, which deletes the `android` folder and writes it again from `app.config.ts`. Starting clean means a permission or plugin removed from the config does not linger in the app.
+4. Runs Gradle's `assembleRelease`, which bundles the JavaScript, compiles the native code and signs the APK.
+
+The first build takes 10 minutes or more; later ones are faster. It ends by printing where the APK is: `apps/mobile/android/app/build/outputs/apk/release/app-release.apk`.
+
+### 5. Install it
+
+The first time only: uninstall any AudioStash already on the phone, from `pnpm mobile:dev` or EAS. Those are signed with other keys, so Android refuses to install over them. Uninstalling deletes the app's library on the phone; it syncs again after you sign in.
+
+With the phone connected over USB and USB debugging on ([A real phone over USB](../README.md#a-real-phone-over-usb)):
+
+```powershell
+adb install -r apps\mobile\android\app\build\outputs\apk\release\app-release.apk
+```
+
+`-r` replaces the installed app and keeps its data. If PowerShell does not know `adb`, it is at `$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe`.
+
+Without a cable, copy the APK to the phone (Google Drive works), open it there, and allow installing unknown apps when Android asks.
+
+From now on the phone runs release builds only. Develop on the emulator: `pnpm mobile:dev` makes debug builds, signed with the debug key, which cannot install over the release app.
+
+### 6. Check it works
+
+Sign in, choose where songs go, and download a song. The Downloads screen should show the PC online, and the song should reach your library within a minute or two.
 
 Clerk stays on its development instance (`pk_test_` and `sk_test_` keys), and that is fine for one person. A production Clerk instance needs a domain name you own. The `ts.net` address belongs to Tailscale, so it does not count.
 
 ## Settings, by place
 
-| Place                          | Settings                                                                                                                                                                                        |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Server, `deploy/server/.env`   | `POSTGRES_PASSWORD`, `RABBITMQ_PASSWORD`, `CLERK_SECRET_KEY`, `CLERK_ALLOWED_USER_IDS`, the five `S3_*` values, `WORKER_TOKEN`. Optional: `CLERK_JWT_KEY`, `YOUTUBE_API_KEY`, `CATALOG_COUNTRY` |
-| PC, `deploy/worker/.env`       | `TS_AUTHKEY`, `API_URL`, `RABBITMQ_URL`, `WORKER_TOKEN`. Optional: `WORKER_CONCURRENCY`                                                                                                         |
-| EAS, set with `eas env:create` | `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY`. Optional: `EXPO_PUBLIC_CHART_COUNTRY`                                                                                               |
+| Place                                         | Settings                                                                                                                                                                                        |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Server, `deploy/server/.env`                  | `POSTGRES_PASSWORD`, `RABBITMQ_PASSWORD`, `CLERK_SECRET_KEY`, `CLERK_ALLOWED_USER_IDS`, the five `S3_*` values, `WORKER_TOKEN`. Optional: `CLERK_JWT_KEY`, `YOUTUBE_API_KEY`, `CATALOG_COUNTRY` |
+| PC, `deploy/worker/.env`                      | `TS_AUTHKEY`, `API_URL`, `RABBITMQ_URL`, `WORKER_TOKEN`. Optional: `WORKER_CONCURRENCY`                                                                                                         |
+| PC, `apps/mobile/.env.release`                | `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY`. Optional: `EXPO_PUBLIC_CHART_COUNTRY`                                                                                               |
+| PC, `%USERPROFILE%\.gradle\gradle.properties` | `AUDIOSTASH_STORE_FILE`, `AUDIOSTASH_STORE_PASSWORD`, `AUDIOSTASH_KEY_ALIAS`, `AUDIOSTASH_KEY_PASSWORD`                                                                                         |
 
-The two `.env` files stay on their machines and are never committed. The EAS values are built into the APK, so none of them may be a secret.
+None of these files is committed. The `.env.release` values are built into the APK, so none of them may be a secret. The keystore and its password are secrets: keep them backed up and out of the repository.
 
-## Shipping changes
+## After the first deploy
 
-You keep developing exactly as now: the local Docker stack and the emulator. Production only changes when you deploy.
-
-1. Check and push:
-
-   ```powershell
-   pnpm lint
-   pnpm typecheck
-   pnpm test
-   git push
-   ```
-
-   GitHub Actions (CI) runs the same checks, the integration tests and both image builds on every push. Wait for a green tick before deploying.
-
-2. Deploy each part you changed:
-
-   | You changed                   | Run                                                                                                                                       |
-   | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-   | `apps/api` or `packages/*`    | `ssh ubuntu@audiostash "cd AudioStash && git pull && docker compose -f deploy/server/compose.yaml up -d --build"`                         |
-   | `apps/worker` or `packages/*` | On the PC: `git pull`, then `docker compose -f deploy/worker/compose.yaml up -d --build`                                                  |
-   | `apps/mobile`                 | `cd apps/mobile`, then `npx eas-cli build --platform android --profile preview`. Open the link on the phone and install over the old app. |
-
-   The API is down for a few seconds while its container restarts. The app retries, and jobs wait in RabbitMQ, so nothing is lost. New database migrations run on their own before the API starts.
-
-Rules that start with the first deploy:
-
-- **Migrations only grow.** Until now the schema was regenerated as one `0000_init.sql`. Once production has data, never edit or regenerate a migration that has run there. Change `schema.ts`, run `pnpm db:generate`, and commit the new file. Update the migration rule in `CLAUDE.md` when you deploy.
-- **The server goes first.** The phone keeps the old app until you install the new APK, so the API must still accept what the old app sends. Deploy the API, then the app. The same applies to the worker: deploy the API, then the worker.
-- **Old images pile up.** Every build leaves the previous image behind. Run `docker image prune -f` on the server now and then.
-
-### Faster app updates, later
-
-Each app change currently needs a full EAS build: several minutes in the queue, then an install. [EAS Update](https://docs.expo.dev/eas-update/introduction/) can send JavaScript-only changes straight to the installed app, which picks them up the next time it opens. Changes to native code (a new Expo module, `app.config.ts` plugins, an Expo SDK upgrade) still need a build. Setting it up means adding `expo-updates` and making one new build. It is worth it once you change the app often.
-
-### Automatic deploys, later
-
-CI already checks every push. CD (continuous deployment) would also run the deploy command when CI passes on `main`. A GitHub Actions job can join your tailnet with [Tailscale's GitHub Action](https://tailscale.com/kb/1276/tailscale-github-action) and run the same `ssh` command. For one person, running the command yourself is simpler, and you choose when production changes. Add CD when that stops being true. The worker cannot be deployed this way, because the PC is not always on.
-
-## Looking after it
-
-- **Logs:** `docker compose -f deploy/server/compose.yaml logs -f api` on the server. Old log files are deleted automatically.
-- **RabbitMQ's web UI:** run `ssh -L 15672:localhost:15672 ubuntu@audiostash` on your PC, then open `http://localhost:15672`. The UI listens only on the server's localhost, and `-L` carries it through SSH to your PC.
-- **Backups:** Postgres holds the library: which songs, playlists and edits exist. R2 holds the files. If the server's disk is lost, the library goes with it, although the files survive. There are no automatic backups yet. Until there are, take a copy now and then:
-
-  ```powershell
-  ssh ubuntu@audiostash "cd AudioStash && docker compose -f deploy/server/compose.yaml exec -T postgres pg_dump -U audiostash audiostash" > audiostash-backup.sql
-  ```
-
-- **Server updates:** Ubuntu installs security updates on its own. Run `sudo apt upgrade` now and then for the rest.
+[Shipping changes, and looking after production](shipping-changes.md) covers getting each change to production, logs, backups and server updates.

@@ -11,5 +11,5 @@
     "erasableSyntaxOnly": true,
     "types": []
   },
-  "include": ["src", "app.config.ts", "vitest.config.ts"]
+  "include": ["src", "plugins", "app.config.ts", "vitest.config.ts"]
 }

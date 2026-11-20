@@ -67,9 +67,10 @@ An **APK** (Android package) installs directly on a phone. An **AAB** (Android A
 Android refuses to install an update unless it is signed with the same key as the version already installed. The **keystore** is the file holding that key.
 
 - EAS makes a keystore on the first build and keeps it, so every EAS build updates the last one.
-- A local build signs with a different key.
+- A local release build (`pnpm mobile:release`) signs with your own keystore, which you make once and back up ([Deploying AudioStash, Part 4](../deploy.md#part-4-the-app-on-your-phone)). Expo generates the `android` folder and does not keep it in git, so [a small Expo plugin](../../apps/mobile/plugins/release-signing.ts) adds the signing setup each time the folder is generated.
+- A debug build (`pnpm mobile:dev`) signs with the debug key that comes with every Android project. Anyone can download that key, which is why release builds do not use it.
 
-Switching between the two means uninstalling first. Uninstalling deletes the app's database, so the library is pulled again and every song is downloaded again into the music folder (see [Android storage](android-storage.md)). Pick one way to build and stay with it.
+Switching between any two of these means uninstalling first. Uninstalling deletes the app's database, so the library is pulled again and every song is downloaded again into the music folder (see [Android storage](android-storage.md)). Pick one way to build and stay with it.
 
 ## EAS Build
 

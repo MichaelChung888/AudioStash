@@ -3,7 +3,7 @@
 A personal music library for Android. Paste a YouTube, SoundCloud or Bandcamp link, pick songs from the charts, or upload your own files. A worker on your home PC downloads each song at the best quality available and adds the title, artist, album, cover art and lyrics. Your phone keeps a copy of the whole library, so everything plays offline.
 
 **Built so far:** the API, the download worker, the Android app, and the local setup that runs the backend.
-**To use it for real:** [Deploying AudioStash](docs/deploy.md) puts the backend on a cloud server and the app on your phone, and covers shipping changes afterwards. The installed app needs this, because a release build only connects over `https://`.
+**To use it for real:** [Deploying AudioStash](docs/deploy.md) puts the backend on a cloud server and the app on your phone, and [Shipping changes](docs/shipping-changes.md) covers each change after that. The installed app needs this, because a release build only connects over `https://`.
 
 ## How it fits together
 
@@ -203,7 +203,12 @@ A build made this way is signed with a different key from the APK built by EAS. 
 
 ## The Android app
 
-The app is installed as an APK, built on Expo's servers (EAS Build) so you do not need Android tools on your computer. [Expo, and how the app becomes an APK](docs/learning/expo-and-the-apk.md) explains each step.
+The app is installed as an APK. There are two ways to build it:
+
+- **On your PC**, signed with your own key, with no limit on builds. It needs Android Studio, which the emulator already needs. [Deploying AudioStash, Part 4](docs/deploy.md#part-4-the-app-on-your-phone) has the steps. This is the way AudioStash is deployed.
+- **On Expo's servers (EAS Build)**, with no Android tools on your computer, but 30 free builds a month. The steps below.
+
+Pick one and stay with it: each signs with a different key, and switching means uninstalling the app. [Expo, and how the app becomes an APK](docs/learning/expo-and-the-apk.md) explains each step.
 
 The APK only connects to `https://` addresses, so it needs the API deployed first ([Deploying AudioStash](docs/deploy.md)). Until then, [try the app on an emulator](#try-the-app-on-an-emulator).
 
