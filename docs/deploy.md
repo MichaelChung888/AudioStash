@@ -225,7 +225,7 @@ The local development stack (`pnpm docker:up`) can keep running alongside it. It
 
 ## Part 4: The app on your phone
 
-The app is built on your PC as a **release APK**: the app's JavaScript is packed inside, so it runs on its own, and it is signed with your own key. Building on your PC needs Android Studio, which the emulator already needed, and has no monthly limit. [EAS Build](../README.md#the-android-app) builds on Expo's servers instead, with no Android tools but 30 builds a month. Pick one and stay with it, for the reason in step 1.
+The app is built on your PC as a **release APK**: the app's JavaScript is packed inside, so it runs on its own, and it is signed with your own key. Building on your PC needs Android Studio, which the emulator already needed, and has no monthly limit. [EAS Build](https://docs.expo.dev/build/introduction/) builds on Expo's servers instead, with no Android tools but 30 builds a month. Pick one and stay with it, for the reason in step 1.
 
 ### 1. Make the signing key, once
 
@@ -306,15 +306,21 @@ The first build takes 10 minutes or more; later ones are faster. It ends by prin
 
 The first time only: uninstall any AudioStash already on the phone, from `pnpm mobile:dev` or EAS. Those are signed with other keys, so Android refuses to install over them. Uninstalling deletes the app's library on the phone; it syncs again after you sign in.
 
-With the phone connected over USB and USB debugging on ([A real phone over USB](../README.md#a-real-phone-over-usb)):
+Then get the APK onto the phone. Either way works, because the signature is inside the file.
+
+**Send the file.** Quick Share, Google Drive or a message to yourself all work. Open the file on the phone and allow installing unknown apps when Android asks. If Google Play Protect warns about an unknown developer, choose **Install anyway**.
+
+**Or install over USB**, which needs USB debugging turned on once:
+
+1. On the phone, open **Settings > About phone** and tap **Build number** seven times. This turns on **Developer options**.
+2. In **Developer options**, turn on **USB debugging**.
+3. Plug the phone into the PC and allow debugging when the phone asks.
 
 ```powershell
 adb install -r apps\mobile\android\app\build\outputs\apk\release\app-release.apk
 ```
 
 `-r` replaces the installed app and keeps its data. If PowerShell does not know `adb`, it is at `$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe`.
-
-Without a cable, copy the APK to the phone (Google Drive works), open it there, and allow installing unknown apps when Android asks.
 
 From now on the phone runs release builds only. Develop on the emulator: `pnpm mobile:dev` makes debug builds, signed with the debug key, which cannot install over the release app.
 

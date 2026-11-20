@@ -4,7 +4,7 @@ Things AudioStash does not do yet, or does in a simple way on purpose. Each entr
 
 ## Not tried on a phone yet
 
-The app passes type checks, unit tests, lint, and builds its Android bundle. It has not run on a phone or an emulator yet. Audio, the folder picker, background playback and lock screen controls are checked only by running it ([Try the app on an emulator](../README.md#try-the-app-on-an-emulator)).
+The app passes type checks, unit tests, lint, and builds its Android bundle. It has not run on a phone or an emulator yet. Audio, the folder picker, background playback and lock screen controls are checked only by running it ([Try the app on an emulator](../README.md#try-the-app-on-a-mobile-emulator)).
 
 ## The APK needs the API on https
 

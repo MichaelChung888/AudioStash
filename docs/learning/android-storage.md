@@ -105,15 +105,3 @@ Songs are saved only on Wi-Fi unless you turn on "Save songs over mobile data" i
 | [apps/mobile/src/files/plan.ts](../../apps/mobile/src/files/plan.ts)                     | What to save, replace and delete                  |
 | [apps/mobile/src/files/mirror.ts](../../apps/mobile/src/files/mirror.ts)                 | Downloading, checking, copying, writing playlists |
 | [apps/mobile/src/app/music-folder.tsx](../../apps/mobile/src/app/music-folder.tsx)       | The "Where should songs go?" screen               |
-
-<details>
-<summary>Check: you uninstall AudioStash, install it again and pick the same folder. What happens to the songs already there?</summary>
-
-Uninstalling deleted the app's database, so `saved_songs` is empty and the plan says to save every song. Each one is downloaded again and copied over the file with the same name, so the folder ends with one copy of each. Signing out is different: it keeps `saved_songs`, so signing in again downloads nothing already saved. Skipping the downloads after a reinstall would need the app to read and hash the files already in the folder first.
-</details>
-
-<details>
-<summary>Check: why is the mirror allowed to run only after a complete sync?</summary>
-
-It deletes files whose songs are not in the local database. Partway through a sync, songs on later pages are not in the database yet, so their files would be deleted and downloaded again a moment later.
-</details>

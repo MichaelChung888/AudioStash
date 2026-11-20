@@ -127,15 +127,3 @@ The record of saved files stays, with each file's path and hash. Signing in agai
 | [apps/mobile/src/api/sse.ts](../../apps/mobile/src/api/sse.ts)           | Turns arriving text into messages; tested on awkward chunk splits |
 | [apps/mobile/src/session.ts](../../apps/mobile/src/session.ts)           | What starts at sign-in and the sign-out order                     |
 | [apps/api/src/services/sync.ts](../../apps/api/src/services/sync.ts)     | The server side of push and pull                                  |
-
-<details>
-<summary>Check: the app saves the cursor in the same transaction as the changes. What could go wrong if it saved the cursor afterwards, in a separate write?</summary>
-
-If the app closed between the two writes, the changes would be applied but the cursor would still point before them. The next pull would apply the same page again. For upserts and deletes that happens to be harmless, but the phone would download the page twice and the code would rely on every change type being safe to repeat. One transaction removes the question.
-</details>
-
-<details>
-<summary>Check: why does the app sync when the event stream reconnects, rather than asking the server to resend the events it missed?</summary>
-
-Resending would need the server to keep every event per phone until that phone confirms it, which is a second change log. The real change log already exists and the phone already has a cursor into it. The stream only needs to say "look now".
-</details>

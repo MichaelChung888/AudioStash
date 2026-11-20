@@ -129,15 +129,3 @@ AudioStash is built for one owner. To let others have their own libraries:
 4. Allow sign-ups in Clerk and remove the allow-list.
 
 Step 2 is the large one: every query in the API changes.
-
-<details>
-<summary>Check: a token's payload says <code>"sub": "user_owner"</code>. Could someone change it to another user id and send it?</summary>
-
-They can change the text, but the signature was made over the original payload. The API recomputes the check with Clerk's public key, it fails, and the API answers 401. `clerk.test.ts` has a test that does exactly this.
-</details>
-
-<details>
-<summary>Check: why not make session tokens last a day, to save the phone fetching one every minute?</summary>
-
-The API never asks Clerk whether a session is still active. A token's lifetime is how long it keeps working after its session is revoked, for example after a phone is lost. A minute limits that window; a day would not.
-</details>

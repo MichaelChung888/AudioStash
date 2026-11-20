@@ -100,15 +100,3 @@ Native behaviour (audio, the folder picker, background playback) is checked only
 | [apps/mobile/.env.example](../../apps/mobile/.env.example)                     | The settings baked into the app                   |
 | [apps/mobile/src/app](../../apps/mobile/src/app)                               | Screens. Expo Router turns each file into a route |
 | [apps/mobile/scripts/make-icons.mts](../../apps/mobile/scripts/make-icons.mts) | Draws the app icons from the logo                 |
-
-<details>
-<summary>Check: you change <code>EXPO_PUBLIC_API_URL</code> in <code>.env</code> and reopen the installed APK. Does it use the new address?</summary>
-
-No. The old address was written into the bundle when the APK was built. The app has to be built again.
-</details>
-
-<details>
-<summary>Check: why is it fine for the Clerk publishable key to be inside the APK, but not the worker token?</summary>
-
-The publishable key only identifies which Clerk application to sign in to; signing in still needs your email and a code. The worker token lets whoever holds it claim jobs and write songs, with no sign-in at all.
-</details>

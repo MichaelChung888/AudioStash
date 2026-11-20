@@ -88,31 +88,7 @@ The first build takes several minutes. When it finishes, `docker compose ps` sho
 | http://localhost:15672       | RabbitMQ's web UI, user `audiostash`, password `audiostash`                  |
 | http://localhost:9001        | The storage console, user `audiostash-dev`, password `audiostash-dev-secret` |
 
-### 5. Try it
-
-Without the app, you can call the API from PowerShell. This gets a sign-in token for your Clerk user and starts a download:
-
-```powershell
-$token = docker compose exec -T api node apps/api/scripts/token.ts
-$auth = @{ Authorization = "Bearer $token" }
-Invoke-RestMethod http://localhost:3000/v1/status -Headers $auth
-
-$body = @{ id = [guid]::NewGuid().ToString(); source = @{ kind = 'url'; url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' } } | ConvertTo-Json
-$download = Invoke-RestMethod http://localhost:3000/v1/downloads -Method Post -Headers $auth -ContentType 'application/json' -Body $body
-Invoke-RestMethod "http://localhost:3000/v1/downloads/$($download.id)" -Headers $auth
-```
-
-Run the last line again after a minute and the status changes to `completed`. The song is in the storage console under the `audiostash` bucket. `docker compose logs -f worker` shows each step as it happens.
-
-### Stop, update, reset
-
-| Task                    | Command                                      |
-| ----------------------- | -------------------------------------------- |
-| Stop                    | `docker compose --profile app down`          |
-| Update after `git pull` | `docker compose --profile app up -d --build` |
-| Delete all local data   | `docker compose --profile app down -v`       |
-
-## Try the app on an emulator
+## Try the app on a mobile emulator
 
 An emulator is a virtual Android phone that runs in a window on your PC. This builds a debug version of the app on your PC and installs it there. A debug build allows plain `http://`, so it works with the backend from the quick start, before any cloud deploy.
 
@@ -129,7 +105,7 @@ The backend must be running (quick start step 4), and you need Node 24 and pnpm 
 
 3. Install CMake 3.31.6. The Android SDK's default CMake cannot handle this project's long file paths, and the build fails with `build.ninja still dirty after 100 tries`.
    1. In Android Studio, open **Settings > Languages & Frameworks > Android SDK > SDK Tools**, tick **Show Package Details**, and install **CMake 3.31.6**.
-   2. Tell Gradle to use it. This is a setting for your PC, not the repo, because the APK is built on Linux.
+   2. Tell Gradle to use it. This is a setting for your PC, not the repo, because only Windows needs it.
 
       ```powershell
       New-Item -ItemType Directory -Force "$env:USERPROFILE\.gradle" | Out-Null
@@ -188,66 +164,17 @@ With the virtual phone running:
 pnpm run mobile:dev
 ```
 
-The first build takes 10 minutes or more. Later builds are much faster. When it finishes, the app opens on the virtual phone. Then follow [First run](#4-first-run) below.
+The first build takes 10 minutes or more. Later builds are much faster. When it finishes, the app opens on the virtual phone. Then follow [First run](#first-run) below.
 
 The command keeps running: it is Metro, the server that sends the app's JavaScript to the phone. Saving a change to the code reloads the app within a second. Press `Ctrl+C` to stop it. Run the same command again next time.
 
-### A real phone over USB
+## The app on your phone
 
-The same steps work with your own phone in place of the virtual one:
+The phone runs a **release APK**: the install file with the app's JavaScript packed inside, signed with your own key. You build it on your PC with `pnpm mobile:release` and send it to the phone. [Deploying AudioStash, Part 4](docs/deploy.md#part-4-the-app-on-your-phone) has the one-time set-up, and [Expo, and how the app becomes an APK](docs/learning/expo-and-the-apk.md) explains what each step of the build does.
 
-1. On the phone, open **Settings > About phone** and tap **Build number** seven times. This turns on **Developer options**.
-2. In **Developer options**, turn on **USB debugging**.
-3. Plug the phone into the PC and allow debugging when the phone asks.
-4. Run `pnpm run mobile:dev`. The phone must be on the same Wi-Fi as the PC. In Windows, set that Wi-Fi to Private (**Settings > Network & internet > Wi-Fi >** your network **> Network profile type**). On a Public network, Windows Firewall blocks other devices from connecting to the PC, so the phone cannot reach the backend.
+The APK only connects to `https://` addresses, so it needs the API deployed first. Until then, [try the app on an emulator](#try-the-app-on-a-mobile-emulator).
 
-A build made this way is signed with a different key from the APK built by EAS. To switch from one to the other, uninstall the app first. See [Signing](docs/learning/expo-and-the-apk.md#signing).
-
-## The Android app
-
-The app is installed as an APK. There are two ways to build it:
-
-- **On your PC**, signed with your own key, with no limit on builds. It needs Android Studio, which the emulator already needs. [Deploying AudioStash, Part 4](docs/deploy.md#part-4-the-app-on-your-phone) has the steps. This is the way AudioStash is deployed.
-- **On Expo's servers (EAS Build)**, with no Android tools on your computer, but 30 free builds a month. The steps below.
-
-Pick one and stay with it: each signs with a different key, and switching means uninstalling the app. [Expo, and how the app becomes an APK](docs/learning/expo-and-the-apk.md) explains each step.
-
-The APK only connects to `https://` addresses, so it needs the API deployed first ([Deploying AudioStash](docs/deploy.md)). Until then, [try the app on an emulator](#try-the-app-on-an-emulator).
-
-### 1. Set up EAS
-
-You need Node 24 and pnpm (see [Developing](#developing)), and a free account at [expo.dev](https://expo.dev).
-
-```powershell
-cd apps/mobile
-npx eas-cli login
-npx eas-cli init
-```
-
-`eas init` creates the project on expo.dev. It cannot edit `app.config.ts` itself, so it prints a project id: add it to the config as `extra: { eas: { projectId: '<the id>' } }`. The id is not a secret.
-
-### 2. Give the build its settings
-
-The build runs on Expo's servers, which never see your `.env`. Set the values there instead:
-
-```powershell
-npx eas-cli env:create --environment preview --visibility plaintext --name EXPO_PUBLIC_API_URL --value https://<your API address>
-npx eas-cli env:create --environment preview --visibility plaintext --name EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY --value pk_test_...
-```
-
-The publishable key is under **API keys** in the Clerk dashboard. Both values are built into the app, where anyone with the APK can read them, so they are not secrets.
-
-### 3. Build and install
-
-```powershell
-npx eas-cli build --platform android --profile preview
-```
-
-Free builds wait in a queue, often for some minutes. When the build finishes, the command prints a link. Open it on your phone, download the APK, and allow your browser to install unknown apps when Android asks.
-
-Later builds install over the old one and keep your library. They must all come from EAS: a build made elsewhere is signed with a different key, and Android will only install it after you uninstall the app.
-
-### 4. First run
+### First run
 
 1. Sign in with your email and password, or a social account.
 2. Choose where songs go. **A folder in Music** puts them in `Music/AudioStash`, where other players can see them.
