@@ -2,13 +2,14 @@ import type { CatalogTrack, Genre } from '@audiostash/contracts';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { type ReactNode, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { errorMessage } from '../../api/client.ts';
 import { keys, useCharts, useForYou, useGenres, useStatus, useTrending } from '../../api/queries.ts';
 import { config } from '../../config.ts';
 import { TrackCard, TrackRow } from '../../ui/catalog.tsx';
 import { Button, Chip, Screen, StatusDot, Touchable } from '../../ui/components.tsx';
 import { Icon, Logo } from '../../ui/Icon.tsx';
+import { Pulse, Repeat, TrackCardPlaceholder, TrackRowPlaceholder } from '../../ui/placeholders.tsx';
 import { colors, fonts, text } from '../../ui/theme.ts';
 
 const ALL_GENRES: Genre = { id: 0, name: 'All' };
@@ -107,7 +108,15 @@ function Charts() {
           </Touchable>
         ) : null}
       </SectionTitle>
-      <Loadable query={charts} empty="No chart for this genre right now.">
+      <Loadable
+        query={charts}
+        empty="No chart for this genre right now."
+        placeholder={
+          <Repeat times={CHART_PREVIEW}>
+            <TrackRowPlaceholder ranked />
+          </Repeat>
+        }
+      >
         {(showAll ? tracks : tracks.slice(0, CHART_PREVIEW)).map((track, i) => (
           <TrackRow key={track.id} track={track} rank={i + 1} />
         ))}
@@ -121,7 +130,7 @@ function Trending() {
   return (
     <View style={styles.section}>
       <SectionTitle title={trendingTitle(config.chartCountry)} />
-      <Loadable query={trending} empty="Nothing trending right now.">
+      <Loadable query={trending} empty="Nothing trending right now." placeholder={<ShelfPlaceholder />}>
         <Shelf tracks={trending.data ?? []} />
       </Loadable>
     </View>
@@ -153,6 +162,16 @@ function Shelf({ tracks }: { tracks: CatalogTrack[] }) {
   );
 }
 
+function ShelfPlaceholder() {
+  return (
+    <View style={[styles.shelf, styles.shelfPlaceholder]}>
+      <Repeat times={3}>
+        <TrackCardPlaceholder />
+      </Repeat>
+    </View>
+  );
+}
+
 function SectionTitle({ title, reason, children }: { title: string; reason?: string; children?: ReactNode }) {
   return (
     <View style={styles.sectionHeader}>
@@ -170,11 +189,12 @@ function SectionTitle({ title, reason, children }: { title: string; reason?: str
 interface LoadableProps {
   query: { isPending: boolean; isError: boolean; error: unknown; data?: readonly unknown[]; refetch: () => unknown };
   empty: string;
+  placeholder: ReactNode;
   children: ReactNode;
 }
 
-function Loadable({ query, empty, children }: LoadableProps) {
-  if (query.isPending) return <ActivityIndicator color={colors.accent} style={styles.loading} />;
+function Loadable({ query, empty, placeholder, children }: LoadableProps) {
+  if (query.isPending) return <Pulse>{placeholder}</Pulse>;
   if (query.isError)
     return (
       <View style={styles.problem}>
@@ -211,6 +231,6 @@ const styles = StyleSheet.create({
   sectionText: { flex: 1, gap: 2 },
   seeAll: { fontFamily: fonts.semibold, fontSize: 13, color: colors.textMuted },
   shelf: { gap: 12, paddingHorizontal: 20 },
-  loading: { paddingVertical: 32 },
+  shelfPlaceholder: { flexDirection: 'row', overflow: 'hidden' },
   problem: { alignItems: 'flex-start', gap: 12, paddingHorizontal: 20, paddingVertical: 12 },
 });

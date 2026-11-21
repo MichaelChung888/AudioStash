@@ -1,14 +1,15 @@
 import { parseSourceUrl } from '@audiostash/core';
 import * as Clipboard from 'expo-clipboard';
 import * as DocumentPicker from 'expo-document-picker';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { type ReactNode, useEffect, useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { errorMessage } from '../../api/client.ts';
 import { useSearchSongs, useSearchYoutube } from '../../api/queries.ts';
 import { openAddSheet } from '../../downloads/add-request.ts';
 import { TrackRow, VideoRow } from '../../ui/catalog.tsx';
 import { Field, Message, Screen, Touchable } from '../../ui/components.tsx';
 import { Icon, type IconName } from '../../ui/Icon.tsx';
+import { Pulse, Repeat, TrackRowPlaceholder, VideoRowPlaceholder } from '../../ui/placeholders.tsx';
 import { colors, fonts, text } from '../../ui/theme.ts';
 
 type Tab = 'songs' | 'youtube';
@@ -90,7 +91,7 @@ export default function SearchScreen() {
 
 function SongResults({ q }: { q: string }) {
   const results = useSearchSongs(q, true);
-  if (q === '' || results.isPending) return <Loading />;
+  if (q === '' || results.isPending) return <Loading row={<TrackRowPlaceholder />} />;
   if (results.isError) return <Message title="Search failed" detail={errorMessage(results.error)} />;
   if (results.data.length === 0) return <Message title="No songs found" detail="Try the YouTube tab, or paste a link." />;
   return (
@@ -106,7 +107,7 @@ function SongResults({ q }: { q: string }) {
 
 function VideoResults({ q }: { q: string }) {
   const results = useSearchYoutube(q, true);
-  if (q === '' || results.isPending) return <Loading />;
+  if (q === '' || results.isPending) return <Loading row={<VideoRowPlaceholder />} />;
   if (results.isError) return <Message title="Search failed" detail={errorMessage(results.error)} />;
   if (results.data.length === 0) return <Message title="No videos found" />;
   return (
@@ -120,8 +121,12 @@ function VideoResults({ q }: { q: string }) {
   );
 }
 
-function Loading() {
-  return <ActivityIndicator color={colors.accent} style={styles.loading} />;
+function Loading({ row }: { row: ReactNode }) {
+  return (
+    <Pulse>
+      <Repeat times={6}>{row}</Repeat>
+    </Pulse>
+  );
 }
 
 function ActionButton({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
@@ -173,5 +178,4 @@ const styles = StyleSheet.create({
   segment: { flex: 1, height: 36, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
   segmentSelected: { backgroundColor: colors.raised },
   segmentText: { fontFamily: fonts.semibold, fontSize: 14 },
-  loading: { paddingVertical: 32 },
 });
