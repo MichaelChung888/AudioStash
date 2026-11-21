@@ -10,6 +10,7 @@ import { Cover, IconButton, Touchable } from '../ui/components.tsx';
 import { Icon } from '../ui/Icon.tsx';
 import { MenuButton } from '../ui/menu.tsx';
 import { colors, fonts } from '../ui/theme.ts';
+import { playerBackground } from '../ui/tint.ts';
 
 const CODEC_NAMES = { opus: 'Opus', aac: 'AAC', mp3: 'MP3' } as const;
 
@@ -46,7 +47,10 @@ function Player({ song, sourceName, sourceId, shuffle, repeat }: PlayerProps) {
   ].filter((chip): chip is string => chip !== null);
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={[styles.content, { paddingTop: insets.top + 8, paddingBottom: insets.bottom }]}>
+    <ScrollView
+      style={[styles.screen, { backgroundColor: playerBackground(song.coverColor, colors.player) }]}
+      contentContainerStyle={[styles.content, { paddingTop: insets.top + 8, paddingBottom: insets.bottom }]}
+    >
       <View style={styles.topBar}>
         <IconButton icon="down" label="Close the player" color={colors.text} onPress={() => router.back()} />
         <View style={styles.from}>
@@ -208,7 +212,7 @@ function SyncedLines({ lines, positionMs }: { lines: LyricLine[]; positionMs: nu
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.player },
+  screen: { flex: 1 },
   content: { gap: 20, paddingHorizontal: 24 },
   topBar: { flexDirection: 'row', alignItems: 'center', marginHorizontal: -12 },
   from: { flex: 1, alignItems: 'center' },
