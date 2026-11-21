@@ -1,15 +1,17 @@
 import type { CatalogTrack, YoutubeVideo } from '@audiostash/contracts';
 import { formatDuration } from '@audiostash/core';
 import { Image } from 'expo-image';
+import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ActivityIndicator, type StyleProp, StyleSheet, Text, ToastAndroid, View, type ViewStyle } from 'react-native';
 import { errorMessage } from '../api/client.ts';
+import { useDownloading } from '../api/queries.ts';
 import { openAddSheet } from '../downloads/add-request.ts';
 import { type PreviewState, usePreviewState, usePreviewStatus } from '../player/hooks.ts';
 import { togglePreview } from '../player/player.ts';
 import { Cover, DownloadButton, InLibraryMark, ProgressBar, Touchable } from './components.tsx';
 import { Icon } from './Icon.tsx';
-import { colors, fonts, text } from './theme.ts';
+import { colors, fonts, TOUCH, text } from './theme.ts';
 
 // Rows and cards for songs from charts and search, which may not be in the library yet.
 
@@ -28,6 +30,7 @@ interface TrackRowProps {
 export function TrackRow({ track, rank, showAlbum = false, showDuration = false }: TrackRowProps) {
   const subtitle = showAlbum && track.album ? `${track.artist} · ${track.album}` : track.artist;
   const preview = usePreviewState(track.id);
+  const downloading = useDownloading(track.id);
   return (
     <PreviewArea track={track} preview={preview} style={styles.row}>
       {rank !== undefined ? <Text style={styles.rank}>{rank}</Text> : null}
@@ -44,7 +47,13 @@ export function TrackRow({ track, rank, showAlbum = false, showDuration = false 
         </Text>
       </View>
       {showDuration && track.durationSec ? <Text style={text.numeric}>{formatDuration(track.durationSec * 1000)}</Text> : null}
-      {track.inLibrary ? <InLibraryMark /> : <DownloadButton label={`Download ${track.title}`} onPress={() => downloadTrack(track)} />}
+      {track.inLibrary ? (
+        <InLibraryMark />
+      ) : downloading ? (
+        <DownloadingButton title={track.title} size={TOUCH} />
+      ) : (
+        <DownloadButton label={`Download ${track.title}`} onPress={() => downloadTrack(track)} />
+      )}
     </PreviewArea>
   );
 }
@@ -52,6 +61,7 @@ export function TrackRow({ track, rank, showAlbum = false, showDuration = false 
 // A square song tile, for the sideways shelves on Home: Trending and "Because you like".
 export function TrackCard({ track }: { track: CatalogTrack }) {
   const preview = usePreviewState(track.id);
+  const downloading = useDownloading(track.id);
   return (
     <PreviewArea track={track} preview={preview} style={styles.card}>
       <View>
@@ -61,6 +71,8 @@ export function TrackCard({ track }: { track: CatalogTrack }) {
             <View accessible accessibilityLabel="In your library" style={styles.cardButton}>
               <Icon name="inLibrary" size={34} color={colors.accent} />
             </View>
+          ) : downloading ? (
+            <DownloadingButton title={track.title} size={34} style={styles.cardDownloading} />
           ) : (
             <Touchable
               accessibilityRole="button"
@@ -123,13 +135,27 @@ function PreviewCover({ uri, size, radius, preview }: { uri: string | null; size
   );
 }
 
-// Mounted only while a preview plays, because it re-renders four times a second.
 function PreviewProgress({ inset }: { inset: number }) {
   const { currentTime, duration } = usePreviewStatus();
   return (
     <View style={[styles.previewProgress, { left: inset, right: inset, bottom: inset }]}>
       <ProgressBar value={duration > 0 ? currentTime / duration : 0} track="rgba(255, 255, 255, 0.3)" height={3} />
     </View>
+  );
+}
+
+function DownloadingButton({ title, size, style }: { title: string; size: number; style?: StyleProp<ViewStyle> }) {
+  return (
+    <Touchable
+      accessibilityRole="button"
+      accessibilityLabel={`Downloading ${title}. Open downloads`}
+      onPress={() => router.navigate('/downloads')}
+      hitSlop={6}
+      round={size}
+      style={[styles.downloading, { width: size, height: size }, style]}
+    >
+      <ActivityIndicator size="small" color={colors.accent} />
+    </Touchable>
   );
 }
 
@@ -184,6 +210,8 @@ const styles = StyleSheet.create({
   cardAction: { position: 'absolute', right: 6, bottom: 6 },
   cardButton: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   cardDownload: { backgroundColor: colors.accent },
+  cardDownloading: { borderRadius: 17, backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+  downloading: { alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   cardTitle: { marginTop: 6, fontFamily: fonts.semibold, fontSize: 14, color: colors.text },
   videoRow: { flexDirection: 'row', alignItems: 'center', gap: 12, height: 72, paddingLeft: 20, paddingRight: 8 },
   thumbnail: { width: 96, height: 54, borderRadius: 6, backgroundColor: colors.raised },

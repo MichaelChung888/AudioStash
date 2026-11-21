@@ -12,6 +12,7 @@ import { api } from '../api/endpoints.ts';
 import { putDownload, useDefaultDownloadOptions, usePlaylists, useStatus } from '../api/queries.ts';
 import { type AddRequest, getAddRequest } from '../downloads/add-request.ts';
 import { sourceName } from '../downloads/describe.ts';
+import { rememberRequested } from '../downloads/requested.ts';
 import { formatBytes, plural } from '../lib/format.ts';
 import { Button, Cover, Field, IconButton, ProgressBar, Sheet, Touchable } from '../ui/components.tsx';
 import { DownloadOptionsForm, Radio } from '../ui/download-options.tsx';
@@ -64,6 +65,12 @@ function AddForm({ request }: { request: AddRequest }) {
       }
       setBusy('Starting');
       const created = await api.createDownload({ id: downloadId, source, options: chosen, target: toDownloadTarget(target, newPlaylistId) });
+      if (request.kind === 'tracks') {
+        rememberRequested(
+          created.id,
+          request.tracks.map((track) => track.id),
+        );
+      }
       putDownload(client, created);
       ToastAndroid.show(online ? 'Download started' : 'Download queued until your PC is online', ToastAndroid.SHORT);
       router.back();

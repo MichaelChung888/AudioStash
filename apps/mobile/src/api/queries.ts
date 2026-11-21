@@ -3,6 +3,7 @@ import { type QueryClient, useQuery } from '@tanstack/react-query';
 import { config } from '../config.ts';
 import { getLibraryTotals, getPlaylist, getPlaylistItems, listPlaylists, listSongs } from '../db/library.ts';
 import { getDefaultDownloadOptions, getMobileDataAllowed } from '../db/settings.ts';
+import { requestedDownload } from '../downloads/requested.ts';
 import { getLibraryFolder } from '../files/library-folder.ts';
 import { requestSync } from '../sync/engine.ts';
 import { api } from './endpoints.ts';
@@ -46,6 +47,13 @@ export const useSearchYoutube = (q: string, enabled: boolean) =>
   useQuery({ queryKey: keys.searchYoutube(q), queryFn: () => api.searchYoutube(q), enabled: enabled && q.length > 0, staleTime: 10 * MINUTE });
 
 export const useDownloads = (status: 'open' | 'finished') => useQuery({ queryKey: keys.downloads(status), queryFn: () => api.downloads(status) });
+
+export const useDownloading = (trackId: string): boolean =>
+  useQuery({
+    queryKey: keys.downloads('open'),
+    queryFn: () => api.downloads('open'),
+    select: (open) => open.some((download) => download.id === requestedDownload(trackId)),
+  }).data ?? false;
 export const useDownload = (id: string, enabled = true) => useQuery({ queryKey: keys.download(id), queryFn: () => api.download(id), enabled });
 
 export const useSessions = () => useQuery({ queryKey: keys.sessions, queryFn: api.sessions });
