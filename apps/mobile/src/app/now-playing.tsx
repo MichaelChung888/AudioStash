@@ -99,7 +99,7 @@ function Player({ song, sourceName, sourceId, shuffle, repeat }: PlayerProps) {
       <View style={styles.controls}>
         <ControlButton icon="shuffle" label={shuffle ? 'Shuffle on' : 'Shuffle off'} active={shuffle} onPress={() => setShuffle(!shuffle)} />
         <IconButton icon="previous" label="Previous" color={colors.text} size={30} onPress={previous} />
-        <Touchable accessibilityRole="button" accessibilityLabel={status.playing ? 'Pause' : 'Play'} onPress={togglePlay} style={styles.play}>
+        <Touchable accessibilityRole="button" accessibilityLabel={status.playing ? 'Pause' : 'Play'} onPress={togglePlay} round={68} style={styles.play}>
           <Icon name={status.playing ? 'pause' : 'play'} size={32} color={colors.onAccent} />
         </Touchable>
         <IconButton icon="next" label="Next" color={colors.text} size={30} onPress={next} />
@@ -126,7 +126,14 @@ const REPEAT_LABELS = { none: 'Repeat off', all: 'Repeat all', single: 'Repeat t
 
 function ControlButton({ icon, label, active, onPress }: { icon: 'shuffle' | 'repeat'; label: string; active: boolean; onPress: () => void }) {
   return (
-    <Touchable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ selected: active }} onPress={onPress} style={styles.control}>
+    <Touchable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: active }}
+      onPress={onPress}
+      round={44}
+      style={styles.control}
+    >
       <Icon name={icon} size={22} color={active ? colors.accent : colors.playerMuted} />
     </Touchable>
   );

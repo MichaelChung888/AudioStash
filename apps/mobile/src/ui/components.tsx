@@ -17,10 +17,18 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon, type IconName } from './Icon.tsx';
 import { colors, fonts, TOUCH, text } from './theme.ts';
 
-type TouchableProps = Omit<PressableProps, 'style'> & { style?: StyleProp<ViewStyle> };
+type TouchableProps = Omit<PressableProps, 'style'> & {
+  style?: StyleProp<ViewStyle>;
+  // The width of a round button. Its ripple is then a circle that size instead of a rectangle.
+  round?: number;
+};
 
-export function Touchable({ style, ...props }: TouchableProps) {
-  return <Pressable {...props} style={({ pressed }) => [style, pressed && styles.pressed, props.disabled && styles.disabled]} />;
+// Drawn over the children, so the ripple also shows on covers and filled buttons.
+const RIPPLE = { color: 'rgba(255, 255, 255, 0.14)', foreground: true };
+
+export function Touchable({ style, round, ...props }: TouchableProps) {
+  const ripple = round ? { ...RIPPLE, borderless: true, radius: round / 2 } : RIPPLE;
+  return <Pressable android_ripple={ripple} {...props} style={[style, props.disabled && styles.disabled]} />;
 }
 
 interface IconButtonProps {
@@ -37,7 +45,7 @@ interface IconButtonProps {
 export function IconButton({ icon, label, onPress, color = colors.text, size = 22, circle, disabled }: IconButtonProps) {
   const glyph = <Icon name={icon} size={size} color={color} />;
   return (
-    <Touchable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} disabled={disabled} hitSlop={4} style={styles.iconButton}>
+    <Touchable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} disabled={disabled} hitSlop={4} round={TOUCH} style={styles.iconButton}>
       {circle ? <View style={[styles.circle, { width: circle, height: circle, borderRadius: circle / 2 }]}>{glyph}</View> : glyph}
     </Touchable>
   );
@@ -46,7 +54,7 @@ export function IconButton({ icon, label, onPress, color = colors.text, size = 2
 // The round download button on chart and search rows.
 export function DownloadButton({ label, onPress }: { label: string; onPress: () => void }) {
   return (
-    <Touchable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={styles.iconButton}>
+    <Touchable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} round={TOUCH} style={styles.iconButton}>
       <View style={styles.downloadRing}>
         <Icon name="download" size={18} color={colors.textSecondary} />
       </View>
@@ -252,7 +260,6 @@ export function Message({ title, detail, action }: { title: string; detail?: str
 }
 
 const styles = StyleSheet.create({
-  pressed: { opacity: 0.6 },
   disabled: { opacity: 0.4 },
   iconButton: { width: TOUCH, height: TOUCH, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   circle: { backgroundColor: colors.raised, alignItems: 'center', justifyContent: 'center' },

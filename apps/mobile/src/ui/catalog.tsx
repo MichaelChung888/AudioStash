@@ -67,6 +67,7 @@ export function TrackCard({ track }: { track: CatalogTrack }) {
               accessibilityLabel={`Download ${track.title}`}
               onPress={() => downloadTrack(track)}
               hitSlop={6}
+              round={34}
               style={[styles.cardButton, styles.cardDownload]}
             >
               <Icon name="download" size={18} color={colors.onAccent} strokeWidth={2.4} />

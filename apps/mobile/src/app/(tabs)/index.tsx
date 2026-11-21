@@ -65,7 +65,7 @@ function HomeHeader() {
         <StatusDot online={online} />
         <Text style={styles.pillText}>{status.data ? (online ? 'PC online' : 'PC offline') : 'Checking PC'}</Text>
       </Touchable>
-      <Touchable accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings')} hitSlop={6} style={styles.avatar}>
+      <Touchable accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/settings')} hitSlop={6} round={32} style={styles.avatar}>
         <Icon name="user" size={18} color={colors.textSecondary} />
       </Touchable>
     </View>

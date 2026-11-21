@@ -240,7 +240,14 @@ function Summary({ source, playlist, songs, playing, onPlay, onShuffle }: Summar
         <IconButton icon="shuffle" label="Shuffle" onPress={onShuffle} disabled={!anySaved} />
         {playlist ? <IconButton icon="plusCircle" label="Add songs" onPress={() => router.push(`/add-songs?playlistId=${playlist.id}`)} /> : null}
         <View style={styles.grow} />
-        <Touchable accessibilityRole="button" accessibilityLabel={playing ? 'Pause or play' : 'Play'} onPress={onPlay} disabled={!anySaved} style={styles.play}>
+        <Touchable
+          accessibilityRole="button"
+          accessibilityLabel={playing ? 'Pause or play' : 'Play'}
+          onPress={onPlay}
+          disabled={!anySaved}
+          round={56}
+          style={styles.play}
+        >
           <PlayGlyph playing={playing} />
         </Touchable>
       </View>
