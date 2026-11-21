@@ -2,9 +2,6 @@
 
 A personal music library for Android. Paste a YouTube, SoundCloud or Bandcamp link, pick songs from the charts, or upload your own files. A worker on your home PC downloads each song at the best quality available and adds the title, artist, album, cover art and lyrics. Your phone keeps a copy of the whole library, so everything plays offline.
 
-**Built so far:** the API, the download worker, the Android app, and the local setup that runs the backend.
-**To use it for real:** [Deploying AudioStash](docs/deploy.md) puts the backend on a cloud server and the app on your phone, and [Shipping changes](docs/shipping-changes.md) covers each change after that. The installed app needs this, because a release build only connects over `https://`.
-
 ![Four screens of the app: Home with the charts, Search, the download options for a song, and Downloads with the PC's progress](docs/screenshots.png)
 
 ## How it fits together
