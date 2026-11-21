@@ -22,6 +22,21 @@ export function startQueue(length: number, first: number, shuffle: boolean, rand
   return { order, position: Math.max(0, order.indexOf(first)) };
 }
 
+// Keeps the songs that pass `keep`, and renumbers the play order to match the shorter list.
+// For songs [a, b, c, d] played in order [2, 0, 3, 1] (c, a, d, b), dropping b:
+//
+//   { songs: [a, c, d], order: [1, 0, 2] }  still c, a, d
+export function keepSongs<T>(songs: readonly T[], order: readonly number[], keep: (song: T) => boolean): { songs: T[]; order: number[] } {
+  const kept: T[] = [];
+  const newIndex = new Map<number, number>();
+  for (const [index, song] of songs.entries()) {
+    if (!keep(song)) continue;
+    newIndex.set(index, kept.length);
+    kept.push(song);
+  }
+  return { songs: kept, order: order.filter((index) => newIndex.has(index)).map((index) => newIndex.get(index) as number) };
+}
+
 export type RepeatMode = 'none' | 'all' | 'single';
 
 export function nextRepeatMode(mode: RepeatMode): RepeatMode {

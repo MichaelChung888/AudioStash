@@ -3,9 +3,9 @@ import { addNetworkStateListener } from 'expo-network';
 import { AppState } from 'react-native';
 import { openEventStream } from './api/events.ts';
 import { applyEvent, keys } from './api/queries.ts';
-import { clearLibrary } from './db/database.ts';
+import { clearLibrary, onLibraryChanged } from './db/database.ts';
 import { runMirror, stopMirror } from './files/mirror.ts';
-import { stopPlayback } from './player/player.ts';
+import { dropDeletedSongs, stopPlayback } from './player/player.ts';
 import { onSynced, requestSync } from './sync/engine.ts';
 
 // What runs while signed in: sync, live events from the server, and saving songs to
@@ -13,6 +13,9 @@ import { onSynced, requestSync } from './sync/engine.ts';
 export function startSession(client: QueryClient): () => void {
   // Saving runs only after a complete sync. See files/mirror.ts.
   const offSynced = onSynced(() => void runMirror());
+
+  // Songs deleted on this phone or on another device leave the queue.
+  const offLibraryChanged = onLibraryChanged(() => void dropDeletedSongs());
 
   // The event stream stays open only while the app is on screen. Opening it syncs,
   // which picks up any changes missed while it was closed.
@@ -44,6 +47,7 @@ export function startSession(client: QueryClient): () => void {
 
   return () => {
     offSynced();
+    offLibraryChanged();
     closeStreamNow();
     appState.remove();
     network.remove();

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { nextRepeatMode, playCountsAt, playOrder, startQueue } from './queue.ts';
+import { keepSongs, nextRepeatMode, playCountsAt, playOrder, startQueue } from './queue.ts';
 
 describe('playOrder', () => {
   it('keeps the list order without shuffle', () => {
@@ -24,6 +24,16 @@ describe('startQueue', () => {
 
   it('starts at the front with shuffle, where the chosen song is', () => {
     expect(startQueue(4, 2, true, () => 0)).toEqual({ order: [2, 1, 3, 0], position: 0 });
+  });
+});
+
+describe('keepSongs', () => {
+  it('drops a song and keeps the rest in the same play order', () => {
+    expect(keepSongs(['a', 'b', 'c', 'd'], [2, 0, 3, 1], (song) => song !== 'b')).toEqual({ songs: ['a', 'c', 'd'], order: [1, 0, 2] });
+  });
+
+  it('can drop every song', () => {
+    expect(keepSongs(['a', 'b'], [1, 0], () => false)).toEqual({ songs: [], order: [] });
   });
 });
 

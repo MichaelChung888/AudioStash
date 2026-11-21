@@ -1,8 +1,8 @@
 import { gainToVolume } from '@audiostash/core';
 import { type AudioPlaylist, type AudioPlaylistStatus, createAudioPlaylist, setAudioModeAsync } from 'expo-audio';
-import type { LibrarySong } from '../db/library.ts';
+import { type LibrarySong, listSongIds } from '../db/library.ts';
 import { recordPlay } from '../db/mutations.ts';
-import { nextRepeatMode, playCountsAt, playOrder, type RepeatMode, startQueue } from './queue.ts';
+import { keepSongs, nextRepeatMode, playCountsAt, playOrder, type RepeatMode, startQueue } from './queue.ts';
 
 // One player for the whole app, kept outside React so playback carries on while
 // screens come and go. Android's media session gives it lock screen and headphone controls.
@@ -140,6 +140,28 @@ export function stopPlayback(): void {
   songs = [];
   order = [];
   update({ source: null, position: 0 });
+}
+
+export async function dropDeletedSongs(): Promise<void> {
+  if (songs.length === 0) return;
+  const ids = await listSongIds();
+  const isKept = (song: LibrarySong) => ids.has(song.id);
+  // Read the queue after the wait: a new one may have started meanwhile.
+  if (!playlist || songs.every(isKept)) return;
+  if (!songs.some(isKept)) {
+    stopPlayback();
+    return;
+  }
+
+  const playing = snapshot.current;
+  for (let position = order.length - 1; position >= 0; position--) {
+    if (!isKept(songs[order[position] as number] as LibrarySong)) playlist.remove(position);
+  }
+  ({ songs, order } = keepSongs(songs, order, isKept));
+  update({ position: playlist.currentIndex });
+  // When the playing song is removed, the next one takes its position and the
+  // native player sends no track change.
+  if (snapshot.current !== playing) onTrackChanged(snapshot.position);
 }
 
 function onTrackChanged(position: number): void {

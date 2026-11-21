@@ -46,6 +46,11 @@ export async function listSongs(): Promise<LibrarySong[]> {
   return rows.map(toLibrarySong);
 }
 
+export async function listSongIds(): Promise<Set<string>> {
+  const rows = await db().getAllAsync<{ id: string }>('SELECT id FROM songs');
+  return new Set(rows.map((row) => row.id));
+}
+
 export async function getSong(songId: string): Promise<LibrarySong | null> {
   const row = await db().getFirstAsync<SongRow>(`${SONG_SELECT} WHERE s.id = ?`, songId);
   return row ? toLibrarySong(row) : null;
