@@ -198,7 +198,7 @@ function ExplicitMark() {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, height: 60, paddingLeft: 20, paddingRight: 8 },
-  rank: { width: 18, textAlign: 'center', fontFamily: fonts.headingSemibold, fontSize: 16, color: colors.textFaint },
+  rank: { width: 24, textAlign: 'center', fontFamily: fonts.headingSemibold, fontSize: 16, color: colors.textFaint },
   rowText: { flex: 1, minWidth: 0, gap: 2 },
   titleLine: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   shrink: { flexShrink: 1 },

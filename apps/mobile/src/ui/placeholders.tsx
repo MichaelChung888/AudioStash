@@ -39,7 +39,7 @@ export function Repeat({ times, children }: { times: number; children: ReactNode
 export function TrackRowPlaceholder({ ranked = false }: { ranked?: boolean }) {
   return (
     <View style={styles.row}>
-      {ranked ? <Block width={18} height={14} /> : null}
+      {ranked ? <Block width={24} height={14} /> : null}
       <Block width={48} height={48} radius={6} />
       <Lines first="70%" second="45%" />
     </View>
