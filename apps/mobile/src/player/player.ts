@@ -31,13 +31,14 @@ export interface PlayerSnapshot {
   repeat: RepeatMode;
   // The id of the catalog track whose preview is playing.
   previewId: string | null;
+  previewLoading: boolean;
 }
 
 let playlist: AudioPlaylist | null = null;
 let previewPlayer: AudioPlayer | null = null;
 let songs: LibrarySong[] = [];
 let order: number[] = [];
-let snapshot: PlayerSnapshot = { source: null, queue: [], position: 0, current: null, shuffle: false, repeat: 'none', previewId: null };
+let snapshot: PlayerSnapshot = { source: null, queue: [], position: 0, current: null, shuffle: false, repeat: 'none', previewId: null, previewLoading: false };
 const listeners = new Set<() => void>();
 let playCounted = false;
 
@@ -73,7 +74,7 @@ export async function togglePreview(trackId: string, deezerId: number): Promise<
   // Pause, not stop, so the queue can resume where it was.
   if (playlist?.playing) playlist.pause();
   previewPlayer?.pause();
-  update({ previewId: trackId });
+  update({ previewId: trackId, previewLoading: true });
 
   // Fetched on tap, because Deezer's links expire after 15 minutes.
   let url: string;
@@ -90,12 +91,13 @@ export async function togglePreview(trackId: string, deezerId: number): Promise<
   const player = getPreviewPlayer();
   player.replace({ uri: url });
   player.play();
+  update({ previewLoading: false });
 }
 
 export function stopPreview(): void {
   if (snapshot.previewId === null) return;
   previewPlayer?.pause();
-  update({ previewId: null });
+  update({ previewId: null, previewLoading: false });
 }
 
 function getPreviewPlayer(): AudioPlayer {

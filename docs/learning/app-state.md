@@ -50,21 +50,21 @@ flowchart LR
     API -- "1. useQuery" --> RQ
     SQLite -- "2. useQuery, keys under 'local'" --> RQ
     RQ --> Screen
-    Player -- "3. usePlayer, usePreviewing" --> Screen
+    Player -- "3. usePlayer, usePreviewState" --> Screen
     Mirror -- "3. useMirrorState" --> Screen
     Native -- "4. usePlaybackStatus" --> Screen
     Clerk -- "5. useAuth" --> Screen
     Screen -- "6. useState" --> Screen
 ```
 
-|     | Place                        | Read with                                      | Changed by                      | Lost when         |
-| --- | ---------------------------- | ---------------------------------------------- | ------------------------------- | ----------------- |
-| 1   | The server                   | `useCharts`, `useDownloads`, …                 | Refetching, live events         | The app closes    |
-| 2   | The phone's database         | `useSongs`, `usePlaylists`, …                  | Your edits, sync                | Sign-out          |
-| 3   | Module stores                | `usePlayer`, `usePreviewing`, `useMirrorState` | Functions in that module        | The app closes    |
-| 4   | The native player's position | `usePlaybackStatus`                            | Playback itself, twice a second | The app closes    |
-| 5   | Sign-in                      | `useAuth`                                      | Signing in and out              | Sign-out          |
-| 6   | One screen                   | `useState`                                     | That screen                     | The screen closes |
+|     | Place                        | Read with                                        | Changed by                      | Lost when         |
+| --- | ---------------------------- | ------------------------------------------------ | ------------------------------- | ----------------- |
+| 1   | The server                   | `useCharts`, `useDownloads`, …                   | Refetching, live events         | The app closes    |
+| 2   | The phone's database         | `useSongs`, `usePlaylists`, …                    | Your edits, sync                | Sign-out          |
+| 3   | Module stores                | `usePlayer`, `usePreviewState`, `useMirrorState` | Functions in that module        | The app closes    |
+| 4   | The native player's position | `usePlaybackStatus`                              | Playback itself, twice a second | The app closes    |
+| 5   | Sign-in                      | `useAuth`                                        | Signing in and out              | Sign-out          |
+| 6   | One screen                   | `useState`                                       | That screen                     | The screen closes |
 
 ## 1. Data from the server
 
@@ -142,24 +142,25 @@ The player lives outside React for three reasons:
 
 Its snapshot:
 
-| Field       | Meaning                                                                                                                     |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `source`    | Where the queue came from: a playlist's id and name, or `'all'` for All songs. Now Playing uses it for "Open the playlist". |
-| `queue`     | The songs in the order they will play, shuffled or not                                                                      |
-| `position`  | Which entry in `queue` is playing                                                                                           |
-| `current`   | The song playing: `queue[position]`, or `null` when nothing is loaded                                                       |
-| `shuffle`   | `true` or `false`                                                                                                           |
-| `repeat`    | `'none'`, `'all'` or `'one'`                                                                                                |
-| `previewId` | The catalog song whose 30-second preview is playing, or `null`                                                              |
+| Field            | Meaning                                                                                                                     |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `source`         | Where the queue came from: a playlist's id and name, or `'all'` for All songs. Now Playing uses it for "Open the playlist". |
+| `queue`          | The songs in the order they will play, shuffled or not                                                                      |
+| `position`       | Which entry in `queue` is playing                                                                                           |
+| `current`        | The song playing: `queue[position]`, or `null` when nothing is loaded                                                       |
+| `shuffle`        | `true` or `false`                                                                                                           |
+| `repeat`         | `'none'`, `'all'` or `'single'`                                                                                             |
+| `previewId`      | The catalog song whose 30-second preview is playing, or `null`                                                              |
+| `previewLoading` | `true` from the tap until the preview's link has loaded and playback has begun                                              |
 
 The module also keeps values the snapshot does not show: the native players, the list as chosen (`songs`), the play order (`order`), and whether this play has been counted yet (`playCounted`). Screens never read them. They only call the module's functions, such as `playSongs`, `next` and `togglePreview`.
 
 Two hooks read the snapshot:
 
 - `usePlayer()` returns all of it. The mini player, Now Playing and the playlist screen use it.
-- `usePreviewing(trackId)` returns only `true` or `false`: "is my song's preview playing?" The song rows and cards on Home and Search use it.
+- `usePreviewState(trackId)` returns only `null`, `'loading'` or `'playing'`: "what is my song's preview doing?" The song rows and cards on Home and Search use it to draw a spinner or a pause icon on the cover.
 
-Both are built on React's `useSyncExternalStore(subscribe, read)`. React calls `subscribe` once, to add a listener. On every change it calls `read` again and compares the result with the last one using `===`. It re-renders only if they differ. So when you tap song B while song A's preview plays, only rows A and B re-render. A's answer went from `true` to `false` and B's from `false` to `true`. Every other row still answers `false`.
+Both are built on React's `useSyncExternalStore(subscribe, read)`. React calls `subscribe` once, to add a listener. On every change it calls `read` again and compares the result with the last one using `===`. It re-renders only if they differ. So when you tap song B while song A's preview plays, only rows A and B re-render. A's answer went from `'playing'` to `null` and B's from `null` to `'loading'`. Every other row still answers `null`.
 
 ### The mirror
 
@@ -220,8 +221,8 @@ This one is React Context: `<ClerkProvider>` wraps the whole app. `<QueryClientP
 Tapping a song on Home to hear its preview touches four of the six places.
 
 1. `TrackRow` was drawn from **the server's data** (place 1): `useCharts` gave it the song, including `previewDeezerId`.
-2. The tap calls `togglePreview` in **the player store** (place 3). It pauses the queue and sets `previewId` to this song, which redraws only this row, with the pause overlay.
-3. The player asks the API for a fresh preview link, then plays it on its second, preview-only player.
+2. The tap calls `togglePreview` in **the player store** (place 3). It pauses the queue and sets `previewId` to this song with `previewLoading` on, which redraws only this row, with a spinner.
+3. The player asks the API for a fresh preview link, then plays it on its second, preview-only player, and turns `previewLoading` off. The row swaps the spinner for a pause icon. The spinner covers only the wait for the link, the slow part: on a slow connection the icon can appear a moment before the sound.
 4. If the API cannot give a link, `togglePreview` throws, the row shows the error as a toast, and `previewId` goes back to `null`. If the clip plays to the end, the player sets `previewId` back to `null` too, and the overlay goes.
 5. If you then play a song from a playlist, the mini player appears. It reads `current` from the player store and the moving position from **the native player** (place 4).
 
@@ -253,9 +254,9 @@ The rename goes through db/mutations.ts, which writes it to the phone's database
 </details>
 
 <details>
-<summary>Why does the song row use <code>usePreviewing(track.id)</code> instead of <code>usePlayer().previewId === track.id</code>?</summary>
+<summary>Why does the song row use <code>usePreviewState(track.id)</code> instead of reading <code>usePlayer().previewId</code>?</summary>
 
-`usePlayer()` returns the whole snapshot, a new object on every player change. Every row would re-render on every change: each new song, shuffle, repeat. `usePreviewing` returns a boolean, which only changes for the row whose preview starts or stops.
+`usePlayer()` returns the whole snapshot, a new object on every player change. Every row would re-render on every change: each new song, shuffle, repeat. `usePreviewState` returns `null` for every row but the one previewing, so only the rows whose preview starts, loads or stops re-render.
 
 </details>
 

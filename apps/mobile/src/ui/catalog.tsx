@@ -2,10 +2,10 @@ import type { CatalogTrack, YoutubeVideo } from '@audiostash/contracts';
 import { formatDuration } from '@audiostash/core';
 import { Image } from 'expo-image';
 import type { ReactNode } from 'react';
-import { type StyleProp, StyleSheet, Text, ToastAndroid, View, type ViewStyle } from 'react-native';
+import { ActivityIndicator, type StyleProp, StyleSheet, Text, ToastAndroid, View, type ViewStyle } from 'react-native';
 import { errorMessage } from '../api/client.ts';
 import { openAddSheet } from '../downloads/add-request.ts';
-import { usePreviewing } from '../player/hooks.ts';
+import { type PreviewState, usePreviewState } from '../player/hooks.ts';
 import { togglePreview } from '../player/player.ts';
 import { Cover, DownloadButton, InLibraryMark, Touchable } from './components.tsx';
 import { Icon } from './Icon.tsx';
@@ -27,11 +27,11 @@ interface TrackRowProps {
 // A full-width song row, for the Top 50 chart on Home and song results in Search.
 export function TrackRow({ track, rank, showAlbum = false, showDuration = false }: TrackRowProps) {
   const subtitle = showAlbum && track.album ? `${track.artist} · ${track.album}` : track.artist;
-  const previewing = usePreviewing(track.id);
+  const preview = usePreviewState(track.id);
   return (
-    <PreviewArea track={track} previewing={previewing} style={styles.row}>
+    <PreviewArea track={track} preview={preview} style={styles.row}>
       {rank !== undefined ? <Text style={styles.rank}>{rank}</Text> : null}
-      <PreviewCover uri={track.coverUrl} size={48} radius={6} previewing={previewing} />
+      <PreviewCover uri={track.coverUrl} size={48} radius={6} preview={preview} />
       <View style={styles.rowText}>
         <View style={styles.titleLine}>
           <Text numberOfLines={1} style={[text.title, styles.shrink]}>
@@ -51,11 +51,11 @@ export function TrackRow({ track, rank, showAlbum = false, showDuration = false 
 
 // A square song tile, for the sideways shelves on Home: Trending and "Because you like".
 export function TrackCard({ track }: { track: CatalogTrack }) {
-  const previewing = usePreviewing(track.id);
+  const preview = usePreviewState(track.id);
   return (
-    <PreviewArea track={track} previewing={previewing} style={styles.card}>
+    <PreviewArea track={track} preview={preview} style={styles.card}>
       <View>
-        <PreviewCover uri={track.coverUrl} size={136} radius={8} previewing={previewing} />
+        <PreviewCover uri={track.coverUrl} size={136} radius={8} preview={preview} />
         <View style={styles.cardAction}>
           {track.inLibrary ? (
             <View accessible accessibilityLabel="In your library" style={styles.cardButton}>
@@ -86,13 +86,13 @@ export function TrackCard({ track }: { track: CatalogTrack }) {
 
 // Tapping a song plays its 30-second preview. Songs without one cannot be tapped.
 // The download button inside handles its own taps.
-function PreviewArea({ track, previewing, style, children }: { track: CatalogTrack; previewing: boolean; style: StyleProp<ViewStyle>; children: ReactNode }) {
+function PreviewArea({ track, preview, style, children }: { track: CatalogTrack; preview: PreviewState; style: StyleProp<ViewStyle>; children: ReactNode }) {
   const { previewDeezerId } = track;
   if (previewDeezerId === null) return <View style={style}>{children}</View>;
   return (
     <Touchable
       accessibilityRole="button"
-      accessibilityLabel={previewing ? `Stop the preview of ${track.title}` : `Play a preview of ${track.title}`}
+      accessibilityLabel={preview ? `Stop the preview of ${track.title}` : `Play a preview of ${track.title}`}
       onPress={() => togglePreview(track.id, previewDeezerId).catch((error: unknown) => ToastAndroid.show(errorMessage(error), ToastAndroid.SHORT))}
       style={style}
     >
@@ -101,14 +101,18 @@ function PreviewArea({ track, previewing, style, children }: { track: CatalogTra
   );
 }
 
-// The song's cover, with a pause icon over it while its preview plays.
-function PreviewCover({ uri, size, radius, previewing }: { uri: string | null; size: number; radius: number; previewing: boolean }) {
+// The song's cover. While its preview loads it shows a spinner, then a pause icon.
+function PreviewCover({ uri, size, radius, preview }: { uri: string | null; size: number; radius: number; preview: PreviewState }) {
   return (
     <View>
       <Cover uri={uri} size={size} radius={radius} />
-      {previewing ? (
+      {preview ? (
         <View style={[styles.previewing, { borderRadius: radius }]}>
-          <Icon name="pause" size={Math.round(size * 0.4)} color={colors.text} />
+          {preview === 'loading' ? (
+            <ActivityIndicator color={colors.text} size={size > 64 ? 'large' : 'small'} />
+          ) : (
+            <Icon name="pause" size={Math.round(size * 0.4)} color={colors.text} />
+          )}
         </View>
       ) : null}
     </View>

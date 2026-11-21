@@ -6,9 +6,15 @@ export function usePlayer(): PlayerSnapshot {
   return useSyncExternalStore(onPlayerChange, getPlayerSnapshot);
 }
 
-// Re-renders only when this track's preview starts or stops, not on every player change.
-export function usePreviewing(trackId: string): boolean {
-  return useSyncExternalStore(onPlayerChange, () => getPlayerSnapshot().previewId === trackId);
+export type PreviewState = 'loading' | 'playing' | null;
+
+// Re-renders only when this track's preview changes state, not on every player change.
+export function usePreviewState(trackId: string): PreviewState {
+  return useSyncExternalStore(onPlayerChange, () => {
+    const { previewId, previewLoading } = getPlayerSnapshot();
+    if (previewId !== trackId) return null;
+    return previewLoading ? 'loading' : 'playing';
+  });
 }
 
 // Updates twice a second while playing, so only the mini player and the player screen use it.
