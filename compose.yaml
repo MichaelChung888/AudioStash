@@ -2,7 +2,8 @@
 #
 #   pnpm docker:up                              Postgres, RabbitMQ and storage. Run the API and
 #                                               worker on your machine with pnpm api:dev and pnpm worker:dev.
-#   docker compose --profile app up -d --build  The same, plus the API and worker in containers.
+#   pnpm docker:app                             The same, plus the API and worker in containers
+#                                               (docker compose --profile app up -d --build).
 #
 # The passwords here are for local use only.
 name: audiostash

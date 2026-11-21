@@ -26,6 +26,7 @@
     "mobile:release": "pnpm --filter @audiostash/mobile release",
     "mobile:icons": "pnpm --filter @audiostash/mobile icons",
     "docker:up": "docker compose up -d --wait && pnpm db:migrate",
+    "docker:app": "docker compose --profile app up -d --build",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f"
   },

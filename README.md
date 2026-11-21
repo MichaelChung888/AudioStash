@@ -74,7 +74,7 @@ Leave everything else as it is.
 ### 4. Start
 
 ```powershell
-docker compose --profile app up -d --build
+pnpm docker:app
 ```
 
 The first build takes several minutes. When it finishes, `docker compose ps` shows every service as running or healthy. If Windows asks whether Docker may use private networks, allow it: the phone needs to reach your PC.
@@ -193,6 +193,7 @@ pnpm install
 | Command                                   | What it does                                                                                                                     |
 | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | `pnpm docker:up`                          | Starts Postgres, RabbitMQ and storage only, and runs the migrations                                                              |
+| `pnpm docker:app`                         | Starts everything, with the API and worker in containers. Run it again after a code change: it rebuilds them                     |
 | `pnpm api:dev`                            | Runs the API on your machine, restarting on changes                                                                              |
 | `pnpm worker:dev`                         | Runs the worker on your machine. Needs yt-dlp, ffmpeg and Python with mutagen installed; the Docker worker is easier on Windows. |
 | `pnpm test`                               | Unit tests                                                                                                                       |
