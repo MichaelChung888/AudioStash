@@ -90,9 +90,11 @@ export function next(): void {
 }
 
 // Like most players: restart the song if it has played a few seconds, otherwise go back one.
+// If Repeat all is on and the first song is playing, go back to the last song.
 export function previous(): void {
   const player = getPlaylist();
-  if (player.currentTime > 3 || snapshot.position === 0) void player.seekTo(0);
+  const atStart = snapshot.position === 0 && snapshot.repeat !== 'all';
+  if (player.currentTime > 3 || atStart) void player.seekTo(0);
   else player.previous();
 }
 
