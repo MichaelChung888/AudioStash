@@ -19,6 +19,9 @@ export const keys = {
   forYou: ['catalog', 'forYou'] as const,
   searchSongs: (q: string) => ['catalog', 'search', q] as const,
   searchYoutube: (q: string) => ['catalog', 'youtube', q] as const,
+  searchArtists: (q: string) => ['catalog', 'searchArtists', q] as const,
+  topArtists: ['catalog', 'topArtists'] as const,
+  artist: (deezerId: number) => ['catalog', 'artist', deezerId] as const,
   downloads: (status: 'open' | 'finished') => ['downloads', status] as const,
   download: (id: string) => ['download', id] as const,
   sessions: ['sessions'] as const,
@@ -45,6 +48,12 @@ export const useSearchSongs = (q: string, enabled: boolean) =>
   useQuery({ queryKey: keys.searchSongs(q), queryFn: () => api.searchSongs(q), enabled: enabled && q.length > 0, staleTime: 10 * MINUTE });
 export const useSearchYoutube = (q: string, enabled: boolean) =>
   useQuery({ queryKey: keys.searchYoutube(q), queryFn: () => api.searchYoutube(q), enabled: enabled && q.length > 0, staleTime: 10 * MINUTE });
+
+export const useSearchArtists = (q: string) =>
+  useQuery({ queryKey: keys.searchArtists(q), queryFn: () => api.searchArtists(q), enabled: q.length > 0, staleTime: 10 * MINUTE });
+
+export const useTopArtists = () => useQuery({ queryKey: keys.topArtists, queryFn: api.topArtists, staleTime: 30 * MINUTE });
+export const useArtist = (deezerId: number) => useQuery({ queryKey: keys.artist(deezerId), queryFn: () => api.artist(deezerId), staleTime: 30 * MINUTE });
 
 export const useDownloads = (status: 'open' | 'finished') => useQuery({ queryKey: keys.downloads(status), queryFn: () => api.downloads(status) });
 

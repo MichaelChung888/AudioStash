@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatAgo, formatBytes, formatCompactDuration, plural } from './format.ts';
+import { formatAgo, formatBytes, formatCompactDuration, formatCount, plural } from './format.ts';
 
 describe('formatBytes', () => {
   it('picks the unit by size', () => {
@@ -56,6 +56,23 @@ describe('formatCompactDuration', () => {
   it('drops the minutes from 10 hours, rounding to the nearest hour', () => {
     expect(minutes(600)).toBe('10 hrs');
     expect(minutes(277 * 60 + 47)).toBe('278 hrs');
+  });
+});
+
+describe('formatCount', () => {
+  it('shortens thousands and millions', () => {
+    expect(formatCount(999)).toBe('999');
+    expect(formatCount(58_879)).toBe('58.9K');
+    expect(formatCount(123_456)).toBe('123K');
+    expect(formatCount(5_241_809)).toBe('5.2M');
+  });
+
+  it('moves up a unit when rounding reaches 1000', () => {
+    expect(formatCount(999_960)).toBe('1M');
+  });
+
+  it('drops a trailing .0', () => {
+    expect(formatCount(2_000)).toBe('2K');
   });
 });
 

@@ -56,6 +56,23 @@ export function TrackCardPlaceholder() {
   );
 }
 
+export function ArtistCardPlaceholder() {
+  return (
+    <View style={styles.artistCard}>
+      <Block width={104} height={104} radius={52} />
+      <Block width={72} height={12} />
+    </View>
+  );
+}
+
+export function ShelfPlaceholder({ card }: { card: ReactNode }) {
+  return (
+    <View style={styles.shelf}>
+      <Repeat times={4}>{card}</Repeat>
+    </View>
+  );
+}
+
 export function VideoRowPlaceholder() {
   return (
     <View style={styles.videoRow}>
@@ -82,6 +99,8 @@ function Block({ width, height, radius = 4 }: { width: number | `${number}%`; he
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, height: 60, paddingHorizontal: 20 },
   card: { width: 136, gap: 8 },
+  artistCard: { width: 104, alignItems: 'center', gap: 8 },
+  shelf: { flexDirection: 'row', gap: 12, paddingHorizontal: 20, overflow: 'hidden' },
   videoRow: { flexDirection: 'row', alignItems: 'center', gap: 12, height: 72, paddingHorizontal: 20 },
   lines: { flex: 1, gap: 8 },
 });

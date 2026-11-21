@@ -40,6 +40,23 @@ export function formatCompactDuration(ms: number): string {
   return minutes === 0 ? plural(hours, 'hr') : `${plural(hours, 'hr')} ${plural(minutes, 'min')}`;
 }
 
+const COUNT_UNITS = ['K', 'M', 'B'] as const;
+
+// "999", "58.9K", "123K", "5.2M": one decimal below 100. As in formatBytes, the unit is
+// chosen after rounding, so 999,960 shows as "1M", not "1000K".
+export function formatCount(count: number): string {
+  if (count < 1000) return String(count);
+  const round = (value: number) => Number(value.toFixed(value < 100 ? 1 : 0));
+  let value = count;
+  let unit = '';
+  for (const next of COUNT_UNITS) {
+    value /= 1000;
+    unit = next;
+    if (round(value) < 1000) break;
+  }
+  return `${round(value)}${unit}`;
+}
+
 export function plural(count: number, one: string, many = `${one}s`): string {
   return `${count} ${count === 1 ? one : many}`;
 }

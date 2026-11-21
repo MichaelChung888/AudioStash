@@ -1,4 +1,6 @@
 import {
+  artistResponseSchema,
+  artistsResponseSchema,
   type CreateDownloadRequest,
   type CreateUploadsRequest,
   createUploadsResponseSchema,
@@ -32,6 +34,9 @@ export const api = {
   trending: (country: string) => request(`/v1/catalog/trending${query({ country, limit: 20 })}`, { schema: tracksResponseSchema }).then((r) => r.tracks),
   forYou: () => request('/v1/catalog/for-you', { schema: forYouResponseSchema }).then((r) => r.sections),
   searchSongs: (q: string) => request(`/v1/catalog/search${query({ q })}`, { schema: tracksResponseSchema }).then((r) => r.tracks),
+  topArtists: () => request(`/v1/catalog/top-artists${query({ limit: 20 })}`, { schema: artistsResponseSchema }).then((r) => r.artists),
+  searchArtists: (q: string) => request(`/v1/catalog/search/artists${query({ q, limit: 10 })}`, { schema: artistsResponseSchema }).then((r) => r.artists),
+  artist: (deezerId: number) => request(`/v1/catalog/artists/${deezerId}`, { schema: artistResponseSchema }),
   searchYoutube: (q: string) => request(`/v1/catalog/youtube${query({ q })}`, { schema: videosResponse }).then((r) => r.videos),
   previewUrl: (deezerId: number) => request(`/v1/catalog/preview/${deezerId}`, { schema: previewResponseSchema }).then((r) => r.url),
 

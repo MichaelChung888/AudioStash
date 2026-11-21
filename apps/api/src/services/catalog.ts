@@ -1,5 +1,14 @@
-import { type AppleChartSong, type AppleChartsClient, appleArtwork, type DeezerClient, type DeezerTrack, type YoutubeClient } from '@audiostash/catalog';
-import type { CatalogTrack, ForYouResponse, Genre, YoutubeVideo } from '@audiostash/contracts';
+import {
+  type AppleChartSong,
+  type AppleChartsClient,
+  appleArtwork,
+  type DeezerArtist,
+  type DeezerClient,
+  type DeezerTrack,
+  deezerImage,
+  type YoutubeClient,
+} from '@audiostash/catalog';
+import type { ArtistResponse, CatalogArtist, CatalogTrack, ForYouResponse, Genre, YoutubeVideo } from '@audiostash/contracts';
 import { normalizeForMatch, parseIsoDuration, pickBestMatch, stripFeaturing, youtubeVideoUrl } from '@audiostash/core';
 import type { Database } from '@audiostash/db';
 import * as songsDb from '../db/songs.ts';
@@ -15,6 +24,7 @@ interface Deps {
 }
 
 type UnownedTrack = Omit<CatalogTrack, 'inLibrary'>;
+type UnownedArtistPage = Omit<ArtistResponse, 'topTracks'> & { topTracks: UnownedTrack[] };
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
@@ -31,6 +41,8 @@ export function createCatalogService({ db, deezer, apple, youtube }: Deps) {
     trending: new TtlCache<UnownedTrack[]>({ ttlMs: HOUR }),
     search: new TtlCache<UnownedTrack[]>({ ttlMs: 10 * MINUTE }),
     forYou: new TtlCache<{ title: string; reason: string; tracks: UnownedTrack[] }[]>({ ttlMs: HOUR }),
+    artists: new TtlCache<CatalogArtist[]>({ ttlMs: HOUR }),
+    artist: new TtlCache<UnownedArtistPage | null>({ ttlMs: HOUR }),
     youtube: new TtlCache<YoutubeVideo[]>({ ttlMs: HOUR }),
     preview: new TtlCache<string | null>({ ttlMs: 12 * MINUTE }),
   };
@@ -75,6 +87,35 @@ export function createCatalogService({ db, deezer, apple, youtube }: Deps) {
         caches.search.get(`${query.toLowerCase()}:${limit}`, async () => (await deezer.searchTracks(query, limit)).map(fromDeezer)),
       );
       return markOwned(tracks);
+    },
+
+    topArtists: (limit: number): Promise<CatalogArtist[]> =>
+      upstream(() => caches.artists.get(`top:${limit}`, async () => (await deezer.chartArtists(0, limit)).map(fromDeezerArtist), nonEmpty)),
+
+    searchArtists: (query: string, limit: number): Promise<CatalogArtist[]> =>
+      upstream(() =>
+        caches.artists.get(`search:${query.toLowerCase()}:${limit}`, async () => (await deezer.searchArtists(query, limit)).map(fromDeezerArtist)),
+      ),
+
+    async artist(deezerId: number): Promise<ArtistResponse> {
+      const page = await upstream(() =>
+        caches.artist.get(
+          String(deezerId),
+          async () => {
+            const artist = await deezer.artist(deezerId);
+            if (!artist) return null;
+            const [topTracks, related] = await Promise.all([deezer.artistTopTracks(deezerId, 10), deezer.relatedArtists(deezerId, 12)]);
+            return {
+              artist: { ...fromDeezerArtist(artist), fans: artist.nb_fan ?? null },
+              topTracks: topTracks.map(fromDeezer),
+              related: related.map(fromDeezerArtist),
+            };
+          },
+          (found) => found !== null,
+        ),
+      );
+      if (!page) throw new NotFoundError('This artist is not on Deezer');
+      return { ...page, topTracks: await markOwned(page.topTracks) };
     },
 
     // "Because you like X": top tracks of artists related to the library's most played artists.
@@ -170,6 +211,10 @@ function fromDeezer(track: DeezerTrack): UnownedTrack {
       coverUrl: coverUrl ?? undefined,
     },
   };
+}
+
+function fromDeezerArtist(artist: DeezerArtist): CatalogArtist {
+  return { deezerId: artist.id, name: artist.name, pictureUrl: deezerImage(artist.picture_xl) };
 }
 
 function fromApple(song: AppleChartSong): UnownedTrack {

@@ -4,12 +4,12 @@ import { router } from 'expo-router';
 import { type ReactNode, useState } from 'react';
 import { FlatList, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { errorMessage } from '../../api/client.ts';
-import { keys, useCharts, useForYou, useGenres, useStatus, useTrending } from '../../api/queries.ts';
+import { keys, useCharts, useForYou, useGenres, useStatus, useTopArtists, useTrending } from '../../api/queries.ts';
 import { config } from '../../config.ts';
-import { TrackCard, TrackRow } from '../../ui/catalog.tsx';
-import { Button, Chip, Screen, StatusDot, Touchable } from '../../ui/components.tsx';
+import { ArtistCard, Shelf, TrackCard, TrackRow } from '../../ui/catalog.tsx';
+import { Button, Chip, Screen, SectionTitle, StatusDot, Touchable } from '../../ui/components.tsx';
 import { Icon, Logo } from '../../ui/Icon.tsx';
-import { Pulse, Repeat, TrackCardPlaceholder, TrackRowPlaceholder } from '../../ui/placeholders.tsx';
+import { ArtistCardPlaceholder, Pulse, Repeat, ShelfPlaceholder, TrackCardPlaceholder, TrackRowPlaceholder } from '../../ui/placeholders.tsx';
 import { colors, fonts, text } from '../../ui/theme.ts';
 
 const ALL_GENRES: Genre = { id: 0, name: 'All' };
@@ -42,6 +42,7 @@ export default function HomeScreen() {
       >
         <Charts />
         <Trending />
+        <PopularArtists />
         <ForYou />
       </ScrollView>
     </Screen>
@@ -130,8 +131,20 @@ function Trending() {
   return (
     <View style={styles.section}>
       <SectionTitle title={trendingTitle(config.chartCountry)} />
-      <Loadable query={trending} empty="Nothing trending right now." placeholder={<ShelfPlaceholder />}>
-        <Shelf tracks={trending.data ?? []} />
+      <Loadable query={trending} empty="Nothing trending right now." placeholder={<ShelfPlaceholder card={<TrackCardPlaceholder />} />}>
+        <TrackShelf tracks={trending.data ?? []} />
+      </Loadable>
+    </View>
+  );
+}
+
+function PopularArtists() {
+  const artists = useTopArtists();
+  return (
+    <View style={styles.section}>
+      <SectionTitle title="Popular artists" />
+      <Loadable query={artists} empty="No artists to show right now." placeholder={<ShelfPlaceholder card={<ArtistCardPlaceholder />} />}>
+        <Shelf items={artists.data ?? []} keyOf={(artist) => String(artist.deezerId)} render={(artist) => <ArtistCard artist={artist} />} />
       </Loadable>
     </View>
   );
@@ -144,46 +157,13 @@ function ForYou() {
   return forYou.data.map((section) => (
     <View key={section.title} style={styles.section}>
       <SectionTitle title={section.title} reason={section.reason} />
-      <Shelf tracks={section.tracks} />
+      <TrackShelf tracks={section.tracks} />
     </View>
   ));
 }
 
-function Shelf({ tracks }: { tracks: CatalogTrack[] }) {
-  return (
-    <FlatList
-      horizontal
-      data={tracks}
-      keyExtractor={(track) => track.id}
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.shelf}
-      renderItem={({ item }) => <TrackCard track={item} />}
-    />
-  );
-}
-
-function ShelfPlaceholder() {
-  return (
-    <View style={[styles.shelf, styles.shelfPlaceholder]}>
-      <Repeat times={3}>
-        <TrackCardPlaceholder />
-      </Repeat>
-    </View>
-  );
-}
-
-function SectionTitle({ title, reason, children }: { title: string; reason?: string; children?: ReactNode }) {
-  return (
-    <View style={styles.sectionHeader}>
-      <View style={styles.sectionText}>
-        <Text accessibilityRole="header" style={text.sectionTitle}>
-          {title}
-        </Text>
-        {reason ? <Text style={text.secondary}>{reason}</Text> : null}
-      </View>
-      {children}
-    </View>
-  );
+function TrackShelf({ tracks }: { tracks: CatalogTrack[] }) {
+  return <Shelf items={tracks} keyOf={(track) => track.id} render={(track) => <TrackCard track={track} />} />;
 }
 
 interface LoadableProps {
@@ -227,10 +207,6 @@ const styles = StyleSheet.create({
   content: { paddingBottom: 24 },
   chips: { gap: 8, paddingTop: 8, paddingHorizontal: 20 },
   section: { marginTop: 28 },
-  sectionHeader: { flexDirection: 'row', alignItems: 'flex-end', gap: 12, paddingTop: 20, paddingBottom: 10, paddingHorizontal: 20 },
-  sectionText: { flex: 1, gap: 2 },
   seeAll: { fontFamily: fonts.semibold, fontSize: 13, color: colors.textMuted },
-  shelf: { gap: 12, paddingHorizontal: 20 },
-  shelfPlaceholder: { flexDirection: 'row', overflow: 'hidden' },
   problem: { alignItems: 'flex-start', gap: 12, paddingHorizontal: 20, paddingVertical: 12 },
 });

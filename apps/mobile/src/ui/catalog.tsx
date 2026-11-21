@@ -1,19 +1,19 @@
-import type { CatalogTrack, YoutubeVideo } from '@audiostash/contracts';
+import type { CatalogArtist, CatalogTrack, YoutubeVideo } from '@audiostash/contracts';
 import { formatDuration } from '@audiostash/core';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import type { ReactNode } from 'react';
-import { ActivityIndicator, type StyleProp, StyleSheet, Text, ToastAndroid, View, type ViewStyle } from 'react-native';
+import type { ReactElement, ReactNode } from 'react';
+import { ActivityIndicator, FlatList, type StyleProp, StyleSheet, Text, ToastAndroid, View, type ViewStyle } from 'react-native';
 import { errorMessage } from '../api/client.ts';
 import { useDownloading } from '../api/queries.ts';
 import { openAddSheet } from '../downloads/add-request.ts';
 import { type PreviewState, usePreviewState, usePreviewStatus } from '../player/hooks.ts';
 import { togglePreview } from '../player/player.ts';
-import { Cover, DownloadButton, InLibraryMark, ProgressBar, Touchable } from './components.tsx';
+import { Button, Cover, DownloadButton, InLibraryMark, ProgressBar, Touchable } from './components.tsx';
 import { Icon } from './Icon.tsx';
 import { colors, fonts, TOUCH, text } from './theme.ts';
 
-// Rows and cards for songs from charts and search, which may not be in the library yet.
+// Rows and cards for songs and artists from charts and search, which may not be in the library yet.
 
 function downloadTrack(track: CatalogTrack) {
   openAddSheet({ kind: 'tracks', tracks: [track] });
@@ -94,6 +94,53 @@ export function TrackCard({ track }: { track: CatalogTrack }) {
         {track.artist}
       </Text>
     </PreviewArea>
+  );
+}
+
+// A round photo with the artist's name, for shelves. Opens the artist's page.
+export function ArtistCard({ artist }: { artist: CatalogArtist }) {
+  return (
+    <Touchable
+      accessibilityRole="button"
+      accessibilityLabel={artist.name}
+      onPress={() => router.push(`/catalog/artist/${artist.deezerId}`)}
+      style={styles.artistCard}
+    >
+      <Cover uri={artist.pictureUrl} size={104} radius={52} />
+      <Text numberOfLines={1} style={styles.artistName}>
+        {artist.name}
+      </Text>
+    </Touchable>
+  );
+}
+
+// A row of cards that scrolls sideways.
+export function Shelf<T>({ items, keyOf, render }: { items: readonly T[]; keyOf: (item: T) => string; render: (item: T) => ReactElement }) {
+  return (
+    <FlatList
+      horizontal
+      data={items}
+      keyExtractor={keyOf}
+      renderItem={({ item }) => render(item)}
+      showsHorizontalScrollIndicator={false}
+      // A shelf in search results takes a tap while the keyboard is open, as the rows do.
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={styles.shelf}
+    />
+  );
+}
+
+// Opens the download sheet for the songs in the list that are not in the library yet.
+export function DownloadAllButton({ tracks }: { tracks: readonly CatalogTrack[] }) {
+  const missing = tracks.filter((track) => !track.inLibrary);
+  return (
+    <Button
+      label="Download all"
+      icon="download"
+      variant="outline"
+      disabled={missing.length === 0}
+      onPress={() => openAddSheet({ kind: 'tracks', tracks: missing })}
+    />
   );
 }
 
@@ -205,6 +252,9 @@ const styles = StyleSheet.create({
   explicit: { width: 16, height: 16, borderRadius: 3, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.border },
   explicitText: { fontFamily: fonts.bold, fontSize: 10, color: colors.textSecondary },
   card: { width: 136, gap: 4 },
+  artistCard: { width: 104, alignItems: 'center', gap: 8 },
+  artistName: { fontFamily: fonts.semibold, fontSize: 13, color: colors.text, textAlign: 'center' },
+  shelf: { gap: 12, paddingHorizontal: 20 },
   previewing: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.55)' },
   previewProgress: { position: 'absolute' },
   cardAction: { position: 'absolute', right: 6, bottom: 6 },

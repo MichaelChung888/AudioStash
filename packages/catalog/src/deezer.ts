@@ -23,6 +23,9 @@ const artistSchema = z.object({
   name: z.string(),
   picture_xl: z.string().nullish(),
 });
+export type DeezerArtist = z.infer<typeof artistSchema>;
+
+const artistDetailSchema = artistSchema.extend({ nb_fan: z.number().optional() });
 
 const trackSchema = z.object({
   id: z.number(),
@@ -88,12 +91,18 @@ export function createDeezerClient(options: HttpOptions) {
     }
   }
 
+  const searchArtists = async (query: string, limit: number) =>
+    (await get(`/search/artist?q=${encodeURIComponent(query)}&limit=${limit}`, list(artistSchema))).data;
+
   return {
     // Genre ids that /chart accepts. 0 means all genres.
     genres: async () => (await get('/genre', list(genreSchema))).data,
     chart: async (genreId: number, limit: number) => (await get(`/chart/${genreId}/tracks?limit=${limit}`, list(trackSchema))).data,
+    chartArtists: async (genreId: number, limit: number) => (await get(`/chart/${genreId}/artists?limit=${limit}`, list(artistSchema))).data,
     searchTracks: async (query: string, limit: number) => (await get(`/search?q=${encodeURIComponent(query)}&limit=${limit}`, list(trackSchema))).data,
-    searchArtist: async (name: string) => (await get(`/search/artist?q=${encodeURIComponent(name)}&limit=1`, list(artistSchema))).data[0] ?? null,
+    searchArtists,
+    searchArtist: async (name: string) => (await searchArtists(name, 1))[0] ?? null,
+    artist: (id: number) => getOrNull(`/artist/${id}`, artistDetailSchema),
     track: (id: number) => getOrNull(`/track/${id}`, trackDetailSchema),
     // ISRC: the international code that identifies one recording, shared by every store.
     trackByIsrc: (isrc: string) => getOrNull(`/track/isrc:${encodeURIComponent(isrc)}`, trackDetailSchema),
@@ -104,3 +113,9 @@ export function createDeezerClient(options: HttpOptions) {
 }
 
 export type DeezerClient = ReturnType<typeof createDeezerClient>;
+
+// Deezer gives an artist or album without a picture a URL with an empty image id,
+// which serves a stock grey image. Return null and show our own placeholder instead.
+export function deezerImage(url: string | null | undefined): string | null {
+  return url && !/\/images\/\w+\/\//.test(url) ? url : null;
+}

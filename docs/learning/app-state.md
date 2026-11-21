@@ -72,14 +72,15 @@ flowchart LR
 
 A hook such as `useCharts(genreId)` returns `{ data, isLoading, error }`. The first screen to ask for a chart fetches it. Every other screen that asks while it is cached gets the same copy at once.
 
-| Hook                                                    | What it holds                                | Fresh for                     |
-| ------------------------------------------------------- | -------------------------------------------- | ----------------------------- |
-| `useGenres`                                             | Genre chips on Home                          | 24 hours                      |
-| `useCharts`, `useTrending`, `useForYou`                 | Home's lists                                 | 30 minutes                    |
-| `useSearchSongs`, `useSearchYoutube`                    | Search results                               | 10 minutes                    |
-| `useDownloads('open' \| 'finished')`, `useDownload(id)` | The Downloads tab                            | 30 seconds, the app's default |
-| `useStatus`                                             | Whether the API and the PC worker are online | Fetched every minute          |
-| `useSessions`                                           | Devices signed in, in Settings               | 30 seconds                    |
+| Hook                                                     | What it holds                                | Fresh for                     |
+| -------------------------------------------------------- | -------------------------------------------- | ----------------------------- |
+| `useGenres`                                              | Genre chips on Home                          | 24 hours                      |
+| `useCharts`, `useTrending`, `useTopArtists`, `useForYou` | Home's lists                                 | 30 minutes                    |
+| `useArtist(deezerId)`                                    | An artist's page                             | 30 minutes                    |
+| `useSearchSongs`, `useSearchArtists`, `useSearchYoutube` | Search results                               | 10 minutes                    |
+| `useDownloads('open' \| 'finished')`, `useDownload(id)`  | The Downloads tab                            | 30 seconds, the app's default |
+| `useStatus`                                              | Whether the API and the PC worker are online | Fetched every minute          |
+| `useSessions`                                            | Devices signed in, in Settings               | 30 seconds                    |
 
 The times differ because the data does. Charts change a few times a day, while a download's progress changes every second.
 

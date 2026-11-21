@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { appleArtwork } from './apple.ts';
-import { createDeezerClient, DeezerError } from './deezer.ts';
+import { createDeezerClient, DeezerError, deezerImage } from './deezer.ts';
 import { HttpError } from './http.ts';
 import { createLrclibClient } from './lrclib.ts';
 import { createYoutubeClient } from './youtube.ts';
@@ -21,6 +21,18 @@ describe('deezer client', () => {
     const deezer = createDeezerClient({ userAgent: 'test', fetch });
     await expect(deezer.chart(0, 10)).resolves.toMatchObject([{ title: 'Houdini', artist: { name: 'Dua Lipa' } }]);
     expect(fetch).toHaveBeenCalledWith('https://api.deezer.com/chart/0/tracks?limit=10', expect.anything());
+  });
+
+  it('parses the artist chart', async () => {
+    const fetch = vi.fn(async () => json({ data: [{ id: 27, name: 'Daft Punk', picture_xl: 'https://cdn/27.jpg' }] }));
+    const deezer = createDeezerClient({ userAgent: 'test', fetch });
+    await expect(deezer.chartArtists(0, 20)).resolves.toEqual([{ id: 27, name: 'Daft Punk', picture_xl: 'https://cdn/27.jpg' }]);
+    expect(fetch).toHaveBeenCalledWith('https://api.deezer.com/chart/0/artists?limit=20', expect.anything());
+  });
+
+  it('returns null for a missing artist', async () => {
+    const deezer = createDeezerClient({ userAgent: 'test', fetch: async () => json({ error: { type: 'DataException', message: 'no data', code: 800 } }) });
+    await expect(deezer.artist(1)).resolves.toBeNull();
   });
 
   it('treats an error object in a 200 response as an error', async () => {
@@ -45,6 +57,19 @@ describe('deezer client', () => {
     await expect(result).resolves.toHaveLength(1);
     expect(fetch).toHaveBeenCalledTimes(2);
     vi.useRealTimers();
+  });
+});
+
+describe('deezerImage', () => {
+  it('keeps a real picture', () => {
+    const url = 'https://cdn-images.dzcdn.net/images/artist/638e69b9caaf9f9f3f8826febea7b543/1000x1000-000000-80-0-0.jpg';
+    expect(deezerImage(url)).toBe(url);
+  });
+
+  it('drops the stock image Deezer gives when there is no picture', () => {
+    expect(deezerImage('https://cdn-images.dzcdn.net/images/artist//1000x1000-000000-80-0-0.jpg')).toBeNull();
+    expect(deezerImage('https://cdn-images.dzcdn.net/images/cover//500x500-000000-80-0-0.jpg')).toBeNull();
+    expect(deezerImage(null)).toBeNull();
   });
 });
 

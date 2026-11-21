@@ -249,6 +249,21 @@ export function Header({ title, children }: { title: string; children?: ReactNod
   );
 }
 
+// A heading over a list or shelf, with an optional reason below it and actions to the right.
+export function SectionTitle({ title, reason, children }: { title: string; reason?: string; children?: ReactNode }) {
+  return (
+    <View style={styles.sectionTitle}>
+      <View style={styles.sectionText}>
+        <Text accessibilityRole="header" style={text.sectionTitle}>
+          {title}
+        </Text>
+        {reason ? <Text style={text.secondary}>{reason}</Text> : null}
+      </View>
+      {children}
+    </View>
+  );
+}
+
 export function Message({ title, detail, action }: { title: string; detail?: string; action?: ReactNode }) {
   return (
     <View style={styles.message}>
@@ -274,6 +289,8 @@ const styles = StyleSheet.create({
   buttonText: { fontFamily: fonts.bold, fontSize: 14 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 16, paddingBottom: 8, paddingLeft: 20, paddingRight: 12 },
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  sectionTitle: { flexDirection: 'row', alignItems: 'flex-end', gap: 12, paddingTop: 20, paddingBottom: 10, paddingHorizontal: 20 },
+  sectionText: { flex: 1, gap: 2 },
   message: { alignItems: 'center', gap: 8, paddingHorizontal: 32, paddingVertical: 48 },
   field: {
     flexDirection: 'row',

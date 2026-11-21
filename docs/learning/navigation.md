@@ -32,6 +32,9 @@ src/app/
 │   └── playlists.tsx        /playlists
 ├── playlist/
 │   └── [id].tsx             /playlist/abc123, /playlist/all
+├── catalog/                 pages about music outside the library
+│   └── artist/
+│       └── [id].tsx         /catalog/artist/27
 ├── now-playing.tsx          /now-playing
 ├── music-folder.tsx         /music-folder
 ├── settings.tsx             /settings

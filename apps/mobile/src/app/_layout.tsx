@@ -71,6 +71,7 @@ function Navigator() {
         <Stack.Protected guard={signedIn}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="playlist/[id]" />
+          <Stack.Screen name="catalog/artist/[id]" />
           <Stack.Screen name="add-songs" />
           <Stack.Screen name="settings" />
           <Stack.Screen name="download-defaults" />

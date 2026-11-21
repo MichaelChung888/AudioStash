@@ -322,7 +322,7 @@ These are free web APIs the [packages/catalog](../../packages/catalog/src) clien
 
 | Service              | What AudioStash takes from it                                 | Notes                                                                                                                          |
 | -------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Deezer**           | Song search, album details, and the genre charts              | Public endpoints need no key.                                                                                                  |
+| **Deezer**           | Song and artist search, artist pages, album details, charts   | Public endpoints need no key.                                                                                                  |
 | **Apple's charts**   | The most-played chart                                         | A public feed; no key.                                                                                                         |
 | **LRCLIB**           | Lyrics, including **synced lyrics** with a time for each line | Free and open, run by volunteers.                                                                                              |
 | **YouTube Data API** | YouTube search inside the app                                 | Needs a free Google API key. The free allowance is 10,000 units a day, and each search costs 100, so about 100 searches a day. |

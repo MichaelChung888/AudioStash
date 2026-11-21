@@ -17,6 +17,18 @@ export async function search(c: Context<AppEnv>, query: { q: string; limit: numb
   return c.json({ tracks: await c.get('services').catalog.search(query.q, query.limit) });
 }
 
+export async function topArtists(c: Context<AppEnv>, query: { limit: number }) {
+  return c.json({ artists: await c.get('services').catalog.topArtists(query.limit) });
+}
+
+export async function searchArtists(c: Context<AppEnv>, query: { q: string; limit: number }) {
+  return c.json({ artists: await c.get('services').catalog.searchArtists(query.q, query.limit) });
+}
+
+export async function artist(c: Context<AppEnv>, deezerId: number) {
+  return c.json(await c.get('services').catalog.artist(deezerId));
+}
+
 export async function forYou(c: Context<AppEnv>) {
   return c.json(await c.get('services').catalog.forYou());
 }

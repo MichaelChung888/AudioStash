@@ -1,15 +1,16 @@
+import type { CatalogArtist } from '@audiostash/contracts';
 import { parseSourceUrl } from '@audiostash/core';
 import * as Clipboard from 'expo-clipboard';
 import * as DocumentPicker from 'expo-document-picker';
 import { type ReactNode, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { errorMessage } from '../../api/client.ts';
-import { useSearchSongs, useSearchYoutube } from '../../api/queries.ts';
+import { useSearchArtists, useSearchSongs, useSearchYoutube } from '../../api/queries.ts';
 import { openAddSheet } from '../../downloads/add-request.ts';
-import { TrackRow, VideoRow } from '../../ui/catalog.tsx';
-import { Field, Message, Screen, Touchable } from '../../ui/components.tsx';
+import { ArtistCard, Shelf, TrackRow, VideoRow } from '../../ui/catalog.tsx';
+import { Field, Message, Screen, SectionTitle, Touchable } from '../../ui/components.tsx';
 import { Icon, type IconName } from '../../ui/Icon.tsx';
-import { Pulse, Repeat, TrackRowPlaceholder, VideoRowPlaceholder } from '../../ui/placeholders.tsx';
+import { ArtistCardPlaceholder, Pulse, Repeat, ShelfPlaceholder, TrackRowPlaceholder, VideoRowPlaceholder } from '../../ui/placeholders.tsx';
 import { colors, fonts, text } from '../../ui/theme.ts';
 
 type Tab = 'songs' | 'youtube';
@@ -91,7 +92,8 @@ export default function SearchScreen() {
 
 function SongResults({ q }: { q: string }) {
   const results = useSearchSongs(q, true);
-  if (q === '' || results.isPending) return <Loading row={<TrackRowPlaceholder />} />;
+  const artists = useSearchArtists(q);
+  if (q === '' || results.isPending || artists.isPending) return <SongResultsPlaceholder />;
   if (results.isError) return <Message title="Search failed" detail={errorMessage(results.error)} />;
   if (results.data.length === 0) return <Message title="No songs found" detail="Try the YouTube tab, or paste a link." />;
   return (
@@ -100,8 +102,30 @@ function SongResults({ q }: { q: string }) {
       keyExtractor={(track) => track.id}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
+      ListHeaderComponent={artists.data?.length ? <ArtistResults artists={artists.data} /> : undefined}
       renderItem={({ item }) => <TrackRow track={item} showAlbum showDuration />}
     />
+  );
+}
+
+function ArtistResults({ artists }: { artists: CatalogArtist[] }) {
+  return (
+    <>
+      <SectionTitle title="Artists" />
+      <Shelf items={artists} keyOf={(artist) => String(artist.deezerId)} render={(artist) => <ArtistCard artist={artist} />} />
+      <SectionTitle title="Songs" />
+    </>
+  );
+}
+
+function SongResultsPlaceholder() {
+  return (
+    <>
+      <SectionTitle title="Artists" />
+      <Loading row={<ShelfPlaceholder card={<ArtistCardPlaceholder />} />} times={1} />
+      <SectionTitle title="Songs" />
+      <Loading row={<TrackRowPlaceholder />} />
+    </>
   );
 }
 
@@ -121,10 +145,10 @@ function VideoResults({ q }: { q: string }) {
   );
 }
 
-function Loading({ row }: { row: ReactNode }) {
+function Loading({ row, times = 6 }: { row: ReactNode; times?: number }) {
   return (
     <Pulse>
-      <Repeat times={6}>{row}</Repeat>
+      <Repeat times={times}>{row}</Repeat>
     </Pulse>
   );
 }
