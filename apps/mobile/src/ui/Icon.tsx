@@ -144,17 +144,6 @@ export function Icon({ name, size = 24, color = colors.text, strokeWidth = 2 }: 
   );
 }
 
-// The bars shown in place of the track number for the song that is playing.
-export function PlayingBars({ color = colors.accent }: { color?: string }) {
-  return (
-    <Svg width={16} height={16} viewBox="0 0 16 16" fill={color}>
-      <Rect x={2} y={6} width={3} height={8} rx={1} />
-      <Rect x={6.5} y={2} width={3} height={12} rx={1} />
-      <Rect x={11} y={8} width={3} height={6} rx={1} />
-    </Svg>
-  );
-}
-
 export function Logo({ size = 28 }: { size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 28 28">

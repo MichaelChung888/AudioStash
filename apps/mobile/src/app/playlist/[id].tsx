@@ -11,10 +11,11 @@ import { formatBytes, formatCompactDuration, formatDate } from '../../lib/format
 import { usePlaybackStatus, usePlayer } from '../../player/hooks.ts';
 import { type PlaySource, playSongs, setShuffle, togglePlay } from '../../player/player.ts';
 import { Button, Cover, CoverGrid, type CoverTile, IconButton, Message, Screen, Touchable } from '../../ui/components.tsx';
-import { Icon, PlayingBars } from '../../ui/Icon.tsx';
+import { Icon } from '../../ui/Icon.tsx';
 import { MenuButton } from '../../ui/menu.tsx';
 import { MiniPlayer } from '../../ui/mini-player.tsx';
 import { NamePrompt } from '../../ui/name-prompt.tsx';
+import { PlayingBars } from '../../ui/playing-bars.tsx';
 import { colors, fonts, text } from '../../ui/theme.ts';
 
 interface Row {
