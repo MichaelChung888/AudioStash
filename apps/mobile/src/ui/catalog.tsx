@@ -5,9 +5,9 @@ import type { ReactNode } from 'react';
 import { ActivityIndicator, type StyleProp, StyleSheet, Text, ToastAndroid, View, type ViewStyle } from 'react-native';
 import { errorMessage } from '../api/client.ts';
 import { openAddSheet } from '../downloads/add-request.ts';
-import { type PreviewState, usePreviewState } from '../player/hooks.ts';
+import { type PreviewState, usePreviewState, usePreviewStatus } from '../player/hooks.ts';
 import { togglePreview } from '../player/player.ts';
-import { Cover, DownloadButton, InLibraryMark, Touchable } from './components.tsx';
+import { Cover, DownloadButton, InLibraryMark, ProgressBar, Touchable } from './components.tsx';
 import { Icon } from './Icon.tsx';
 import { colors, fonts, text } from './theme.ts';
 
@@ -101,7 +101,7 @@ function PreviewArea({ track, preview, style, children }: { track: CatalogTrack;
   );
 }
 
-// The song's cover. While its preview loads it shows a spinner, then a pause icon.
+// The song's cover. While its preview loads it shows a spinner, then a pause icon and how far the preview has played.
 function PreviewCover({ uri, size, radius, preview }: { uri: string | null; size: number; radius: number; preview: PreviewState }) {
   return (
     <View>
@@ -111,10 +111,23 @@ function PreviewCover({ uri, size, radius, preview }: { uri: string | null; size
           {preview === 'loading' ? (
             <ActivityIndicator color={colors.text} size={size > 64 ? 'large' : 'small'} />
           ) : (
-            <Icon name="pause" size={Math.round(size * 0.4)} color={colors.text} />
+            <>
+              <Icon name="pause" size={Math.round(size * 0.4)} color={colors.text} />
+              <PreviewProgress inset={Math.round(size * 0.12)} />
+            </>
           )}
         </View>
       ) : null}
+    </View>
+  );
+}
+
+// Mounted only while a preview plays, because it re-renders four times a second.
+function PreviewProgress({ inset }: { inset: number }) {
+  const { currentTime, duration } = usePreviewStatus();
+  return (
+    <View style={[styles.previewProgress, { left: inset, right: inset, bottom: inset }]}>
+      <ProgressBar value={duration > 0 ? currentTime / duration : 0} track="rgba(255, 255, 255, 0.3)" height={3} />
     </View>
   );
 }
@@ -166,6 +179,7 @@ const styles = StyleSheet.create({
   explicitText: { fontFamily: fonts.bold, fontSize: 10, color: colors.textSecondary },
   card: { width: 136, gap: 4 },
   previewing: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.55)' },
+  previewProgress: { position: 'absolute' },
   cardAction: { position: 'absolute', right: 6, bottom: 6 },
   cardButton: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   cardDownload: { backgroundColor: colors.accent },

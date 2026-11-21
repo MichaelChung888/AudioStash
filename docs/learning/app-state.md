@@ -222,7 +222,7 @@ Tapping a song on Home to hear its preview touches four of the six places.
 
 1. `TrackRow` was drawn from **the server's data** (place 1): `useCharts` gave it the song, including `previewDeezerId`.
 2. The tap calls `togglePreview` in **the player store** (place 3). It pauses the queue and sets `previewId` to this song with `previewLoading` on, which redraws only this row, with a spinner.
-3. The player asks the API for a fresh preview link, then plays it on its second, preview-only player, and turns `previewLoading` off. The row swaps the spinner for a pause icon. The spinner covers only the wait for the link, the slow part: on a slow connection the icon can appear a moment before the sound.
+3. The player asks the API for a fresh preview link, then plays it on its second, preview-only player, and turns `previewLoading` off. The row swaps the spinner for a pause icon and a progress bar. The spinner covers only the wait for the link, the slow part: on a slow connection the icon can appear a moment before the sound. The bar reads the preview player's position, which updates four times a second, so it is mounted only while a preview plays.
 4. If the API cannot give a link, `togglePreview` throws, the row shows the error as a toast, and `previewId` goes back to `null`. If the clip plays to the end, the player sets `previewId` back to `null` too, and the overlay goes.
 5. If you then play a song from a playlist, the mini player appears. It reads `current` from the player store and the moving position from **the native player** (place 4).
 

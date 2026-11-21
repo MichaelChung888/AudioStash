@@ -100,9 +100,9 @@ export function stopPreview(): void {
   update({ previewId: null, previewLoading: false });
 }
 
-function getPreviewPlayer(): AudioPlayer {
+export function getPreviewPlayer(): AudioPlayer {
   if (previewPlayer) return previewPlayer;
-  const created = createAudioPlayer(null);
+  const created = createAudioPlayer(null, { updateInterval: 250 }); // Updates 4 times/s, so the 30s progress bar moves smoothly.
   created.addListener('playbackStatusUpdate', (status) => {
     if (status.didJustFinish) stopPreview();
   });
