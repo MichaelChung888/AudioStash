@@ -21,6 +21,10 @@ export async function forYou(c: Context<AppEnv>) {
   return c.json(await c.get('services').catalog.forYou());
 }
 
+export async function preview(c: Context<AppEnv>, deezerId: number) {
+  return c.json({ url: await c.get('services').catalog.preview(deezerId) });
+}
+
 export async function youtube(c: Context<AppEnv>, query: { q: string; limit: number }) {
   return c.json({ videos: await c.get('services').catalog.youtube(query.q, query.limit) });
 }

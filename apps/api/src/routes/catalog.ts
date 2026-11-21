@@ -1,4 +1,4 @@
-import { chartsQuerySchema, searchQuerySchema, trendingQuerySchema } from '@audiostash/contracts';
+import { chartsQuerySchema, previewParamSchema, searchQuerySchema, trendingQuerySchema } from '@audiostash/contracts';
 import { Hono } from 'hono';
 import * as ctrl from '../controllers/catalog.ts';
 import type { AppEnv } from '../lib/types.ts';
@@ -13,4 +13,5 @@ catalogRouter.get('/charts', validate('query', chartsQuerySchema), (c) => ctrl.c
 catalogRouter.get('/trending', validate('query', trendingQuerySchema), (c) => ctrl.trending(c, c.req.valid('query')));
 catalogRouter.get('/search', validate('query', searchQuerySchema), (c) => ctrl.search(c, c.req.valid('query')));
 catalogRouter.get('/for-you', ctrl.forYou);
+catalogRouter.get('/preview/:deezerId', validate('param', previewParamSchema), (c) => ctrl.preview(c, c.req.valid('param').deezerId));
 catalogRouter.get('/youtube', validate('query', searchQuerySchema), (c) => ctrl.youtube(c, c.req.valid('query')));

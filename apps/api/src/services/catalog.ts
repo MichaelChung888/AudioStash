@@ -4,7 +4,7 @@ import { normalizeForMatch, parseIsoDuration, pickBestMatch, stripFeaturing, you
 import type { Database } from '@audiostash/db';
 import * as songsDb from '../db/songs.ts';
 import { mapWithConcurrency } from '../lib/concurrency.ts';
-import { AppError, UnavailableError } from '../lib/errors.ts';
+import { AppError, NotFoundError, UnavailableError } from '../lib/errors.ts';
 import { TtlCache } from '../lib/ttl-cache.ts';
 
 interface Deps {
@@ -32,6 +32,7 @@ export function createCatalogService({ db, deezer, apple, youtube }: Deps) {
     search: new TtlCache<UnownedTrack[]>({ ttlMs: 10 * MINUTE }),
     forYou: new TtlCache<{ title: string; reason: string; tracks: UnownedTrack[] }[]>({ ttlMs: HOUR }),
     youtube: new TtlCache<YoutubeVideo[]>({ ttlMs: HOUR }),
+    preview: new TtlCache<string | null>({ ttlMs: 12 * MINUTE }),
   };
   const nonEmpty = (list: readonly unknown[]) => list.length > 0;
 
@@ -100,6 +101,19 @@ export function createCatalogService({ db, deezer, apple, youtube }: Deps) {
       return { sections: marked.filter((section) => section.tracks.length > 0) };
     },
 
+    // A fresh link to a track's 30-second preview. Links in the cached lists may have expired.
+    async preview(deezerId: number): Promise<string> {
+      const url = await upstream(() =>
+        caches.preview.get(
+          String(deezerId),
+          async () => (await deezer.track(deezerId))?.preview || null,
+          (found) => found !== null,
+        ),
+      );
+      if (!url) throw new NotFoundError('This song has no preview');
+      return url;
+    },
+
     async youtube(query: string, limit: number): Promise<YoutubeVideo[]> {
       if (!youtube) throw new UnavailableError('YouTube search is not set up on the server (YOUTUBE_API_KEY)');
       return upstream(() =>
@@ -144,7 +158,7 @@ function fromDeezer(track: DeezerTrack): UnownedTrack {
     album: track.album.title,
     durationSec,
     coverUrl,
-    previewUrl: track.preview || null,
+    previewDeezerId: track.preview ? track.id : null,
     explicit: track.explicit_lyrics ?? false,
     hint: {
       title: track.title,
@@ -167,7 +181,7 @@ function fromApple(song: AppleChartSong): UnownedTrack {
     album: null,
     durationSec: null,
     coverUrl,
-    previewUrl: null,
+    previewDeezerId: null,
     explicit: false,
     hint: { title: song.name, artist: song.artistName, coverUrl: coverUrl ?? undefined },
   };

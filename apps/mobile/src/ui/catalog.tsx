@@ -1,8 +1,12 @@
 import type { CatalogTrack, YoutubeVideo } from '@audiostash/contracts';
 import { formatDuration } from '@audiostash/core';
 import { Image } from 'expo-image';
-import { StyleSheet, Text, View } from 'react-native';
+import type { ReactNode } from 'react';
+import { type StyleProp, StyleSheet, Text, ToastAndroid, View, type ViewStyle } from 'react-native';
+import { errorMessage } from '../api/client.ts';
 import { openAddSheet } from '../downloads/add-request.ts';
+import { usePreviewing } from '../player/hooks.ts';
+import { togglePreview } from '../player/player.ts';
 import { Cover, DownloadButton, InLibraryMark, Touchable } from './components.tsx';
 import { Icon } from './Icon.tsx';
 import { colors, fonts, text } from './theme.ts';
@@ -20,12 +24,14 @@ interface TrackRowProps {
   showDuration?: boolean;
 }
 
+// A full-width song row, for the Top 50 chart on Home and song results in Search.
 export function TrackRow({ track, rank, showAlbum = false, showDuration = false }: TrackRowProps) {
   const subtitle = showAlbum && track.album ? `${track.artist} · ${track.album}` : track.artist;
+  const previewing = usePreviewing(track.id);
   return (
-    <View style={styles.row}>
+    <PreviewArea track={track} previewing={previewing} style={styles.row}>
       {rank !== undefined ? <Text style={styles.rank}>{rank}</Text> : null}
-      <Cover uri={track.coverUrl} size={48} />
+      <PreviewCover uri={track.coverUrl} size={48} radius={6} previewing={previewing} />
       <View style={styles.rowText}>
         <View style={styles.titleLine}>
           <Text numberOfLines={1} style={[text.title, styles.shrink]}>
@@ -39,15 +45,17 @@ export function TrackRow({ track, rank, showAlbum = false, showDuration = false 
       </View>
       {showDuration && track.durationSec ? <Text style={text.numeric}>{formatDuration(track.durationSec * 1000)}</Text> : null}
       {track.inLibrary ? <InLibraryMark /> : <DownloadButton label={`Download ${track.title}`} onPress={() => downloadTrack(track)} />}
-    </View>
+    </PreviewArea>
   );
 }
 
+// A square song tile, for the sideways shelves on Home: Trending and "Because you like".
 export function TrackCard({ track }: { track: CatalogTrack }) {
+  const previewing = usePreviewing(track.id);
   return (
-    <View style={styles.card}>
+    <PreviewArea track={track} previewing={previewing} style={styles.card}>
       <View>
-        <Cover uri={track.coverUrl} size={136} radius={8} />
+        <PreviewCover uri={track.coverUrl} size={136} radius={8} previewing={previewing} />
         <View style={styles.cardAction}>
           {track.inLibrary ? (
             <View accessible accessibilityLabel="In your library" style={styles.cardButton}>
@@ -72,10 +80,42 @@ export function TrackCard({ track }: { track: CatalogTrack }) {
       <Text numberOfLines={1} style={text.small}>
         {track.artist}
       </Text>
+    </PreviewArea>
+  );
+}
+
+// Tapping a song plays its 30-second preview. Songs without one cannot be tapped.
+// The download button inside handles its own taps.
+function PreviewArea({ track, previewing, style, children }: { track: CatalogTrack; previewing: boolean; style: StyleProp<ViewStyle>; children: ReactNode }) {
+  const { previewDeezerId } = track;
+  if (previewDeezerId === null) return <View style={style}>{children}</View>;
+  return (
+    <Touchable
+      accessibilityRole="button"
+      accessibilityLabel={previewing ? `Stop the preview of ${track.title}` : `Play a preview of ${track.title}`}
+      onPress={() => togglePreview(track.id, previewDeezerId).catch((error: unknown) => ToastAndroid.show(errorMessage(error), ToastAndroid.SHORT))}
+      style={style}
+    >
+      {children}
+    </Touchable>
+  );
+}
+
+// The song's cover, with a pause icon over it while its preview plays.
+function PreviewCover({ uri, size, radius, previewing }: { uri: string | null; size: number; radius: number; previewing: boolean }) {
+  return (
+    <View>
+      <Cover uri={uri} size={size} radius={radius} />
+      {previewing ? (
+        <View style={[styles.previewing, { borderRadius: radius }]}>
+          <Icon name="pause" size={Math.round(size * 0.4)} color={colors.text} />
+        </View>
+      ) : null}
     </View>
   );
 }
 
+// A YouTube result in Search: thumbnail, title, channel and a download button. Videos have no preview.
 export function VideoRow({ video }: { video: YoutubeVideo }) {
   return (
     <View style={styles.videoRow}>
@@ -121,6 +161,7 @@ const styles = StyleSheet.create({
   explicit: { width: 16, height: 16, borderRadius: 3, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.border },
   explicitText: { fontFamily: fonts.bold, fontSize: 10, color: colors.textSecondary },
   card: { width: 136, gap: 4 },
+  previewing: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.55)' },
   cardAction: { position: 'absolute', right: 6, bottom: 6 },
   cardButton: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   cardDownload: { backgroundColor: colors.accent },

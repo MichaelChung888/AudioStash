@@ -1,5 +1,6 @@
 import { gainToVolume } from '@audiostash/core';
-import { type AudioPlaylist, type AudioPlaylistStatus, createAudioPlaylist, setAudioModeAsync } from 'expo-audio';
+import { type AudioPlayer, type AudioPlaylist, type AudioPlaylistStatus, createAudioPlayer, createAudioPlaylist, setAudioModeAsync } from 'expo-audio';
+import { api } from '../api/endpoints.ts';
 import { type LibrarySong, listSongIds } from '../db/library.ts';
 import { recordPlay } from '../db/mutations.ts';
 import { keepSongs, nextRepeatMode, playCountsAt, playOrder, type RepeatMode, startQueue } from './queue.ts';
@@ -10,6 +11,9 @@ import { keepSongs, nextRepeatMode, playCountsAt, playOrder, type RepeatMode, st
 // The native playlist holds the songs in play order. `songs` is the list as chosen
 // and `order` maps each play position to an index in it, so shuffle can be turned
 // off again without losing the original order.
+//
+// Previews of songs not in the library play on a second, simpler player, so they
+// pause the queue instead of replacing it. Only one of the two plays at a time.
 
 // Where the songs came from: a playlist, or "all" for All songs.
 export interface PlaySource {
@@ -25,12 +29,15 @@ export interface PlayerSnapshot {
   current: LibrarySong | null;
   shuffle: boolean;
   repeat: RepeatMode;
+  // The id of the catalog track whose preview is playing.
+  previewId: string | null;
 }
 
 let playlist: AudioPlaylist | null = null;
+let previewPlayer: AudioPlayer | null = null;
 let songs: LibrarySong[] = [];
 let order: number[] = [];
-let snapshot: PlayerSnapshot = { source: null, queue: [], position: 0, current: null, shuffle: false, repeat: 'none' };
+let snapshot: PlayerSnapshot = { source: null, queue: [], position: 0, current: null, shuffle: false, repeat: 'none', previewId: null };
 const listeners = new Set<() => void>();
 let playCounted = false;
 
@@ -48,9 +55,62 @@ export function getPlaylist(): AudioPlaylist {
   const created = createAudioPlaylist({ updateInterval: 500, loop: 'none' });
   created.addListener('trackChanged', () => onTrackChanged(created.currentIndex));
   created.addListener('playlistStatusUpdate', countPlay);
-  void setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true, interruptionMode: 'doNotMix' });
+  created.addListener('playlistStatusUpdate', () => {
+    if (created.playing) stopPreview();
+  });
+  setAudioMode();
   playlist = created;
   return created;
+}
+
+export async function togglePreview(trackId: string, deezerId: number): Promise<void> {
+  // A second tap on the same song stops its preview.
+  if (snapshot.previewId === trackId) {
+    stopPreview();
+    return;
+  }
+
+  // Pause, not stop, so the queue can resume where it was.
+  if (playlist?.playing) playlist.pause();
+  previewPlayer?.pause();
+  update({ previewId: trackId });
+
+  // Fetched on tap, because Deezer's links expire after 15 minutes.
+  let url: string;
+  try {
+    url = await api.previewUrl(deezerId);
+  } catch (error) {
+    if (snapshot.previewId === trackId) stopPreview();
+    throw error;
+  }
+
+  // Another preview, or the queue, may have started while the link loaded.
+  if (snapshot.previewId !== trackId) return;
+
+  const player = getPreviewPlayer();
+  player.replace({ uri: url });
+  player.play();
+}
+
+export function stopPreview(): void {
+  if (snapshot.previewId === null) return;
+  previewPlayer?.pause();
+  update({ previewId: null });
+}
+
+function getPreviewPlayer(): AudioPlayer {
+  if (previewPlayer) return previewPlayer;
+  const created = createAudioPlayer(null);
+  created.addListener('playbackStatusUpdate', (status) => {
+    if (status.didJustFinish) stopPreview();
+  });
+  setAudioMode();
+  previewPlayer = created;
+  return created;
+}
+
+function setAudioMode(): void {
+  void setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true, interruptionMode: 'doNotMix' });
 }
 
 export function playSongs(list: readonly LibrarySong[], start: number, source: PlaySource): void {
@@ -134,6 +194,7 @@ export function setShuffle(shuffle: boolean): void {
 }
 
 export function stopPlayback(): void {
+  stopPreview();
   if (!playlist) return;
   playlist.clear();
   playlist.clearLockScreenControls();

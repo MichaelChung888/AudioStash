@@ -8,6 +8,7 @@ import {
   forYouResponseSchema,
   genreSchema,
   type Mutation,
+  previewResponseSchema,
   pullResponseSchema,
   pushResponseSchema,
   sessionSchema,
@@ -32,6 +33,7 @@ export const api = {
   forYou: () => request('/v1/catalog/for-you', { schema: forYouResponseSchema }).then((r) => r.sections),
   searchSongs: (q: string) => request(`/v1/catalog/search${query({ q })}`, { schema: tracksResponseSchema }).then((r) => r.tracks),
   searchYoutube: (q: string) => request(`/v1/catalog/youtube${query({ q })}`, { schema: videosResponse }).then((r) => r.videos),
+  previewUrl: (deezerId: number) => request(`/v1/catalog/preview/${deezerId}`, { schema: previewResponseSchema }).then((r) => r.url),
 
   downloads: (status: 'open' | 'finished') => request(`/v1/downloads${query({ status, limit: 50 })}`, { schema: downloadsResponse }).then((r) => r.downloads),
   download: (id: string) => request(`/v1/downloads/${id}`, { schema: downloadDetailSchema }),

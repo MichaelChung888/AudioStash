@@ -15,7 +15,7 @@ export const catalogTrackSchema = z.object({
   album: z.string().nullable(),
   durationSec: z.number().int().nullable(),
   coverUrl: z.string().nullable(),
-  previewUrl: z.string().nullable(),
+  previewDeezerId: z.number().int().positive().nullable(),
   explicit: z.boolean(),
   inLibrary: z.boolean(),
   // Pass this straight to POST /v1/downloads as a catalog source.
@@ -40,6 +40,9 @@ export const searchQuerySchema = z.object({
   q: z.string().trim().min(1).max(200),
   limit: z.coerce.number().int().min(1).max(50).default(25),
 });
+
+export const previewParamSchema = z.object({ deezerId: z.coerce.number().int().positive() });
+export const previewResponseSchema = z.object({ url: z.url() });
 
 export const tracksResponseSchema = z.object({ tracks: z.array(catalogTrackSchema) });
 export type TracksResponse = z.infer<typeof tracksResponseSchema>;
