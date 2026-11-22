@@ -62,7 +62,7 @@ Servers usually run Linux because it is free, uses little memory, and is fully c
 
 **In AudioStash.** Every part except the phone app runs in a container: PostgreSQL, RabbitMQ and the API on the server ([deploy/server/compose.yaml](../../deploy/server/compose.yaml)), the worker on your PC ([deploy/worker/compose.yaml](../../deploy/worker/compose.yaml)), and everything together for local development ([compose.yaml](../../compose.yaml)).
 
-**Why this one.** The same image runs on your PC, in GitHub Actions and on the server, so "it worked on my machine" problems mostly disappear. The worker needs yt-dlp, ffmpeg and Python at exact versions; on Windows those are much easier to get inside a Linux container than installed by hand. Updating the server is one command that rebuilds and restarts what changed.
+**Why this one.** The same image runs on your PC, in GitHub Actions and on the server, so "it worked on my machine" problems mostly disappear. The worker needs yt-dlp, ffmpeg and Python at exact versions; on Windows those are much easier to get inside a Linux container than installed by hand. An update rebuilds and restarts only what changed.
 
 **Other options.**
 
@@ -471,10 +471,12 @@ These are free web APIs the [packages/catalog](../../packages/catalog/src) clien
 <details>
 <summary><strong>GitHub Actions</strong></summary>
 
-**What it is.** GitHub's service for running jobs on its own machines when code is pushed. Running every check on each push is called **continuous integration (CI)**.
+**What it is.** GitHub's service for running jobs on its own machines when code is pushed. Running every check on each push is called **continuous integration (CI)**. Putting each change into production once its checks pass, with no one running a deploy command, is called **continuous deployment (CD)**.
 
-**In AudioStash.** [.github/workflows/ci.yml](../../.github/workflows/ci.yml) runs lint, typecheck, unit tests and integration tests, and builds both Docker images, on every push to `main` and every pull request.
+**In AudioStash.** [.github/workflows/ci.yml](../../.github/workflows/ci.yml) runs lint, typecheck, unit tests and integration tests, and builds both Docker images, on every push to `main` and every pull request. When all of that passes on `main`, its Release job moves the `release` branch to the commit and publishes the worker image to the **GitHub Container Registry (GHCR)**, GitHub's store for Docker images. The server and your PC watch those two and update themselves ([Shipping changes](../shipping-changes.md)).
 
-**Other options.** **GitLab CI**, **CircleCI**, **Buildkite**. GitHub Actions is the natural choice when the code is on GitHub, and free for public repositories.
+**Why the machines pull.** The usual way is for the CI job to connect to the server and deploy, which is a **push**. Your PC is often off, so the worker has to check for updates itself, which is a **pull**. The server pulls too, so one method covers both, and GitHub holds no password or key that can reach your machines.
+
+**Other options.** **GitLab CI**, **CircleCI**, **Buildkite**. GitHub Actions is the natural choice when the code is on GitHub, and free for public repositories. For the updates, **Watchtower** is a ready-made container that updates other containers to newer images; a few lines of Compose do the same job here.
 
 </details>

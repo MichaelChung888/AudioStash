@@ -61,3 +61,38 @@ jobs:
           # Reuses layers from earlier runs, kept in GitHub's Actions cache.
           cache-from: type=gha,scope=${{ matrix.app }}
           cache-to: type=gha,mode=max,scope=${{ matrix.app }}
+
+  # Runs when every check passes on main. The server and the PC update themselves from
+  # what it publishes (docs/shipping-changes.md).
+  release:
+    name: Release
+    needs: [check, integration, images]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      # The server deploys this branch. Moved before the worker image is published, so
+      # that a cancelled run leaves the worker behind the API, never ahead of it.
+      # Fails rather than force-moving the branch if main's history was rewritten.
+      - run: git push origin "$GITHUB_SHA:refs/heads/release"
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # Built from the layers the images job just cached, so this takes seconds.
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: apps/worker/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/michaelchung888/audiostash-worker:latest
+            ghcr.io/michaelchung888/audiostash-worker:${{ github.sha }}
+          # Links the image to this repository on GitHub.
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          cache-from: type=gha,scope=worker

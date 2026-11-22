@@ -2,15 +2,15 @@
 
 This puts AudioStash on the internet so the installed app works anywhere, like a real product. It has three parts, as in the [architecture diagram](architecture.svg):
 
-| Where          | What runs there             | How it gets there                                  |
-| -------------- | --------------------------- | -------------------------------------------------- |
-| A cloud server | The API, Postgres, RabbitMQ | `deploy/server/compose.yaml`, built on the server  |
-| Your home PC   | The download worker         | `deploy/worker/compose.yaml`, built on the PC      |
-| Your phone     | The app                     | A release APK built on your PC, installed over USB |
+| Where          | What runs there             | How it gets there                                                                        |
+| -------------- | --------------------------- | ---------------------------------------------------------------------------------------- |
+| A cloud server | The API, Postgres, RabbitMQ | `deploy/server/compose.yaml`, built on the server, which updates itself from GitHub      |
+| Your home PC   | The download worker         | `deploy/worker/compose.yaml`, running the image CI publishes, which the PC keeps updated |
+| Your phone     | The app                     | A release APK built on your PC, installed over USB                                       |
 
 Song files go to Cloudflare R2, and sign-in stays with Clerk.
 
-The first deploy takes an evening. After that, shipping a change is one or two commands ([Shipping changes](shipping-changes.md)).
+The first deploy takes an evening. After that, the server and the worker update themselves each time CI passes on `main`, and only the app needs a build ([Shipping changes](shipping-changes.md)).
 
 ## Tools and accounts
 
@@ -21,7 +21,7 @@ The first deploy takes an evening. After that, shipping a change is one or two c
 | [Cloudflare R2](https://developers.cloudflare.com/r2/) | Stores the song files                                                                     | Free up to 10 GB, about 2,000 songs           |
 | [Clerk](https://clerk.com)                             | Sign-in. You already have it                                                              | Free                                          |
 | Android Studio                                         | Builds and signs the APK on your PC. You already have it from the emulator                | Free                                          |
-| GitHub                                                 | The server and the PC pull the code from it                                               | Free                                          |
+| GitHub                                                 | Checks each push. The server pulls the code, and the PC the worker image, from it         | Free                                          |
 | Docker                                                 | Runs everything on the server and the PC                                                  | Free                                          |
 
 Words used below:
@@ -149,18 +149,30 @@ The comments in [deploy/server/.env.example](../deploy/server/.env.example) say 
 
 ### 4. Start it
 
+The server deploys itself. Every two minutes it checks the `release` branch, which CI moves to each commit that passes every check on `main`, and deploys any new commit ([update.sh](../deploy/server/update.sh)). **systemd**, the program that starts Ubuntu's services, runs the check. Turn it on:
+
 ```bash
-docker compose -f deploy/server/compose.yaml up -d --build
+# systemd reads its settings from /etc/systemd/system.
+sudo cp deploy/server/audiostash-update.service deploy/server/audiostash-update.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+
+# Starts the timer now, and on every boot.
+sudo systemctl enable --now audiostash-update.timer
+
+# Shows the deploys as they run. Ctrl+C stops watching.
+journalctl -u audiostash-update -f
 ```
 
-The first build takes a few minutes. Then:
+Within two minutes it shows `Deploying`, the build, which takes a few minutes the first time, then `Deployed`. Then:
 
 ```bash
 docker compose -f deploy/server/compose.yaml ps      # api should say "healthy"
 curl http://127.0.0.1:3000/ready                     # "status":"ok", with each check true
 ```
 
-`restart: unless-stopped` in the Compose file starts everything again after a reboot.
+- The `release` branch exists once CI has passed on `main`. If the log says it cannot find `release`, check **Actions** on GitHub.
+- The service expects the code in `/home/ubuntu/AudioStash`, as in step 3.
+- The code there now sits on the released commit instead of a branch, so never `git pull` there.
 
 ### 5. Give it an address
 
@@ -212,11 +224,15 @@ If the browser shows **502 Bad Gateway**, Tailscale is working but nothing answe
 3. Start it:
 
    ```powershell
-   docker compose -f deploy/worker/compose.yaml up -d --build
+   docker compose -f deploy/worker/compose.yaml up -d
    docker compose -f deploy/worker/compose.yaml logs -f worker
    ```
 
    Wait for `worker started`, then press Ctrl+C. Ctrl+C only stops watching the log; the worker keeps running.
+
+   The PC builds nothing. It downloads the worker image that CI published to the GitHub Container Registry (GHCR) the last time every check passed on `main`. The `updater` container started with it checks for a newer image every five minutes, and restarts the worker on it. It never changes your repository folder, so your own work there is safe.
+
+   If the download fails with `denied` or `unauthorized`, GitHub made the image private. Open your GitHub profile, then **Packages > audiostash-worker > Package settings**, and under **Danger Zone** change the visibility to **Public**. The code is public already, so this shows nothing new. A private image would need a GitHub login on the PC.
 
 4. In the Tailscale admin console, choose **Disable key expiry** for the new `audiostash-worker` machine too.
 5. In Docker Desktop, **Settings > General**, turn on **Start Docker Desktop when you sign in**. The worker then comes back on its own after the PC restarts.
@@ -343,4 +359,4 @@ None of these files is committed. The `.env.release` values are built into the A
 
 ## After the first deploy
 
-[Shipping changes, and looking after production](shipping-changes.md) covers getting each change to production, logs, backups and server updates.
+[Shipping changes](shipping-changes.md) covers getting each change to production.

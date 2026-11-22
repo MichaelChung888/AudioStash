@@ -1,0 +1,12 @@
+# Starts audiostash-update.service every two minutes, including after a failed run.
+# If a run is still going, systemd leaves it be and starts nothing.
+[Unit]
+Description=Check for a new AudioStash release every two minutes
+
+[Timer]
+OnCalendar=*:0/2
+# systemd may otherwise delay each start by up to a minute, to group wake-ups.
+AccuracySec=10s
+
+[Install]
+WantedBy=timers.target

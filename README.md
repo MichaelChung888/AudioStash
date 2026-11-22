@@ -26,8 +26,8 @@ Downloads run on your PC because YouTube blocks most requests from cloud servers
 | [packages/messaging](packages/messaging) | RabbitMQ queues, retries and events                                         |
 | [packages/catalog](packages/catalog)     | Clients for Deezer, Apple Music charts, LRCLIB lyrics and YouTube search    |
 | [packages/core](packages/core)           | Logic with no I/O: title matching, file paths, loudness, playlist order     |
-| [deploy/server](deploy/server)           | Docker Compose for the API, Postgres and RabbitMQ on the cloud server       |
-| [deploy/worker](deploy/worker)           | Docker Compose for running the worker on your PC                            |
+| [deploy/server](deploy/server)           | The API, Postgres and RabbitMQ on the cloud server, and its updates         |
+| [deploy/worker](deploy/worker)           | The worker on your PC, kept on the newest image                             |
 | [docs/learning](docs/learning)           | Notes explaining each tool and why it is used                               |
 | [docs/adr](docs/adr)                     | Architecture decision records: what was decided, and why                    |
 
